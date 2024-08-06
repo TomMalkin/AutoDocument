@@ -8,6 +8,6 @@ templating language.
 # Installation
 
 See the Installation instructions in the
-[Documentation](https://tommalkin.github.io/autodocument)
+[Documentation](https://tommalkin.github.io/AutoDocument)
 
 
