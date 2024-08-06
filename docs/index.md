@@ -23,6 +23,14 @@ Autodocument links various types of data sources - like Forms, Excel documents a
 
 ---
 
+## Contents
+
+[Sources](/sources.md)
+[Outcomes](/outcomes.md)
+[File Storages](file_storages.md)
+[Databases](databases.md)
+[Templating](templating.md)
+
 # Installation
 
 AutoDocument is designed to be used in a container. Run with:
@@ -33,7 +41,7 @@ AutoDocument works well with shared drives that are mounted in the container. If
 
 `docker run autodocument -p 4605:4605 -v /mnt/shared_filesystem:/shared_filesystem`
 
-See [File Storages](url_for('top.file_storages')) for more info.
+See [File Storages](/file_storages.md) for more info.
 
 You may also want to change the admin password, which is loaded from ADMIN_PASSWORD, and defaulted to "admin":
 
@@ -67,7 +75,7 @@ Select "Number" as the Data Type
 
 If you have access to a Microsoft Word Document, then create a .docx file somewhere.
 
-`Hi {{ '{{name}}' }}, your age is {{ '{{age}}' }}.`
+`Hi {{name}}, your age is {{age}}.`
 
 (The double "Curly Braces", { and }, tell AutoDocument that it is a field. ")
 
@@ -113,7 +121,7 @@ Somewhere, create a .csv file with some records that can populate the same Word 
 | Jane Doe   | 35  |
 | Alice Bob  | 28  |
 
-Now we can add the Microsoft Word Outcome again. Click "Add Microsoft Word". Choose "Uploaded during Workflow" with a Unique Name of "Template", and Output File of "Downloaded after Workflow" with an Output Name of "{{ '{{name}}' }}.docx"
+Now we can add the Microsoft Word Outcome again. Click "Add Microsoft Word". Choose "Uploaded during Workflow" with a Unique Name of "Template", and Output File of "Downloaded after Workflow" with an Output Name of "{{name}}.docx"
 
 When we run the Workflow now, we will download an output.zip file with 3 Word documents - one for each record.
 
@@ -156,12 +164,12 @@ Make sure we set this query to Step 2, because it relies on data from a source w
 We can loop through those items in a template like this:
 
 ```
-Hi {{ '{{ client_name }}' }},
+Hi '{{ client_name }}',
 
 Here is your invoice for your purchase of items:
 
 {% for item in items %}
-{{ "{{ item['quantity'] }}" }} units of {{ "{{ item['item_name'] }}" }}.
+{{ item['quantity'] }} units of {{ item['item_name'] }}.
 {% endfor %}
 ```
 
