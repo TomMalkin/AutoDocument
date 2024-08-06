@@ -1,0 +1,22 @@
+<fieldset class="grid grid-cols-2 gap-6">
+
+    <!--Splitter-->
+    <label class="col-span-1 p-6 border rounded mt-6 has-[:checked]:bg-blue-100" for="splitter">
+        <input type="radio" name="splitter_choice" id="splitter" value="splitter" checked>
+        Splitter
+        <p class="italic mt-6">Each record will be split into a new Workflow</p>
+    </label>
+
+    <!--Field-->
+    <label class="col-span-1 p-6 border rounded mt-6 has-[:checked]:bg-blue-100" for="field">
+        <input type="radio" name="splitter_choice" id="field" class="peer/field" value="field">
+        Field
+        <p class="italic mt-6">All records will be set to a field name as a list</p>
+        <label for="field_name" class="peer-checked/field:text-black block mt-5 text-gray-500">
+            Field Name
+        <input class="mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm" id="field_name"
+            name="field_name" type="text">
+</label>
+    </label>
+
+</fieldset>

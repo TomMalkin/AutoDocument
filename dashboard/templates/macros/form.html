@@ -1,0 +1,8 @@
+{% macro checkbox(name, label) -%}
+<label for="{{ name }}" class="flex cursor-pointer items-start gap-4">
+    <div class="flex items-center">
+        <input type="checkbox" class="rounded border-gray-300" id="{{ name }}" name="{{ name }}" />
+    </div>
+    {{ label }}
+</label>
+{% endmacro %}

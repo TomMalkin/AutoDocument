@@ -1,0 +1,48 @@
+<div class="self-start sticky top-0 justify-between border-e bg-white col-span-1 h-screen">
+    <div class="px-4 py-6">
+        <img class="h-36 w-36 mx-auto mb-6" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <a href="{{ url_for('top.base.index') }}">
+            <span class="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
+                AutoDocument
+            </span>
+        </a>
+
+        <ul class="mt-6 space-y-1">
+            <li>
+                <a href="{{ url_for('top.base.index') }}"
+                    class="block rounded-lg text-gray-600 px-4 py-2 text-sm font-medium hover:bg-gray-100 hover:text-gray-700">
+                    Home
+                </a>
+            </li>
+
+            {% if current_user.is_authenticated %}
+            <li>
+                <a href="{{ url_for('meta.index') }}"
+                    class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-700">
+                    Advanced
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('auth.logout') }}"
+                    class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-700">
+                    Logout
+                </a>
+            </li>
+
+            {% else %}
+
+            <li>
+                <a href="{{ url_for('auth.login') }}"
+                    class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-700">
+                    Admin Login
+                </a>
+            </li>
+
+            {% endif %}
+
+        </ul>
+    </div>
+
+
+</div>

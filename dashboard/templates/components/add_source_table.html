@@ -1,0 +1,56 @@
+<div class="overflow-x-auto rounded-lg border border-gray-200">
+    <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+
+        <tbody class="divide-y divide-gray-200">
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.form_field.add_form_field_view', workflow_id=workflow.workflow_id)}}">
+                        Add Form Field
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.sql.add_record_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add SQL Record
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.sql.add_record_set_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add SQL RecordSet
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.sql.add_record_set_transpose_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add Transposed SQL RecordSet
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.csv.add_csv_record_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add CSV Record
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.csv.add_csv_table_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add CSV Table
+                    </a>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

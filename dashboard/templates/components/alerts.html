@@ -1,0 +1,17 @@
+{% import 'macros/alert.html' as alert_macro %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+
+        {% for category, message in messages %}
+
+            {% if category == 'error' %}
+                {{ alert_macro.alert('Error', message)}}
+            {% else %}
+                {{ alert_macro.alert('Processed', message)}}
+            {% endif %}
+
+        {% endfor %}
+
+    {% endif %}
+{% endwith %} 
+

@@ -1,0 +1,48 @@
+<div class="overflow-x-auto rounded-lg border border-gray-200">
+    <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+
+        <tbody class="divide-y divide-gray-200">
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.html.add_html_outcome_view', workflow_id=workflow.workflow_id)}}">
+                        Add HTML File
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.word.add_word_outcome_view', workflow_id=workflow.workflow_id)}}">
+                        Add Microsoft Word
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.pdf.add_pdf_outcome_view', workflow_id=workflow.workflow_id)}}">
+                        Add PDF
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="#">
+                        <div class="inline-flex">Add Microsoft Word Merger&nbsp;{%include 'svg/construction.html'%}</div>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="#">
+                        <div class="inline-flex">Add PDF Merger&nbsp;{%include 'svg/construction.html'%}</div>
+                    </a>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

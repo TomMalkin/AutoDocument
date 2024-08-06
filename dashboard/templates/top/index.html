@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.html" %}
+{% import 'macros/alert.html' as alert_macro %}
+
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        {% include "components/side-menu.html" %}
+            
+
+
+        <!-- Main content -->
+        <div class="col-span-9 flex-1 p-6 space-y-6">
+            {% include 'components/alerts.html' %}
+
+            <h1 class="text-3xl font-semibold mb-4">AutoDocument</h1>
+            <span class="flex items-center">
+                <span class="h-px flex-1 bg-black"></span>
+            </span>
+
+
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
+
+                <div class="overflow-x-auto space-y-6">
+                    <div class="mx-auto max-w-lg text-center">
+                        <h1 class="text-2xl font-bold sm:text-3xl">Workflows</h1>
+                    </div>
+                        {% include "components/workflows_table.html" %}
+
+                </div>
+
+                <div class="overflow-x-auto">
+                    <div class="mx-auto max-w-screen-xl">
+                        <div class="mx-auto max-w-lg text-center">
+                            <h1 class="text-2xl font-bold sm:text-3xl">Create Workflow</h1>
+                        </div>
+
+                        <form method="post" action="{{ url_for('top.workflow.create_workflow_view') }}"
+                            class="mx-auto mb-0 mt-8 max-w-md space-y-4">
+                            {{ form.csrf_token }}
+                            <div class="flex items-center justify-between">
+                                <label for="Name" class="sr-only">name</label>
+
+                                <div class="flex-grow relative">
+                                    <input type="text" id="Name" name="name"
+                                        class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                                        placeholder="name" />
+                                </div>
+
+                                <button type="submit"
+                                    class="inline-block rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white ml-4">
+                                    create
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+</body>
+
+</html>
