@@ -1,3 +1,4 @@
+{% raw %}
 # Templating
 
 When rendering the Outcomes, AutoDocument will perform field substitution using the "curly brace" syntax: `{{ }}`. You don't need to add any special "field" objects or anything else into your Word Document Templates.
@@ -29,4 +30,4 @@ AutoDocument uses the powerful Jinja2 for templating, and so has access to all t
 ## Microsoft Word
 
 AutoDocument uses the fantastic [python-docx-template](https://github.com/elapouya/python-docx-template) library for templating in Microsoft Word. This uses Jinja2 under the hood so the syntax is the same no matter what Outcome you use, however it adds some other Word-specific tools to make working with it more convenient, like the `{%p %}` syntax for working with paragraphs. See their [documentation](https://docxtpl.readthedocs.io/en/latest/) for the full list of features.
-
+{% endraw %}
