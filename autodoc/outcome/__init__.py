@@ -2,15 +2,13 @@
 
 from .html_outcome import HTMLOutcome
 from .outcome import Outcome
-from .pdf_outcome import PDFCombinationOutcome, PDFOutcome
-from .word_outcome import WordCombinationOutcome, WordOutcome
+from .pdf_outcome import PDFOutcome
+from .word_outcome import WordOutcome
 
 outcome_map = {
     "HTML": HTMLOutcome,
     "Microsoft Word": WordOutcome,
     "PDF": PDFOutcome,
-    "Word Combination": WordCombinationOutcome,
-    "PDF Combination": PDFCombinationOutcome,
 }
 
 __all__ = [
@@ -18,6 +16,4 @@ __all__ = [
     "WordOutcome",
     "PDFOutcome",
     "Outcome",
-    "WordCombinationOutcome",
-    "PDFCombinationOutcome",
 ]
