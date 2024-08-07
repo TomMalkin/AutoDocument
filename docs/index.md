@@ -1,8 +1,10 @@
+{% raw %}
+
 # Overview
 
 Welcome to AutoDocument.
 
-Autodocument links various types of data sources - like Forms, Excel documents and SQL Queries, and outputs Documents like Microsoft Word, PDF or even text files. Create Workflows and link them to your users.
+Autodocument links various types of data sources - like Forms, Spreadsheets and SQL Queries, and outputs Documents like Microsoft Word, PDF or even text files. Create Workflows and link them to your users.
 
 ## Features
 
@@ -13,23 +15,29 @@ Autodocument links various types of data sources - like Forms, Excel documents a
   Use Data Sources with multiple records to split the workflow, like generating a PDF for each line in a spreadsheet.
 
 - **Customised Forms**
-  Add HTML forms to kick off a Workflow
+  Add HTML forms to kick off a Workflow.
 
 - **Data Source Chaining**
-  Data Sources are loaded in order, so the information from one can be used in the next. See [Sources](url_for('top.sources')) for more info
+  Data Sources are loaded in order, so the information from one can be used in the next. See [Sources](/sources.md) for more info.
 
 - **Saving File Options**
-  Download or upload on the fly, or read and write to network filesystems, S3 or Sharepoint Libraries
+  Download or upload on the fly, or read and write to network filesystems, S3 or Sharepoint Libraries.
+
+---
+
+# How It Works
+
+AutoDocument works by building a "dictionary" of keys to values as each source is loaded. One source might set "Name" to "Darryl Kerrigan", and the next might set something else. This dictionary is then used to populate the outcomes (documents like Word or PDFs) by referencing the keys of the dictionary, such as "Name".
 
 ---
 
 ## Contents
 
-[Sources](/sources.md)
-[Outcomes](/outcomes.md)
-[File Storages](file_storages.md)
-[Databases](databases.md)
-[Templating](templating.md)
+- [Sources](/sources.md)
+- [Outcomes](/outcomes.md)
+- [File Storages](file_storages.md)
+- [Databases](databases.md)
+- [Templating](templating.md)
 
 # Installation
 
@@ -46,6 +54,7 @@ See [File Storages](/file_storages.md) for more info.
 You may also want to change the admin password, which is loaded from ADMIN_PASSWORD, and defaulted to "admin":
 
 `docker run autodocument -p 4605:4605 -e ADMIN_PASSWORD="MyPassword"`
+
 
 ---
 
@@ -133,9 +142,9 @@ Lets say you had 3 classes of clients: A, B and C. And you wanted to generate in
 
 **Setup**
 
-We will assume we have a Database connected, called "Business Database" (see [Databases](url_for('top.databases')) for more info).
+We will assume we have a Database connected, called "Business Database" (see [Databases](/databases.md) for more info).
 
-We also assume we have a Windows File Storage set up (see [File Storages](url_for('top.file_storages')) for more info)
+We also assume we have a Windows File Storage set up (see [File Storages](/file_storages.md) for more info)
 
 Step 1 after creating the Workflow is to ask the user what category of Client. So we'll add a form with a name of "category", a label of "Client Category" and datatype of String.
 
@@ -179,3 +188,4 @@ The Output File can use the client_id to build the path, something like "Invoice
 
 We now have a repeatable Workflow that can generate all the Invoices for each client category.
 
+{% endraw %}

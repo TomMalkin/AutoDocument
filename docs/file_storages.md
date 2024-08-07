@@ -1,3 +1,4 @@
+{% raw %}
 # File Storages
 
 File Storages are a way to standardise the load and save locations of your sources, templates and outcomes in AutoDocument. A File Storage is added by the Admin in the Advanced Section of the dashboard. So far the options are Posix filesystems, Windows filesystems, S3 Object Store and SharePoint Libraries.
@@ -38,3 +39,5 @@ AutoDocument can read and write from any S3 compatible storage option. Simply se
 SharePoint Libraries can also be used. The SharePoint "Site" url must be used, such as "https://mybusiness.sharepoint.com/sites/MySite/". Also specify the name of the Library within that Site. the Username and Password is the Microsoft username and password of the account that has enough permissions to read and write that SharePoint site. Note - Client Context isn't supported as it depends on when the SharePoint site was initialised (newer SharePoint sites won't allow app access without client certificates).
 
 Specify the name of the file like any other once that File Storage option is selected, relative to the library, for example if the Library name is MyLibrary, then use "Templates/template.docx" (omitting the library).
+
+{% endraw %}

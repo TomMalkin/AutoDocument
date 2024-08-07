@@ -3,6 +3,8 @@
 
 When rendering the Outcomes, AutoDocument will perform field substitution using the "curly brace" syntax: `{{ }}`. You don't need to add any special "field" objects or anything else into your Word Document Templates.
 
+Simple add `{{ field }}` anywhere at it will be replaced by the value of that field when running the Workflow.
+
 There are also a slew of other useful templating tools available, such as the curly brace + percent syntax, which denotes adding logic to the template. For example:
 
 ```html
