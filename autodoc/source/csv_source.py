@@ -24,8 +24,7 @@ class CSVRecord(Source):
     ) -> None:
         """Initialise the CSVRecord with the file_path of the file."""
         logger.info(
-            f"loading CSVRecord class with Source Id {
-                source_details['SourceId']} and {uploaded_filename=}"
+            f"loading CSVRecord class with Source Id {source_details['SourceId']} and {uploaded_filename=}"
         )
 
         self.source_details = source_details

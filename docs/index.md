@@ -43,17 +43,17 @@ AutoDocument works by building a "dictionary" of keys to values as each source i
 
 AutoDocument is designed to be used in a container. Run with:
 
-`docker run autodocument -p 4605:4605`
+`docker run -p 4605:4605 docker.io/tommalkin/autodocument:latest`
 
 AutoDocument works well with shared drives that are mounted in the container. If your shared drive is mounted on the host at `/mnt/shared_filesystem` then you can mount that to the AutoDocument container:
 
-`docker run autodocument -p 4605:4605 -v /mnt/shared_filesystem:/shared_filesystem`
+`docker run -p 4605:4605 -v /mnt/shared_filesystem:/shared_filesystem docker.io/tommalkin/autodocument:latest`
 
 See [File Storages](/file_storages.md) for more info.
 
 You may also want to change the admin password, which is loaded from ADMIN_PASSWORD, and defaulted to "admin":
 
-`docker run autodocument -p 4605:4605 -e ADMIN_PASSWORD="MyPassword"`
+`docker run -p 4605:4605 -e ADMIN_PASSWORD="MyPassword" docker.io/tommalkin/autodocument:latest`
 
 
 ---
