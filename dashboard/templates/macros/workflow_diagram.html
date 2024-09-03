@@ -1,0 +1,6 @@
+{% macro workflow_diagram(workflow_id) -%}
+
+<div hx-trigger="load" hx-get="{{ url_for('top.base.workflow_diagram', workflow_id=workflow_id) }}" hx-swap="outerHTML">
+
+</div>
+{% endmacro %}

@@ -1,0 +1,17 @@
+{% for step in steps %}
+<div class="flex flex-row items-center bg-gray-300 rounded-lg p-1 pl-2 my-6">
+    <h1 class="text-3xl font-bold">Step {{step}}</h1>
+
+    <div class="flex flex-col flex-grow">
+
+        {% for source_record in sources %}
+            {% if source_record['step'] == step %}
+
+            <div hx-get="{{ url_for('top.base.source_card', source_id=source_record['source_id']) }}" hx-trigger="load" hx-swap="outerHTML">
+            </div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+</div>
+{% endfor %}

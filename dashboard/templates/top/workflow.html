@@ -3,6 +3,7 @@
 {% import 'macros/alert.html' as alert_macro %}
 
 {% include "components/head.html" %}
+{% from 'macros/workflow_diagram.html' import workflow_diagram %}
 
 <body class="bg-gray-100">
     <div class="flex">
@@ -36,6 +37,9 @@
 
 
                     {% include "components/sources_table.html" %}
+
+                    {{ workflow_diagram(workflow.workflow_id) }}
+
                 </div>
 
                 <!--Left hand column with source adding-->
