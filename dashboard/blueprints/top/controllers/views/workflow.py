@@ -47,6 +47,8 @@ def workflow(workflow_id: int) -> str:
 
     workflow = Workflow(workflow_id=workflow_id, event_logger=None, manager=manager)
 
+    print(form_fields)
+
     return render_template(
         "top/workflow.html",
         workflow=workflow,

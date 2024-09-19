@@ -19,22 +19,40 @@
             </span>
 
 
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
+            <div class="flex flex-row gap-4">
 
-                <div class="overflow-x-auto space-y-6">
+                {% if workflows %}
+                <div class="flex-1">
                     <div class="mx-auto max-w-lg text-center">
-                        <h1 class="text-2xl font-bold sm:text-3xl">Workflows</h1>
+                        <h1 class="text-2xl font-bold sm:text-3xl pb-1">Workflows</h1>
                     </div>
-                        {% include "components/workflows_table.html" %}
-
+                    {% include "components/workflows_table.html" %}
                 </div>
 
-                <div class="overflow-x-auto">
-                    <div class="mx-auto max-w-screen-xl">
+                {% else %}
+
+                <div class="border rounded-lg flex-1 flex flex-row p-2 bg-gray-200">
+                    <div>
+                        <svg class="w-12 h-12 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            {% include 'svg/important.html' %}
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Get Started: Add a Workflow</h1>
+                        <p>A Workflow connects one or more data Sources to one or more Outcomes.</p>
+                    </div>
+                </div>
+
+                {% endif %}
+
+                <div class="flex-1">
+                    <div>
                         <div class="mx-auto max-w-lg text-center">
                             <h1 class="text-2xl font-bold sm:text-3xl">Create Workflow</h1>
                         </div>
-
+                    </div>
+                    <div>
                         <form method="post" action="{{ url_for('top.workflow.create_workflow_view') }}"
                             class="mx-auto mb-0 mt-8 max-w-md space-y-4">
                             {{ form.csrf_token }}

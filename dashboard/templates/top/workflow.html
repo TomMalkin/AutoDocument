@@ -24,41 +24,19 @@
             </span>
 
 
-            <!--Sources Vertical Div-->
+            <!-- Vertical Div-->
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-8">
-                <h1 class="text-3xl font-semibold mb-4 lg:col-span-4">Sources</h1>
 
-                <!--Left hand column with list of sources-->
+                <!--Left hand column with diagram-->
                 <div class=" lg:col-span-3">
-
-                    {% if form_fields %}
-                    {% include "components/form_fields_table.html" %}
-                    {% endif %}
-
-
-                    {% include "components/sources_table.html" %}
-
                     {{ workflow_diagram(workflow.workflow_id) }}
-
                 </div>
 
-                <!--Left hand column with source adding-->
-                <div class=" lg:col-span-1">
+                <!--Right hand column with source and outcome adding-->
+                <div class=" lg:col-span-1 flex flex-col gap-4">
+                    <h2>Add Sources</h2>
                     {% include "components/add_source_table.html" %}
-                </div>
-            </div>
-
-            <!--Outcomes Vertical Div-->
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-8">
-                <h1 class="text-3xl font-semibold mb-4 lg:col-span-4">Outcomes</h1>
-
-                <!--Left hand column with list of sources-->
-                <div class=" lg:col-span-3">
-                    {% include "components/outcomes_table.html" %}
-                </div>
-
-                <!--Left hand column with source adding-->
-                <div class=" lg:col-span-1">
+                    <h2>Add Outcomes</h2>
                     {% include "components/add_outcome_table.html" %}
                 </div>
             </div>

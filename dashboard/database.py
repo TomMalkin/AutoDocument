@@ -7,14 +7,11 @@ from flask import current_app, g
 from autodoc.db import Database, DatabaseManager
 from autodoc.workflow import EventLoggerInterface
 
-from loguru import logger
-
 
 def get_manager():
     """Load database manager from application context."""
-    if "manager" not in g:
+    if not hasattr(g, "manager"):
         DB_PATH = current_app.config["DB_PATH"]
-        logger.info(f"Loading database from {DB_PATH=}")
         g.manager = DatabaseManager(db=Database(db_file=DB_PATH))
 
     return g.manager

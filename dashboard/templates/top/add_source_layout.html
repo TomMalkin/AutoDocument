@@ -2,6 +2,7 @@
 <html lang="en">
 
 {% include "components/head.html" %}
+{% from 'macros/workflow_diagram.html' import workflow_diagram %}
 
 <body class="bg-gray-100">
     <div class="flex">
@@ -23,8 +24,11 @@
                 </div>
 
                 <div class="col-span-1">
-                    <div class="inline-flex">Workflow Diagram&nbsp;{%include 'svg/construction.html'%}</div>
+                    <div class="inline-flex font-bold">Current Workflow</div>
+                    {{ workflow_diagram(workflow_id) }}
                 </div>
+
+
             </div>
         </div>
     </div>

@@ -31,7 +31,7 @@ class Record:
 
     def __init__(self, columns, data):
         """Initialize the class with headings and data."""
-        logger.info(f"initialising Record with {columns=} and {data=}")
+        logger.debug(f"initialising Record with {columns=} and {data=}")
         self.headings = columns
         self.data = {}
 
@@ -41,7 +41,7 @@ class Record:
         if data:
             self.data = dict(zip(columns, data))
 
-        logger.info(f"final data is {self.data=}")
+        logger.debug(f"final data is {self.data=}")
 
     def __bool__(self):
         """Return if this record has data."""

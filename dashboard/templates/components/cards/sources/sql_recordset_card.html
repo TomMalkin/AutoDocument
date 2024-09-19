@@ -6,19 +6,36 @@
             {% include 'svg/database.html' %}
         </svg>
 
-        <svg class="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            {% include 'svg/record.html' %}
+        {% if multi_type == 'Splitter' %}
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="w-12 h-12 text-gray-800 dark:text-white" width="24" height="24">
+            {% include 'svg/splitter.html' %}
         </svg>
+
+        {% else %}
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="w-12 h-12 text-gray-800 dark:text-white" width="24" height="24">
+            {% include 'svg/field.html' %}
+        </svg>
+
+        {% endif %}
 
     </div>
 
     <div class="flex flex-col">
         <div class="flex flex-row gap-2 mb-2">
-            <h2 class="text-xl font-bold">SQL Record</h2>
+            <h2 class="text-xl font-bold">SQL Recordset</h2>
             <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
                 href="{{ url_for('top.source.delete_source_view', workflow_id=workflow_id, source_id=source_id) }}">delete</a>
         </div>
+        {% if multi_type == 'Splitter' %}
+        {% include 'components/cards/splitter.html' %}
+        {% else %}
+        {% include 'components/cards/field.html' %}
+        {% endif %}
+
         <p><span class="font-bold">Database:</span> {{ database_name }}</p>
         <p class="font-bold">Query:</p>
 

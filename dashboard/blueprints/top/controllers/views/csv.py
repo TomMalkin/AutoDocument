@@ -18,7 +18,8 @@ def add_csv_record_source_view(workflow_id: int) -> Union[str, Response]:
     form = CreateCSVRecordSourceForm()
 
     if form.validate_on_submit():
-        named_orientation = "horizontal" if form.orientation.data != 1 else "vertical"
+        named_orientation = "horizontal" if form.orientation.data != '1' else "vertical"
+        logger.info(f"{form.orientation.data=}")
 
         location = form.location.data
         bucket = form.bucket.data
@@ -77,20 +78,18 @@ def add_csv_table_source_view(workflow_id: int) -> Union[str, Response]:
         bucket = form.bucket.data
         name = form.name.data
 
-        if request.form["option"]:
-            file_access_id = int(request.form["option"])
+        if name:
+            sql = "select Name from Source where WorkflowId = :workflow_id"
+            params = {"workflow_id": workflow_id}
+            current_names = get_manager().db.recordset(sql=sql, params=params).column("Name")
 
-
-        sql = "select Name from Source where WorkflowId = :workflow_id"
-        params = {"workflow_id": workflow_id}
-        current_names = get_manager().db.recordset(sql=sql, params=params).column("Name")
-
-        if name in current_names:
-            logger.info(f"attempted add of {name} when existing names are {current_names}")
-            flash(f"{name} already exists, choose another name", "error")
-            return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
+            if name in current_names:
+                logger.info(f"attempted add of {name} when existing names are {current_names}")
+                flash(f"{name} already exists, choose another name", "error")
+                return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
         file_access_id = None
+
         if request.form["option"]:
             file_access_id = int(request.form["option"])
             if file_access_id == -1:

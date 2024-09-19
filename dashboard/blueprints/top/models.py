@@ -72,6 +72,32 @@ def add_record_source(workflow_id: int, sql_text: str, database_id: int, step: i
     manager.db.execute(sql, params=params)
 
 
+def add_record_set_transpose_source(
+    workflow_id: int, sql_text: str, database_id: int, step: int, key_field: str, value_field: str
+) -> None:
+    """Add a record source to the project database."""
+    manager = get_manager()
+    sql = "select Id from SourceType where Name = 'SQL RecordSet Transpose'"
+    source_type_id = manager.db.record_scalar(sql).sdatum()
+
+    sql = """
+        insert into Source
+        (WorkflowId, TypeId, DatabaseId, SQLText, KeyField, ValueField, Step)
+        values
+        (:workflow_id, :source_type_id, :database_id, :sql_text, :key_field, :value_field, :step)
+    """
+    params = {
+        "workflow_id": workflow_id,
+        "source_type_id": source_type_id,
+        "sql_text": sql_text,
+        "database_id": database_id,
+        "key_field": key_field,
+        "value_field": value_field,
+        "step": step,
+    }
+    manager.db.execute(sql, params=params)
+
+
 def add_record_set_source(
     workflow_id: int,
     sql_text: str,
@@ -146,25 +172,25 @@ def add_csv_table_source(
     manager.db.execute(sql, params=params)
 
 
-def add_record_set_transpose_source(
-    workflow_id: int,
-    sql_text: str,
-    database_id: int,
-    key_field: str,
-    value_field: str,
-    step: int,
-) -> None:
-    """Add a record set source to the project database."""
-    manager = get_manager()
-    manager.add_source(
-        workflow_id=workflow_id,
-        type_id=6,
-        sql_text=sql_text,
-        database_id=database_id,
-        key_field=key_field,
-        value_field=value_field,
-        step=step,
-    )
+# def add_record_set_transpose_source(
+#     workflow_id: int,
+#     sql_text: str,
+#     database_id: int,
+#     key_field: str,
+#     value_field: str,
+#     step: int,
+# ) -> None:
+#     """Add a record set source to the project database."""
+#     manager = get_manager()
+#     manager.add_source(
+#         workflow_id=workflow_id,
+#         type_id=6,
+#         sql_text=sql_text,
+#         database_id=database_id,
+#         key_field=key_field,
+#         value_field=value_field,
+#         step=step,
+#     )
 
 
 def get_source(source_id):
@@ -206,7 +232,7 @@ def get_form_fields(workflow_id):
         from Source
         inner join SourceType
             on Source.TypeId = SourceType.Id
-        left join SourceFormField
+        inner join SourceFormField
             on SourceFormField.SourceId = Source.Id
         where Source.WorkflowId = :workflow_id
         and SourceType.Name = 'Form'

@@ -1,17 +1,85 @@
-{% for step in steps %}
+{% if form_exists %}
+
+<div hx-get="{{ url_for('card.form_card', workflow_id=workflow_id) }}" hx-trigger="load" hx-swap="outerHTML">
+</div>
+
+<hr>
+
+{% endif %}
+
+
+{% if steps %}
+<div class="flex flex-row items-center bg-gray-200 rounded-lg p-1 pl-2">
+
+    <h1 class="text-3xl font-bold pr-2">Sources</h1>
+
+    <div class="flex-grow">
+        {% for step in steps %}
+
+        <div class="flex flex-row flex-grow items-center bg-gray-300 rounded-lg p-1 pl-2 m-1">
+            <h1 class="text-3xl font-bold">Step {{step}}</h1>
+
+            <div class="flex flex-col flex-grow">
+                {% for source_record in sources %}
+                {% if source_record['step'] == step %}
+                <div hx-get="{{ url_for('card.source_card', source_id=source_record['source_id']) }}" hx-trigger="load"
+                    hx-swap="outerHTML">
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if not form_exists and not steps %}
+<div class="border rounded-lg flex flex-row p-1 m-1 gap-2 bg-gray-200">
+    <div>
+        <svg class="w-12 h-12 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+            height="24" fill="none" viewBox="0 0 24 24">
+            {% include 'svg/important.html' %}
+        </svg>
+    </div>
+    <div>
+        <h1 class="text-xl font-bold">Get Started: Add a Source</h1>
+        <p>Sources provide the data the workflow uses to generate the templates for the Outcomes.</p>
+        <p>They are spreadsheets, database queries, user forms etc.</p>
+    </div>
+</div>
+
+{% endif %}
+
+{% if outcomes %}
 <div class="flex flex-row items-center bg-gray-300 rounded-lg p-1 pl-2 my-6">
-    <h1 class="text-3xl font-bold">Step {{step}}</h1>
+    <h1 class="text-3xl font-bold">Outcomes</h1>
 
     <div class="flex flex-col flex-grow">
 
-        {% for source_record in sources %}
-            {% if source_record['step'] == step %}
-
-            <div hx-get="{{ url_for('top.base.source_card', source_id=source_record['source_id']) }}" hx-trigger="load" hx-swap="outerHTML">
-            </div>
-            {% endif %}
+        {% for outcome in outcomes %}
+        <div hx-get="{{ url_for('card.outcome_card', outcome_id=outcome['OutcomeId']) }}" hx-trigger="load"
+            hx-swap="outerHTML">
+        </div>
         {% endfor %}
 
     </div>
 </div>
-{% endfor %}
+
+{% else %}
+<div class="border rounded-lg flex flex-row p-1 mt-3 m-1 gap-2 bg-gray-200">
+    <div>
+        <svg class="w-12 h-12 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+            height="24" fill="none" viewBox="0 0 24 24">
+            {% include 'svg/important.html' %}
+        </svg>
+    </div>
+    <div>
+        <h1 class="text-xl font-bold">Get Started: Add an Outcome</h1>
+        <p>Outcomes are the files the Workflow will generate when run.</p>
+        <p>They require a template, and a file name where the new file(s) will be saved.</p>
+    </div>
+</div>
+
+{% endif %}
