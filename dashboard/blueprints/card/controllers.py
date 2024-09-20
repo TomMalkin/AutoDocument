@@ -57,6 +57,26 @@ def source_card(source_id: str):
             workflow_id=source_record["WorkflowId"],
         )
 
+    if source_record["TypeName"] == "ExcelRecord":
+        return render_template(
+            "components/cards/sources/excel_card.html",
+            source_id=int(source_id),
+            workflow_id=source_record["WorkflowId"],
+            sheet_name=source_record["SheetName"],
+            header_row=source_record["HeaderRow"],
+        )
+
+    if source_record["TypeName"] == "ExcelTable":
+        return render_template(
+            "components/cards/sources/excel_table_card.html",
+            multi_type="Splitter" if source_record["Splitter"] else "Field",
+            source_id=int(source_id),
+            field_name=source_record["FieldName"],
+            workflow_id=source_record["WorkflowId"],
+            sheet_name=source_record["SheetName"],
+            header_row=source_record["HeaderRow"],
+        )
+
     if source_record["TypeName"] == "SQL Record":
         database_name = source_record["DatabaseName"]
         return render_template(

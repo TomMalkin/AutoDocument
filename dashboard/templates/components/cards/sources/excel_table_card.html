@@ -1,0 +1,64 @@
+<div class="border rounded-lg flex flex-row p-2 m-1 gap-2 bg-emerald-600">
+
+    <div>
+        <svg class="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            {% include 'svg/excel.html' %}
+        </svg>
+
+        {% if multi_type == 'Splitter' %}
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="w-12 h-12 text-gray-800 dark:text-white" width="24" height="24">
+            {% include 'svg/splitter.html' %}
+        </svg>
+
+        {% else %}
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="w-12 h-12 text-gray-800 dark:text-white" width="24" height="24">
+            {% include 'svg/field.html' %}
+        </svg>
+
+        {% endif %}
+
+
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <div class="flex flex-row gap-2">
+            <h2 class="text-xl font-bold">Excel Table</h2>
+            <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
+                href="{{ url_for('top.source.delete_source_view', workflow_id=workflow_id, source_id=source_id) }}">delete</a>
+        </div>
+        <div class="flex flex-row gap-2 items-center">
+            <p class="font-bold">Sheet: </p>
+            <div class="p-1 rounded bg-gray-100">
+                <p>{{ sheet_name }}</p>
+            </div>
+        </div>
+        <div class="flex flex-row gap-2 items-center">
+            <p class="font-bold">Header Row: </p>
+            <div class="p-1 rounded bg-gray-100 px-3">
+                <p>{{ header_row }}</p>
+            </div>
+        </div>
+
+        {% if multi_type == 'Splitter' %}
+        {% include 'components/cards/splitter.html' %}
+        {% else %}
+        {% include 'components/cards/field.html' %}
+        {% endif %}
+
+        <div class="flex flex-row gap-2 mt-2">
+
+            <p class="font-bold">Loaded From:</p>
+            <div class="mt-2 p-1 rounded-lg bg-gray-100" hx-trigger="load"
+                hx-get="{{ url_for('card.source_storage_card', source_id=source_id) }}" hx-swap="outerHTML">
+                <p>hello</p>
+            </div>
+
+        </div>
+
+    </div>
+</div>

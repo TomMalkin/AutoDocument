@@ -14,3 +14,5 @@ from .sql import (
 )
 from .workflow import CreateWorkflowForm as CreateWorkflowForm
 from .pdf import CreatePDFOutcomeForm as CreatePDFOutcomeForm
+from .excel import CreateExcelRecordSourceForm, CreateExcelTableSourceForm
+

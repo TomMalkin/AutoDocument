@@ -50,6 +50,22 @@
                     </a>
                 </td>
             </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.excel.add_excel_record_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add Excel Record
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative"
+                        href="{{ url_for('top.excel.add_excel_table_source_view', workflow_id=workflow.workflow_id)}}">
+                        Add Excel Table
+                    </a>
+                </td>
+            </tr>
 
         </tbody>
     </table>

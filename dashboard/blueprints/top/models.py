@@ -150,10 +150,6 @@ def add_csv_table_source(
             bucket=bucket,
         )
 
-    manager = get_manager()
-    sql = "select Id from SourceType where Name = 'CSVTable'"
-    source_type_id = manager.db.record_scalar(sql).sdatum()
-
     sql = """
         insert into Source
         (WorkflowId, TypeId,FieldName, Splitter, Step, FileAccessInstanceId, Name)
@@ -168,6 +164,52 @@ def add_csv_table_source(
         "step": step,
         "file_instance_id": file_instance_id,
         "name": name,
+    }
+    manager.db.execute(sql, params=params)
+
+
+def add_excel_table_source(
+    workflow_id: int,
+    field_name: str,
+    splitter: bool,
+    sheet_name: str,
+    header_row: int,
+    step: int,
+    location: str | None = None,
+    bucket: str | None = None,
+    file_access_id: int | None = None,
+    name: str | None = None,
+) -> None:
+    """Add a excel table source to the project database."""
+    manager = get_manager()
+    file_instance_id = None
+
+    sql = "select Id from SourceType where Name = 'ExcelTable'"
+    source_type_id = manager.db.record_scalar(sql).sdatum()
+
+    if file_access_id:
+        file_instance_id = manager.add_file_access_instance(
+            file_access_id=file_access_id,
+            location=location,
+            bucket=bucket,
+        )
+
+    sql = """
+        insert into Source
+        (WorkflowId, TypeId,FieldName, Splitter, Step, FileAccessInstanceId, Name, SheetName, HeaderRow)
+        values
+        (:workflow_id, :source_type_id, :field_name, :splitter, :step, :file_instance_id, :name, :sheet_name, :header_row)
+    """
+    params = {
+        "workflow_id": workflow_id,
+        "source_type_id": source_type_id,
+        "field_name": field_name,
+        "splitter": splitter,
+        "step": step,
+        "file_instance_id": file_instance_id,
+        "name": name,
+        "sheet_name": sheet_name,
+        "header_row": header_row,
     }
     manager.db.execute(sql, params=params)
 
@@ -298,6 +340,48 @@ def add_csv_record_source(
         "source_type_id": source_type_id,
         "step": step,
         "orientation": orientation,
+        "file_instance_id": file_instance_id,
+        "name": name,
+    }
+    manager.db.execute(sql, params=params)
+
+
+def add_excel_record_source(
+    workflow_id: int,
+    step: int,
+    sheet_name: str,
+    header_row: int,
+    location: str | None = None,
+    bucket: str | None = None,
+    file_access_id: int | None = None,
+    name: str | None = None,
+) -> None:
+    """Add a excel record source to the project database."""
+    manager = get_manager()
+    file_instance_id = None
+
+    sql = "select Id from SourceType where Name = 'ExcelRecord'"
+    source_type_id = manager.db.record_scalar(sql).sdatum()
+
+    if file_access_id:
+        file_instance_id = manager.add_file_access_instance(
+            file_access_id=file_access_id,
+            location=location,
+            bucket=bucket,
+        )
+
+    sql = """
+        insert into Source
+        (WorkflowId, TypeId, Step, SheetName, HeaderRow, FileAccessInstanceId, Name)
+        values
+        (:workflow_id, :source_type_id, :step, :sheet_name, :header_row, :file_instance_id, :name)
+    """
+    params = {
+        "workflow_id": workflow_id,
+        "source_type_id": source_type_id,
+        "step": step,
+        "sheet_name": sheet_name,
+        "header_row": header_row,
         "file_instance_id": file_instance_id,
         "name": name,
     }
