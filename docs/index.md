@@ -71,13 +71,19 @@ AutoDocument uses repeatable Workflows. On the Home Screen create one called "Tu
 **Creating The Form**
 
 Add the Name Field: Click on "Add Form Field"
-the Name of the field is the keyword that will be substituted later. Type "name"
+
+The Name of the field is the keyword that will be substituted later. Type "name"
+
 The Label of the field is what the user will see on the Form. Type "Client's Name"
+
 This is some text - so select "String" as the Data Type
 
 Add the Age Field: Click on "Add Form Field"
-the Name of the field is the keyword that will be substituted later. Type "age"
+
+The Name of the field is the keyword that will be substituted later. Type "age"
+
 The Label of the field is what the user will see on the Form. Type "Client's Age"
+
 Select "Number" as the Data Type
 
 **Creating The Outcome**
