@@ -1,12 +1,12 @@
-<form method="POST" action="{{ url_for('meta.add_posix_fs') }}">
+<form method="POST" action="{{ url_for('meta.fs.add_posix') }}">
     {{ posix_form.csrf_token }}
     <div>
-    {{ posix_form.local_path.label(class='block text-sm font-medium text-gray-700') }}
+    {{ posix_form.local_path.label(class='block text font-medium text-gray-900') }}
     {{ posix_form.local_path(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
     </div>
 
     <div>
-    {{ posix_form.remote_path.label(class='block text-sm font-medium text-gray-700') }}
+    {{ posix_form.remote_path.label(class='block text font-medium text-gray-900') }}
     {{ posix_form.remote_path(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
     </div>
 

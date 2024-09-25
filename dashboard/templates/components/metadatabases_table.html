@@ -3,6 +3,7 @@
         <tr>
             <th class="font-bold  whitespace-nowrap px-4 py-2 text-gray-900 text-left">Id</th>
             <th class="font-bold whitespace-nowrap px-4 py-2 text-gray-900 text-left">Name</th>
+            <th class="font-bold whitespace-nowrap px-4 py-2 text-gray-900 text-left">Connection String</th>
         </tr>
     </thead>
 
@@ -12,6 +13,7 @@
         <tr>
             <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ database['DatabaseId'] }}</td>
             <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ database['Name'] }}</td>
+            <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ database['ConnectionString'] }}</td>
         </tr>
         {% endfor %}
 

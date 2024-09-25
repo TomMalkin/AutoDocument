@@ -1,4 +1,4 @@
-<form method="POST" action="{{ url_for('meta.add_sharepoint') }}">
+<form method="POST" action="{{ url_for('meta.sp.add') }}">
     {{ sharepoint_form.csrf_token }}
     <div>
         {{ sharepoint_form.url.label(class='block text-sm font-medium text-gray-700') }}
@@ -11,13 +11,13 @@
     </div>
 
     <div>
-        {{ sharepoint_form.username.label(class='block text-sm font-medium text-gray-700') }}
-        {{ sharepoint_form.username(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
+        {{ sharepoint_form.microsoft_username.label(class='block text-sm font-medium text-gray-700') }}
+        {{ sharepoint_form.microsoft_username(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
     </div>
 
     <div>
-        {{ sharepoint_form.password.label(class='block text-sm font-medium text-gray-700') }}
-        {{ sharepoint_form.password(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
+        {{ sharepoint_form.microsoft_password.label(class='block text-sm font-medium text-gray-700') }}
+        {{ sharepoint_form.microsoft_password(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
     </div>
 
     <div class="mt-1.5">

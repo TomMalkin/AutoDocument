@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.html" %}
+
+<body class="bg-gray-100">
+    <div class="flex flex-row flex-1">
+        <!-- Sidebar -->
+        {% include "components/side-menu.html" %}
+
+        <!-- Content -->
+        <div class="flex flex-col p-6 pt-6 gap-6 w-full">
+            <h1 class="text-3xl font-semibold mb-4">Manage S3 Object Storage</h1>
+
+            <div class="flex flex-row gap-6">
+                <div class="basis-1/2">
+
+                    {% include "components/s3_table.html" %}
+                </div>
+                <div class="basis-1/2">
+                    <div class="p-2 rounded-lg border bg-white flex flex-col gap-2">
+                        <h1 class="text-2xl mb-2">Add New S3 Object Storage</h1>
+                        {% include 'components/add_s3_form.html' %}
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+</body>
+
+</html>

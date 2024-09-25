@@ -92,7 +92,6 @@ class DatabaseManager:
         record = self.db.record(sql).data
         return record["FileAccessId"]
 
-
     def delete_workflow(self, workflow_id):
         """Complete all the necessary steps to delete a workflow."""
         # get file access instances
@@ -328,7 +327,7 @@ class DatabaseManager:
     def get_meta_databases(self) -> RecordSet:
         """Return a record of meta database details."""
         sql = """
-            Select DatabaseId, Name
+            Select DatabaseId, Name, ConnectionString
             from DatabaseMetaSource
         """
         return self.db.recordset(sql=sql)
@@ -342,6 +341,15 @@ class DatabaseManager:
             (:name, :connection_string)
         """
         params = {"name": name, "connection_string": connection_string}
+        self.db.execute(sql, params)
+
+    def delete_meta_database(self, database_id):
+        """Add a meta database."""
+        sql = """
+            delete from DatabaseMetaSource
+            where DatabaseId = :database_id
+        """
+        params = {"database_id": database_id}
         self.db.execute(sql, params)
 
     def get_posix_filesystems(self) -> RecordSet:
@@ -507,6 +515,15 @@ class DatabaseManager:
         self.db.execute(sql, params)
 
         return self.db.last_row_id()
+
+    def remove_file_access(self, file_access_id: int):
+        """Remove a file system."""
+        sql = """
+            delete from FileAccess
+            where Id = :file_access_id
+        """
+        params = {"file_access_id": file_access_id}
+        self.db.execute(sql, params)
 
 
 def initialise_database(initial_db=None, target_db=None):

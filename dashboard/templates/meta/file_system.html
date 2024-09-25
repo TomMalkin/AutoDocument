@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.html" %}
+
+<body class="bg-gray-100">
+    <div class="flex flex-row flex-1">
+        <!-- Sidebar -->
+        {% include "components/side-menu.html" %}
+
+        <!-- Content -->
+        <div class="flex flex-col p-6 pt-6 gap-6 w-full">
+            <h1 class="text-3xl font-semibold mb-4">Manage Filesystems</h1>
+
+            <div class="border rounded p-4 bg-gray-50 flex flex-col gap-2">
+                <p>
+                    In order to mount a file system to AutoDocument, it needs to be first mounted on the host of the
+                    AutoDocument Container, and then bound as a volume to the container.
+                </p>
+                <p>
+                    For example, the host might mount a drive on FileSystemHost to <code>/mnt/business_drive</code> on
+                    the container host using:
+                </p>
+                <p class="bg-gray-100 p-4 rounded text-sm text-gray-800 font-mono">
+                    sudo mount -t nfs -o vers=4 FileSystemHost:/business_drive /mnt/business_drive
+                </p>
+                <p>
+                    And then the container can be run with that drive being bound to the container as a bind volume:
+                </p>
+                <p class="bg-gray-100 p-4 rounded text-sm text-gray-800 font-mono overflow-x-auto">
+                    docker run autodocument -p 4605:4605 -v /mnt/business_drive:/app/mnt/business_drive
+                </p>
+                <p>Now we can let AutoDocument know those drives are available using the forms below:</p>
+            </div>
+
+
+            <!-- Forms -->
+            <div class="flex flex-row gap-2">
+
+                <!-- Windows -->
+                <div class="basis-1/2 border rounded p-4 flex flex-col gap-4 bg-gray-50">
+                    <h1 class="text-2xl font-bold">Windows</h1>
+                    <p><span class="font-bold">Container Path:</span> Where this drive is mounted in the <span
+                            class="font-bold">container</span></p>
+                    <p><span class="font-bold">Windows Path:</span> How this directory is known to your users (like
+                        <span class="font-bold">N:\MyDrive</span>)
+                    </p>
+                    {% include "components/windows_filesystems_table.html" %}
+
+                    <h1 class="text-2xl font-bold">Add New</h1>
+                    <div class="border rounded-lg bg-white p-2">
+
+                        {% include 'components/add_windows_fs_form.html' %}
+                    </div>
+
+                </div>
+
+                <!-- Linux -->
+                <div class="basis-1/2 border rounded p-4 flex flex-col gap-4 bg-gray-50">
+                    <h1 class="text-2xl font-bold">Linux</h1>
+                    <p><span class="font-bold">Container Path:</span> Where this drive is mounted in the <span
+                            class="font-bold">container</span></p>
+                    <p><span class="font-bold">Linux Path:</span> How this directory is known to your users (like
+                        <span class="font-bold">/mnt/MyDrive</span>)
+                    </p>
+                    {% include "components/filesystems_table.html" %}
+                    <h1 class="text-2xl font-bold">Add New</h1>
+                    <div class="border rounded-lg bg-white p-2">
+
+                        {% include 'components/add_posix_fs_form.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

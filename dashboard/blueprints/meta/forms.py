@@ -25,33 +25,33 @@ class CreateMetaDatabase(FlaskForm):
 class CreateMetaFileSystem(FlaskForm):
     """Form to create a Unix based file system link."""
 
-    local_path = StringField("Host Path", validators=[InputRequired()])
-    remote_path = StringField("Remote Path", validators=[InputRequired()])
-    submit = SubmitField()
+    local_path = StringField("Container Path", validators=[InputRequired()], render_kw={"placeholder": "/path/in/container"})
+    remote_path = StringField("Linux Path", validators=[InputRequired()], render_kw={"placeholder": "/path/familiar/to/users"})
+    submit = SubmitField("Add Posix File System")
 
 
 class CreateMetaWindowsFileSystem(FlaskForm):
     """Form to create a file system link to a windows share."""
 
-    local_path = StringField("Local Path", validators=[InputRequired()])
-    remote_path = StringField("Windows Path", validators=[InputRequired()])
-    submit = SubmitField()
+    local_path = StringField("Local Path", validators=[InputRequired()], render_kw={"placeholder": "/path/in/container"})
+    remote_path = StringField("Windows Path", validators=[InputRequired()], render_kw={"placeholder": r"Letter:\Familiar\Path"})
+    submit = SubmitField("Add Windows File System")
 
 class CreateMetaS3(FlaskForm):
     """Form to create a S3 connection."""
 
     url = StringField("URL", validators=[InputRequired()])
-    username = StringField("Username", validators=[InputRequired()])
-    password = PasswordField("Password", validators=[InputRequired()])
+    s3_username = StringField("Username", validators=[InputRequired()])
+    s3_password = PasswordField("Password", validators=[InputRequired()])
 
     submit = SubmitField()
 
 class CreateMetaSharePoint(FlaskForm):
     """Form to create a S3 connection."""
 
-    url = StringField("URL", validators=[InputRequired()])
+    url = StringField("URL", validators=[InputRequired()], render_kw={"placeholder": "https://mybusiness.sharepoint.com/sites/MySite/"})
     library = StringField("Library", validators=[InputRequired()])
-    username = StringField("Username", validators=[InputRequired()])
-    password = PasswordField("Password", validators=[InputRequired()])
+    microsoft_username = StringField("Microsoft User", validators=[InputRequired()])
+    microsoft_password = PasswordField("Microsoft Password", validators=[InputRequired()])
 
-    submit = SubmitField()
+    submit = SubmitField("Add SharePoint Library")

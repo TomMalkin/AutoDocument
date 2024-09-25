@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.html" %}
+
+<body class="bg-gray-100">
+    <div class="flex flex-col">
+        <!-- Sidebar -->
+        {% include "components/side-menu.html" %}
+
+        <div class="flex border border-red-500 bg-red-400 rounded">
+                <p>Manage Databases</p>
+            </div>
+
+
+        <!-- Main content -->
+        <div class="col-span-6 flex-1 p-6 space-y-6">
+            <h1 class="text-3xl font-semibold mb-4">Advanced</h1>
+
+            <span class="flex items-center">
+                <span class="h-px flex-1 bg-black"></span>
+            </span>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">Databases</h1>
+                    {% include "components/metadatabases_table.html" %}
+                </div>
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">Add Database</h1>
+
+                    {% include 'components/add_database_form.html' %}
+
+                </div>
+            </div>
+            <span class="flex items-center">
+                <span class="h-px flex-1 bg-black"></span>
+            </span>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">Posix Filesystems</h1>
+                    {% include "components/filesystems_table.html" %}
+                </div>
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">Add Posix FileSystem</h1>
+
+                    {% include 'components/add_posix_fs_form.html' %}
+
+                </div>
+            </div>
+
+            <span class="flex items-center">
+                <span class="h-px flex-1 bg-black"></span>
+            </span>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">Windows Filesystems</h1>
+                    {% include "components/windows_filesystems_table.html" %}
+                </div>
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">Add Windows FileSystem</h1>
+
+                    {% include 'components/add_windows_fs_form.html' %}
+
+                </div>
+            </div>
+
+            <span class="flex items-center">
+                <span class="h-px flex-1 bg-black"></span>
+            </span>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">S3 object storage</h1>
+                    {% include "components/s3_table.html" %}
+                </div>
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4"></h1>
+
+                    {% include 'components/add_s3_form.html' %}
+
+                </div>
+            </div>
+
+            <span class="flex items-center">
+                <span class="h-px flex-1 bg-black"></span>
+            </span>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4">SharePoint Library</h1>
+                    {% include "components/sharepoint_table.html" %}
+                </div>
+
+                <div class="col-span-1">
+                    <h1 class="text-3xl font-semibold mb-4"></h1>
+
+                    {% include 'components/add_sharepoint_form.html' %}
+
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </div>
+</body>
+
+</html>

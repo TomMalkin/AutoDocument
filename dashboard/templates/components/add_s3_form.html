@@ -1,4 +1,4 @@
-<form method="POST" action="{{ url_for('meta.add_s3') }}">
+<form method="POST" action="{{ url_for('meta.s3.add') }}">
     {{ s3_form.csrf_token }}
     <div>
         {{ s3_form.url.label(class='block text-sm font-medium text-gray-700') }}
@@ -6,13 +6,13 @@
     </div>
 
     <div>
-        {{ s3_form.username.label(class='block text-sm font-medium text-gray-700') }}
-        {{ s3_form.username(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
+        {{ s3_form.s3_username.label(class='block text-sm font-medium text-gray-700') }}
+        {{ s3_form.s3_username(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
     </div>
 
     <div>
-        {{ s3_form.password.label(class='block text-sm font-medium text-gray-700') }}
-        {{ s3_form.password(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
+        {{ s3_form.s3_password.label(class='block text-sm font-medium text-gray-700') }}
+        {{ s3_form.s3_password(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
     </div>
 
     <div class="mt-1.5">

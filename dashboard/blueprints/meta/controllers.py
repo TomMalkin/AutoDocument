@@ -14,7 +14,7 @@ from dashboard.database import get_manager
 from flask_login import login_required
 from loguru import logger
 
-meta_blueprint = Blueprint("meta", "meta_blueprint", url_prefix="/meta")
+meta_blueprint = Blueprint("meta", "meta_blueprint")
 
 
 @meta_blueprint.route("/")
@@ -58,6 +58,7 @@ def index() -> Union[str, Response]:
         sharepoint_form=sharepoint_form,
         database_options=database_options,
     )
+
 
 
 @meta_blueprint.route("/add_meta_database", methods=["POST"])
@@ -136,7 +137,7 @@ def add_sharepoint() -> Union[str, Response]:
     if form.validate_on_submit():
         url = form.url.data
         username = form.username.data
-        password = form.password.data
+        password = form.microsoft_password.data
         library = form.library.data
         manager.add_sharepoint(url=url, username=username, password=password, library=library)
 

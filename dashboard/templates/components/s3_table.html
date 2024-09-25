@@ -1,7 +1,7 @@
-<table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+
+<table class="rounded-lg min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
     <thead class="text-left">
         <tr>
-            <th class="font-bold  whitespace-nowrap px-4 py-2 text-gray-900 text-left">Id</th>
             <th class="font-bold whitespace-nowrap px-4 py-2 text-gray-900 text-left">URL</th>
         </tr>
     </thead>
@@ -10,8 +10,11 @@
 
         {% for fs in s3s %}
         <tr>
-            <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ fs['FileAccessId'] }}</td>
             <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ fs['URL'] }}</td>
+            <td class="whitespace-nowrap px-4 py-2">
+                <a class="inline-block rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
+                    href="{{ url_for('meta.s3.delete', file_access_id=fs['FileAccessId'] )}}">delete</a>
+            </td>
         </tr>
         {% endfor %}
 

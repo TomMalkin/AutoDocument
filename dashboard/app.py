@@ -51,8 +51,8 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
 
     initialise_database(initial_db=INIT_DB_PATH, target_db=TARGET_DB_PATH)
 
-    app.register_blueprint(top_blueprint)
-    app.register_blueprint(meta_blueprint)
+    app.register_blueprint(top_blueprint, url_prefix="/")
+    app.register_blueprint(meta_blueprint, url_prefix="/meta")
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(card_blueprint)
 
