@@ -11,7 +11,7 @@ def workflow_diagram():
     """Define a reusable workflow diagram given a workflow id."""
     workflow_id = request.args.get("workflow_id")
     sql = """
-        select Step step, Id source_id
+        select Step step, Id source_id, Splitter splitter
         from Source
         where WorkflowId = :workflow_id
         and Source.TypeId != 4

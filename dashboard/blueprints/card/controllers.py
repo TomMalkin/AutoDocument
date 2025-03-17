@@ -228,4 +228,7 @@ def outcome_storage_card(input_type: str):
         path = record[remote_column] + record[location_column]
         return render_template("components/cards/file_storages/windows.html", path=path)
 
+    if input_type == "output":
+        return render_template("components/cards/file_storages/download.html")
+
     return render_template("components/cards/file_storages/upload.html")

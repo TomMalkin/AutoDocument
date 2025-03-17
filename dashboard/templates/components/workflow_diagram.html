@@ -25,6 +25,7 @@
                 <div hx-get="{{ url_for('card.source_card', source_id=source_record['source_id']) }}" hx-trigger="load"
                     hx-swap="outerHTML">
                 </div>
+
                 {% endif %}
                 {% endfor %}
             </div>

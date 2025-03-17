@@ -11,7 +11,9 @@
     {% include 'components/dynamic_file_access_form.html' %}
 
     {% set file_label = 'Output File:' %}
-    {% include 'components/dynamic_output_file_access_form.html' %}
+    {% with placeholder='example.docx' %}
+        {% include 'components/dynamic_output_file_access_form.html' %}
+    {% endwith %}
     
     <div class="mt-1.5">
         {{ form.submit(class='mt-1.5 rounded border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium

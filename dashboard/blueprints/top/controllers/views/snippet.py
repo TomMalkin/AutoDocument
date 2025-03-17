@@ -50,6 +50,7 @@ def file_accessor_form_snippet():
 def output_file_accessor_form_snippet():
     """Return a form snippet based on the type of file access id."""
     file_access_id = request.args.get("outputoption")
+    placeholder = request.args.get("placeholder")
 
     manager = get_manager()
 
@@ -84,7 +85,7 @@ def output_file_accessor_form_snippet():
 
     snippet_path = f"top/snippets/{snippet_file}"
 
-    return render_template(snippet_path, root_path=root_path)
+    return render_template(snippet_path, root_path=root_path, placeholder=placeholder)
 
 
 @bp.route("/snippet/download_preparing", methods=["POST"])
