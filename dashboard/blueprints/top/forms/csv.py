@@ -11,7 +11,7 @@ class CreateCSVRecordSourceForm(FlaskForm, FileAccessorMixin):
     """Create a Record Source."""
 
     orientation = SelectField(
-        "Orientation of the Record",
+        "Orientation",
         choices=[(0, "Horizontal"), (1, "Vertical")],
         validators=[DataRequired()]
     )

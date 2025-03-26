@@ -2,41 +2,66 @@
 
 {% import 'macros/form.html' as form_macro %}
 
-{% block title %}Add Transposed RecordSet Source to Workflow{% endblock title %}
+{% block title %}Add Multiple Transposed Records to Workflow{% endblock title %}
 
 {% block content %}
 
 <form method="POST" action="{{url_for('top.sql.add_record_set_transpose_source_view', workflow_id=workflow_id)}}">
-      {{ form.csrf_token }}
+    {{ form.csrf_token }}
 
-    <div>
-        {{ form.sql_text.label(class='block text-sm font-medium text-gray-900') }}
-        {{ form.sql_text(class='mt-2 p-2 w-full rounded-lg border-gray-200 align-top shadow-sm sm:text-sm', rows=4) }}
+    <div class="border rounded bg-gray-50 p-4 flex items-center gap-4">
+        <div class="text-green-500">
+            {% include 'svg/important.html' %}
+        </div>
+
+        <div class="flex-col space-y-4">
+            <div>
+                <p>
+                Add a Database Query where a Value column is mapped to a Key Column.
+                </p>
+            </div>
+
+            <div>
+                <p>
+                The Value column can be referenced by the Key column in Outcome templates.
+                </p>
+            </div>
+
+        </div>
     </div>
 
-    <div>
-        {{ form.database.label(class='block mt-4 text-sm font-medium text-gray-900') }}
-        {{ form.database(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
-    </div>
 
-    <div>
-        {{ form.step.label(class='block mt-4 text-sm font-medium text-gray-900') }}
-        {{ form.step(class='mt-1.5 p-2 w-24 rounded border-gray-200 sm:text-sm') }}
-    </div>
 
-    <div>
-        {{ form.key_field.label(class='block mt-4 text-sm font-medium text-gray-900') }}
-        {{ form.key_field(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
-    </div>
+    <div class="border rounded p-2 my-2 bg-gray-50">
 
-    <div>
-        {{ form.value_field.label(class='block mt-4 text-sm font-medium text-gray-900') }}
-        {{ form.value_field(class='mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm') }}
-    </div>
+        <div class="flex gap-4">
+            {{ form.step.label(class='block mt-4 text-sm font-medium text-gray-900') }}
+            {{ form.step(class='mt-1.5 p-2 w-24 rounded border-gray-200 sm:text-sm') }}
+        </div>
+        <div class="flex gap-4">
+            {{ form.sql_text.label(class='block text-sm font-medium text-gray-900') }}
+            {{ form.sql_text(class='mt-2 p-2 w-full rounded-lg border-gray-200 align-top shadow-sm sm:text-sm', rows=4) }}
+        </div>
 
-    <div class="mt-1.5">
-        {{ form.submit(class='mt-1.5 rounded border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium
-        text-white hover:bg-transparent hover:text-indigo-600 focus:outline-none focus:ring active:text-indigo-500') }}
+        <div class="flex gap-4">
+            {{ form.database.label(class='block mt-4 text-sm font-medium text-gray-900') }}
+            {{ form.database(class='mt-1.5 p-2 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
+        </div>
+
+        <div class="flex gap-4">
+            {{ form.key_field.label(class='block mt-4 text-sm font-medium text-gray-900') }}
+            {{ form.key_field(class='p-1 px-4 m-1 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
+        </div>
+
+        <div class="flex gap-4">
+            {{ form.value_field.label(class='mt-4 text-sm font-medium text-gray-900') }}
+            {{ form.value_field(class='p-1 px-4 m-1 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
+        </div>
+
+        <div class="mt-1.5">
+            {{ form.submit(class='mt-1.5 rounded border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium
+            text-white hover:bg-transparent hover:text-indigo-600 focus:outline-none focus:ring active:text-indigo-500') }}
+        </div>
     </div>
 
 

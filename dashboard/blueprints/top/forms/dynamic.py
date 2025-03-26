@@ -5,6 +5,20 @@ from wtforms import StringField, SubmitField
 from autodoc.db import DatabaseManager
 from flask_wtf.file import FileField
 from loguru import logger
+from wtforms.validators import ValidationError
+
+
+def create_file_extension_check(extensions: list):
+    """Create a validator for a given file extension list."""
+    def file_extension_check(_, field):
+        file = field.data
+        if file:
+            filename = file.filename
+            # Check if the file extension is allowed
+            if not ("." in filename and filename.rsplit(".", 1)[1].lower() in extensions):
+                raise ValidationError(f"Invalid file extension. Allowed: {','.join(extensions)}")
+
+    return file_extension_check
 
 
 def get_form(workflow_id: int, url_params: dict, manager: DatabaseManager):
@@ -59,10 +73,22 @@ def get_form(workflow_id: int, url_params: dict, manager: DatabaseManager):
 
     upload_file_fields = []  # a list of the filefield names
 
+    file_extension_mapping = {
+        "CSVRecord": ["csv"],
+        "CSVTable": ["csv"],
+        "ExcelRecord": ["xlsx", "xls"],
+        "ExcelTable": ["xlsx", "xls"],
+
+    }
+
     for uploaded_file in uploaded_files_records:
         name = uploaded_file["SourceName"]
         label = f"({uploaded_file['SourceTypeName']}) {uploaded_file['SourceName']}"
-        setattr(Form, name, FileField(label))
+
+        file_extension = file_extension_mapping.get(uploaded_file["SourceTypeName"])
+        extension_validator = create_file_extension_check(file_extension)
+
+        setattr(Form, name, FileField(label, validators=[extension_validator]))
         upload_file_fields.append(name)
 
     # add outcome template uploaded files
@@ -84,7 +110,6 @@ def get_form(workflow_id: int, url_params: dict, manager: DatabaseManager):
         setattr(Form, name, FileField(label))
         upload_file_fields.append(name)
 
-
     if not field_data and not upload_file_fields:
         logger.info("no field dat and no upload file fields.")
         return None
@@ -93,5 +118,3 @@ def get_form(workflow_id: int, url_params: dict, manager: DatabaseManager):
     form.upload_file_fields = upload_file_fields
 
     return form
-
-

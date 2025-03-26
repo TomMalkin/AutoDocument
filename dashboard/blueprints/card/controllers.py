@@ -144,7 +144,7 @@ def source_storage_card():
         path = record["RemotePath"] + record["Location"]
         return render_template("components/cards/file_storages/windows.html", path=path)
 
-    return render_template("components/cards/file_storages/upload.html")
+    return render_template("components/cards/file_storages/upload.html", name=record["SourceName"])
 
 
 @card_blueprint.route("/sql_text")
@@ -229,6 +229,6 @@ def outcome_storage_card(input_type: str):
         return render_template("components/cards/file_storages/windows.html", path=path)
 
     if input_type == "output":
-        return render_template("components/cards/file_storages/download.html")
+        return render_template("components/cards/file_storages/download.html", name=record["OutputFileLocation"])
 
-    return render_template("components/cards/file_storages/upload.html")
+    return render_template("components/cards/file_storages/upload.html", name=record["OutcomeName"])
