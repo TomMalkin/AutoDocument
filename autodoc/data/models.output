@@ -1,0 +1,362 @@
+```python
+"""Define the logic behind the data in the database."""
+
+import pendulum
+from sqlalchemy import select, delete, insert
+from sqlalchemy.orm import Session
+
+from . import (
+    FileAccess,
+    FileAccessInstance,
+    Outcome,
+    Source,
+    SourceFormField,
+    Workflow,
+    VSource,
+    VOutcome,
+    DatabaseMetaSource,
+)
+from .tables import FileAccessType
+
+
+class DatabaseManager:
+    """Expose useful queries as methods of a database."""
+
+    def __init__(self, session: Session):
+        """Initialize the QueryManager with a database connection."""
+        self.session = session
+
+    def get_download_access_id(self):
+        """Get the FileAccessId for the special download file accessor."""
+        stmt = select(FileAccess.Id).where(FileAccess.FileAccessTypeId == 1)
+        result = self.session.execute(stmt).scalar()
+        return result
+
+    def delete_workflow(self, workflow_id):
+        """Complete all the necessary steps to delete a workflow."""
+        # get file access instances
+        stmt = select(Outcome.InputFileInstanceId, Outcome.OutputFileInstanceId).where(
+            Outcome.WorkflowId == workflow_id
+        )
+        instances = self.session.execute(stmt).all()
+
+        # delete file access instances associated with outcomes
+        for row in instances:
+            if row.InputFileInstanceId:
+                stmt = delete(FileAccessInstance).where(
+                    FileAccessInstance.Id == row.InputFileInstanceId
+                )
+                self.session.execute(stmt)
+            if row.OutputFileInstanceId:
+                stmt = delete(FileAccessInstance).where(
+                    FileAccessInstance.Id == row.OutputFileInstanceId
+                )
+                self.session.execute(stmt)
+
+        # delete outcomes
+        stmt = delete(Outcome).where(Outcome.WorkflowId == workflow_id)
+        self.session.execute(stmt)
+
+        # get source file access instances
+        stmt = select(Source.FileAccessInstanceId).where(Source.WorkflowId == workflow_id)
+        instances = self.session.execute(stmt).all()
+
+        # delete file access instances associated with sources
+        for row in instances:
+            if row.FileAccessInstanceId:
+                stmt = delete(FileAccessInstance).where(
+                    FileAccessInstance.Id == row.FileAccessInstanceId
+                )
+                self.session.execute(stmt)
+
+        # delete form fields for source
+        stmt = delete(SourceFormField).where(
+            SourceFormField.SourceId.in_(
+                select(Source.Id).where(Source.WorkflowId == workflow_id)
+            )
+        )
+        self.session.execute(stmt)
+
+        # delete sources
+        stmt = delete(Source).where(Source.WorkflowId == workflow_id)
+        self.session.execute(stmt)
+
+        # now delete the workflow
+        stmt = delete(Workflow).where(Workflow.Id == workflow_id)
+        self.session.execute(stmt)
+
+        self.session.commit()
+
+    def add_source(
+        self,
+        workflow_id,
+        type_id,
+        location=None,
+        database_id=None,
+        sql_text=None,
+        splitter=False,
+        field_name=None,
+        key_field=None,
+        value_field=None,
+        step=1,
+    ):
+        """Add a new source line."""
+        stmt = insert(Source).values(
+            WorkflowId=workflow_id,
+            TypeId=type_id,
+            FileAccessInstanceId=location,
+            DatabaseId=database_id,
+            SQLText=sql_text,
+            Splitter=splitter,
+            FieldName=field_name,
+            Step=step,
+            KeyField=key_field,
+            ValueField=value_field,
+        )
+        self.session.execute(stmt)
+        self.session.commit()
+
+    def create_workflow(self, name):
+        """Create a new workflow."""
+        workflow = Workflow(Name=name)
+        self.session.add(workflow)
+        self.session.commit()
+        self.session.refresh(workflow)  # Refresh to get the generated Id
+        return workflow.Id
+
+    def get_form_source_id(self, workflow_id: int):
+        """Get a source Id."""
+        stmt = select(Source.Id).where(
+            Source.WorkflowId == workflow_id, Source.TypeId == 4
+        )
+        result = self.session.execute(stmt).scalar()
+        return result
+
+    def get_workflows(self):
+        """Return all workflows."""
+        stmt = select(Workflow.Id, Workflow.Name)
+        result = self.session.execute(stmt).all()
+        return [{"Id": row.Id, "Name": row.Name} for row in result]
+
+    def get_sources(self, workflow_id: int, step: int):
+        """Get the details of the sources for a given workflow_id."""
+        stmt = select(VSource).where(
+            VSource.WorkflowId == workflow_id, VSource.Step >= step
+        )
+        result = self.session.execute(stmt).scalars().all()
+        return [row.__dict__ for row in result]
+
+    def get_fields(self, source_id: int):
+        """Get a list of field details from the autodoc database."""
+        stmt = select(SourceFormField.Id, SourceFormField.FieldType, SourceFormField.FieldName).where(
+            SourceFormField.SourceId == source_id
+        )
+        result = self.session.execute(stmt).all()
+        return [
+            {"Id": row.Id, "FieldType": row.FieldType, "FieldName": row.FieldName}
+            for row in result
+        ]
+
+    def get_form(self, workflow_id: int):
+        """Get the form details for a given workflow."""
+        stmt = select(
+            SourceFormField.Id.label("SourceFormFieldId"),
+            SourceFormField.FieldType,
+            SourceFormField.FieldName,
+            SourceFormField.FieldLabel,
+        ).join(Source, Source.Id == SourceFormField.SourceId).join(
+            SourceType, Source.TypeId == SourceType.Id
+        ).where(
+            Workflow.Id == workflow_id, SourceType.Name == "Form"
+        )  # Assuming Workflow is joined somewhere in your actual query
+        result = self.session.execute(stmt).all()
+        return [
+            {
+                "SourceFormFieldId": row.SourceFormFieldId,
+                "FieldType": row.FieldType,
+                "FieldName": row.FieldName,
+                "FieldLabel": row.FieldLabel,
+            }
+            for row in result
+        ]
+
+    def get_outcomes(self, workflow_id: int):
+        """Return the outcomes for a given workflow."""
+        stmt = select(VOutcome).where(VOutcome.WorkflowId == workflow_id)
+        result = self.session.execute(stmt).scalars().all()
+        return [row.__dict__ for row in result]
+
+    def get_suboutcomes(self, parent_outcome_id: int):
+        """Return any sub outcomes for a given outcome."""
+        stmt = select(
+            Outcome.Id.label("OutcomeId"),
+            Outcome.Name.label("Name"),
+            Outcome.FilterField,
+            Outcome.FilterValue,
+        ).join(
+            OutcomeType, Outcome.OutcomeTypeId == OutcomeType.Id
+        ).where(
+            Outcome.ParentOutcomeId == parent_outcome_id
+        ).order_by(
+            Outcome.DocumentOrder.asc()
+        )
+        result = self.session.execute(stmt).all()
+        return [
+            {
+                "OutcomeId": row.OutcomeId,
+                "Name": row.Name,
+                "FilterField": row.FilterField,
+                "FilterValue": row.FilterValue,
+            }
+            for row in result
+        ]
+
+    def get_workflow_name(self, workflow_id: int):
+        """Return the name of a given workflow."""
+        stmt = select(Workflow.Name).where(Workflow.Id == workflow_id)
+        name = self.session.execute(stmt).scalar()
+        return str(name) if name else "No Name"
+
+    def create_workflow_instance(self, workflow_id: int, step: int):
+        """Create a workflow instance in the project database and return the instance Id."""
+        start_time = pendulum.now().to_iso8601_string()
+
+        workflow_instance = WorkflowInstance(
+            WorkflowId=workflow_id, StartTime=start_time, Step=step
+        )
+        self.session.add(workflow_instance)
+        self.session.commit()
+        self.session.refresh(workflow_instance)  # Refresh to get the generated InstanceId
+        return workflow_instance.InstanceId
+
+    def create_split_workflow_instance(
+        self, workflow_id: int, parent_instance_id: int, step: int
+    ):
+        """Create a child workflow based on another workflow."""
+        start_time = pendulum.now().to_iso8601_string()
+        workflow_instance = WorkflowInstance(
+            WorkflowId=workflow_id,
+            ParentInstanceId=parent_instance_id,
+            StartTime=start_time,
+            Step=step,
+        )
+        self.session.add(workflow_instance)
+        self.session.commit()
+        self.session.refresh(workflow_instance)  # Refresh to get the generated InstanceId
+        return workflow_instance.InstanceId
+
+    def get_meta_database_details(self, database_id):
+        """Return a record of meta database details."""
+        stmt = select(DatabaseMetaSource).where(DatabaseMetaSource.DatabaseId == database_id)
+        database = self.session.execute(stmt).scalar()
+        return database.__dict__ if database else None
+
+    def get_meta_databases(self):
+        """Return a record of meta database details."""
+        stmt = select(DatabaseMetaSource)
+        databases = self.session.execute(stmt).scalars().all()
+        return [database.__dict__ for database in databases]
+
+    def add_meta_database(self, name, connection_string):
+        """Add a meta database."""
+        meta_database = DatabaseMetaSource(Name=name, ConnectionString=connection_string)
+        self.session.add(meta_database)
+        self.session.commit()
+
+    def delete_meta_database(self, database_id):
+        """Add a meta database."""
+        stmt = delete(DatabaseMetaSource).where(
+            DatabaseMetaSource.DatabaseId == database_id
+        )
+        self.session.execute(stmt)
+        self.session.commit()
+
+    def get_posix_filesystems(self):
+        """Return a record set of all posix filesystems."""
+        return self._get_filesystems_by_type("Linux Share")
+
+    def get_windows_filesystems(self):
+        """Return a record set of all windows filesystems."""
+        return self._get_filesystems_by_type("Windows Share")
+
+    def get_s3_filesystems(self):
+        """Return a record set of all windows filesystems."""
+        return self._get_filesystems_by_type("S3")
+
+    def get_sharepoints(self):
+        """Return a record set of all windows filesystems."""
+        return self._get_filesystems_by_type("SharePoint")
+
+    def _get_filesystems_by_type(self, file_access_type_name: str):
+        """Helper to get filesystems by type."""
+        stmt = select(
+            FileAccess.Id.label("FileAccessId"),
+            FileAccessType.Name.label("FileAccessType"),
+            FileAccess.LocalPath,
+            FileAccess.RemotePath,
+            FileAccess.TopLevel,
+            FileAccess.URL,
+            FileAccess.Username,
+            FileAccess.Password,
+        ).join(
+            FileAccessType, FileAccess.FileAccessTypeId == FileAccessType.Id
+        ).where(
+            FileAccessType.Name == file_access_type_name
+        )
+        result = self.session.execute(stmt).all()
+        return [row._asdict() for row in result]
+
+    def add_posix_filesystem(self, local_path, remote_path):
+        """Add a new posix filesystem to the database."""
+        self._add_filesystem(3, local_path, remote_path)  # 3 is the posix type ID
+
+    def add_windows_filesystem(self, local_path, remote_path):
+        """Add a new windows filesystem to the database."""
+        self._add_filesystem(2, local_path, remote_path)  # 2 is the windows type ID
+
+    def _add_filesystem(self, file_access_type_id, local_path, remote_path):
+        """Helper to add a filesystem."""
+        stmt = insert(FileAccess).values(
+            FileAccessTypeId=file_access_type_id, LocalPath=local_path, RemotePath=remote_path
+        )
+        self.session.execute(stmt)
+        self.session.commit()
+
+    def add_s3(self, url, username, password):
+        """Add a new S3 filesystem to the database."""
+        self._add_file_access(4, url=url, username=username, password=password)  # 4 is S3 type
+
+    def add_sharepoint(self, url, library, username, password):
+        """Add a new SharePoint filesystem to the database."""
+        self._add_file_access(
+            5, url=url, library=library, username=username, password=password
+        )  # 5 is SharePoint type
+
+    def _add_file_access(self, file_access_type_id, url=None, library=None, username=None, password=None):
+        """Helper to add a file access entry."""
+        stmt = insert(FileAccess).values(
+            FileAccessTypeId=file_access_type_id,
+            URL=url,
+            RemotePath=library,
+            Username=username,
+            Password=password,
+        )
+        self.session.execute(stmt)
+        self.session.commit()
+
+    def add_file_access_instance(self, file_access_id, location=None, bucket=None, outcome_id=None):
+        """Add a file access instance and return the inserted Id."""
+        file_access_instance = FileAccessInstance(
+            FileAccessId=file_access_id, OutcomeId=outcome_id, Location=location, Bucket=bucket
+        )
+        self.session.add(file_access_instance)
+        self.session.commit()
+        self.session.refresh(file_access_instance)  # Refresh to get the generated Id
+        return file_access_instance.Id
+
+    def remove_file_access(self, file_access_id: int):
+        """Remove a file system."""
+        stmt = delete(FileAccess).where(FileAccess.Id == file_access_id)
+        self.session.execute(stmt)
+        self.session.commit()
+```

@@ -3,16 +3,14 @@
 import sys
 from pathlib import Path
 from flask import Flask
-from autodoc.config import TARGET_DB_PATH, INIT_DB_PATH
-from autodoc.db import initialise_database
+from autodoc.config import TARGET_DB_PATH
 from .blueprints import top_blueprint, meta_blueprint, auth_blueprint, card_blueprint
 from .blueprints.auth.controllers import login_manager
-from dashboard.database import init_app
+from dashboard.database import register_db_teardown
 from loguru import logger
 from dotenv import load_dotenv
 import os
 
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 
 load_dotenv()
 
@@ -47,9 +45,10 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
     app.config["ADMIN_PASSWORD"] = ADMIN_PASSWORD
     app.secret_key = "your_secret_key"
 
-    init_app(app)
+    # init_app(app)
+    register_db_teardown(app)
 
-    initialise_database(initial_db=INIT_DB_PATH, target_db=TARGET_DB_PATH)
+    # initialise_database(initial_db=INIT_DB_PATH, target_db=TARGET_DB_PATH)
 
     app.register_blueprint(top_blueprint, url_prefix="/")
     app.register_blueprint(meta_blueprint, url_prefix="/meta")

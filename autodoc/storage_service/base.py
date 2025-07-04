@@ -1,23 +1,34 @@
-"""Define the template for file access classes."""
+"""Define the base template for storage services."""
 
+import os
+import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-import tempfile
-import os
+from typing import Optional
+
 from loguru import logger
 
 
-class FileAccess(ABC):
+class StorageService(ABC):
     """
-    FileAccess template for getting and saving files.
+    StorageService base class used for getting and saving files.
 
     The temp_file_name is used for when remote storage is used like s3. The file
     is downloaded and saved to a tempfile (if a file) or just read and the text
     returned (if a text file).
     """
 
+    path: Path
+
     @abstractmethod
-    def __init__(self, root: str, relative: str, url=None, username=None, password=None):
+    def __init__(
+        self,
+        root: str,
+        relative: str,
+        url: Optional[str] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+    ):
         """
         Initialise.
 
@@ -38,7 +49,7 @@ class FileAccess(ABC):
         """Get just the text contents of a file."""
 
     @abstractmethod
-    def save_text(self, text) -> None:
+    def save_text(self, text: str) -> None:
         """Save a text to storage."""
 
     @abstractmethod
@@ -49,7 +60,7 @@ class FileAccess(ABC):
     def render(self, data: dict):
         """Render the appropriate fields in this class with the finalised data."""
 
-    def temp_file(self):
+    def temp_file(self) -> str:
         """Set and return a temp_file that can be saved to by outcomes that save files."""
         if not self.temp_file_name:
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:

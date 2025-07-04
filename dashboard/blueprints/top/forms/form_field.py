@@ -11,7 +11,7 @@ class CreateFormFieldForm(FlaskForm):
     """Create a form field."""
 
     name = StringField("Name of Field", validators=[InputRequired()])
-    label = StringField("Label of Field")
+    label = StringField("Label of Field", validators=[InputRequired()])
     choices = [("Integer", "Integer"), ("String", "String")]
     field_type = SelectField("Data Type of Field", choices=choices, validators=[InputRequired()])
     submit = SubmitField()

@@ -1,7 +1,7 @@
 """Define workflow views."""
 
 from flask import Blueprint, render_template, request, render_template_string
-from dashboard.database import get_manager
+from dashboard.database import get_db_manager
 from loguru import logger
 
 
@@ -14,7 +14,7 @@ def file_accessor_form_snippet():
     file_access_id = request.args.get("option")
     logger.debug(f"Getting file accessor form snippet for {file_access_id=}")
 
-    manager = get_manager()
+    manager = get_db_manager()
 
     if not file_access_id:
         return render_template_string("")
@@ -24,25 +24,29 @@ def file_accessor_form_snippet():
         root_path = None
 
     else:
-        sql = "select * from vFileAccessors where FileAccessId = :file_access_id"
-        params = {"file_access_id": int(file_access_id)}
 
-        record = manager.db.record(sql, params).data
+        file_access_id = int(file_access_id)
+        file_accessor = manager.v_file_accessors.get(file_access_id)
 
-        file_access_type_id = record["FileAccessTypeId"]
+        file_access_type_id = None
 
-        snippet_file_map = {
-            2: "file_system.html",
-            3: "file_system.html",
-            4: "s3.html",
-            5: "sharepoint.html",
-        }
+        if file_accessor:
+            file_access_type_id = file_accessor.FileAccessTypeId
 
-        snippet_file = snippet_file_map.get(file_access_type_id)
-        root_path = record["RemotePath"]
+            snippet_file_map = {
+                2: "file_system.html",
+                3: "file_system.html",
+                4: "s3.html",
+                5: "sharepoint.html",
+            }
+
+            snippet_file = snippet_file_map.get(file_access_type_id)
+            root_path = file_accessor.RemotePath
+
+        else:
+            raise
 
     snippet_path = f"top/snippets/{snippet_file}"
-
     return render_template(snippet_path, root_path=root_path)
 
 
@@ -52,7 +56,7 @@ def output_file_accessor_form_snippet():
     file_access_id = request.args.get("outputoption")
     placeholder = request.args.get("placeholder")
 
-    manager = get_manager()
+    manager = get_db_manager()
 
     if not file_access_id:
         return render_template_string("")
@@ -63,25 +67,26 @@ def output_file_accessor_form_snippet():
 
     else:
 
-        sql = "select * from vFileAccessors where FileAccessId = :file_access_id"
-        params = {"file_access_id": int(file_access_id)}
+        file_access_id = int(file_access_id)
+        file_accessor = manager.v_file_accessors.get(file_access_id)
 
-        record = manager.db.record(sql, params).data
+        if file_accessor:
+            file_access_type_id = file_accessor.FileAccessTypeId
 
-        file_access_type_id = record["FileAccessTypeId"]
+            # file_access_type_id = record["FileAccessTypeId"]
 
-        snippet_file_map = {
-            2: "file_system_output.html",
-            3: "file_system_output.html",
-            4: "s3_output.html",
-            5: "sharepoint_output.html",
-        }
+            snippet_file_map = {
+                2: "file_system_output.html",
+                3: "file_system_output.html",
+                4: "s3_output.html",
+                5: "sharepoint_output.html",
+            }
 
-        snippet_file = snippet_file_map.get(file_access_type_id)
-        root_path = record["RemotePath"]
+            snippet_file = snippet_file_map.get(file_access_type_id)
+            root_path = file_accessor.RemotePath
 
-    if not snippet_file:
-        raise
+        else:
+            raise
 
     snippet_path = f"top/snippets/{snippet_file}"
 

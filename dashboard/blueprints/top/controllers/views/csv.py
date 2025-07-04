@@ -3,9 +3,11 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from loguru import logger
 from ...forms import CreateCSVRecordSourceForm, CreateCSVTableSourceForm
-from ...models import add_csv_table_source, add_csv_record_source, get_file_accessors
+
 from werkzeug.wrappers.response import Response
-from dashboard.database import get_manager
+from dashboard.database import get_db_manager
+from ...models import get_optional_new_file_template_id
+
 
 from typing import Union
 
@@ -16,54 +18,53 @@ bp = Blueprint("csv", __name__)
 def add_csv_record_source_view(workflow_id: int) -> Union[str, Response]:
     """Add a record set source view."""
     form = CreateCSVRecordSourceForm()
+    manager = get_db_manager()
 
     if form.validate_on_submit():
-        named_orientation = "horizontal" if form.orientation.data != '1' else "vertical"
+        named_orientation = "horizontal" if form.orientation.data != "1" else "vertical"
         logger.info(f"{form.orientation.data=}")
 
+        name = form.name.data
+        step = form.step.data or 1
         location = form.location.data
         bucket = form.bucket.data
-        name = form.name.data
+        storage_instance_id = int(request.form["option"])
 
-        if name:
-            sql = "select Name from Source where WorkflowId = :workflow_id"
-            params = {"workflow_id": workflow_id}
-            current_names = get_manager().db.recordset(sql=sql, params=params).column("Name")
+        if name and manager.sources.name_exists(name=name):
+            flash(f"{name} already exists, choose another name", "error")
+            return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
-            if name in current_names:
-                logger.info(f"attempted add of {name} when existing names are {current_names}")
-                flash(f"{name} already exists, choose another name", "error")
-                return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
-
-        file_access_id = None
-
-        if request.form["option"]:
-            file_access_id = int(request.form["option"])
-            if file_access_id == -1:
-                file_access_id = None
-
-        add_csv_record_source(
-            workflow_id=workflow_id,
-            orientation=named_orientation,
-            step=form.step.data,
+        file_template_id = get_optional_new_file_template_id(
+            manager=manager,
+            storage_instance_id=storage_instance_id,
             location=location,
             bucket=bucket,
-            file_access_id=file_access_id,
+        )
+
+        source_type = manager.source_types.get_from_name(name="CSVRecord")
+        manager.sources.add(
+            workflow_id=workflow_id,
+            source_type=source_type,
+            orientation=named_orientation,
+            step=step,
+            file_template_id=file_template_id,
             name=name,
         )
+        manager.commit()
 
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     else:
         logger.error(form.errors)
 
-    file_access_list = get_file_accessors()
+    # file_access_list = manager.v_file_accessors.get_all()
+    storage_instances = manager.storage_instances.get_all()
 
     return render_template(
         "top/add_source/add_csv_record_source.html",
         form=form,
         workflow_id=workflow_id,
-        file_access_list=file_access_list,
+        storage_instances=storage_instances,
     )
 
 
@@ -71,51 +72,49 @@ def add_csv_record_source_view(workflow_id: int) -> Union[str, Response]:
 def add_csv_table_source_view(workflow_id: int) -> Union[str, Response]:
     """Add a record set source view."""
     form = CreateCSVTableSourceForm()
+    manager = get_db_manager()
 
     if form.validate_on_submit():
 
+        name = form.name.data
+        step = form.step.data or 1
         location = form.location.data
         bucket = form.bucket.data
-        name = form.name.data
-
-        if name:
-            sql = "select Name from Source where WorkflowId = :workflow_id"
-            params = {"workflow_id": workflow_id}
-            current_names = get_manager().db.recordset(sql=sql, params=params).column("Name")
-
-            if name in current_names:
-                logger.info(f"attempted add of {name} when existing names are {current_names}")
-                flash(f"{name} already exists, choose another name", "error")
-                return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
-
-        file_access_id = None
-
-        if request.form["option"]:
-            file_access_id = int(request.form["option"])
-            if file_access_id == -1:
-                file_access_id = None
-
+        field_name = form.field_name.data
+        storage_instance_id = int(request.form["option"])
         splitter = form.splitter_choice.data == "splitter"
 
-        add_csv_table_source(
-            workflow_id=workflow_id,
-            field_name=form.field_name.data,
-            splitter=splitter,
-            step=form.step.data,
+        if name and manager.sources.name_exists(name=name):
+            flash(f"{name} already exists, choose another name", "error")
+            return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
+
+        file_template_id = get_optional_new_file_template_id(
+            manager=manager,
+            storage_instance_id=storage_instance_id,
             location=location,
             bucket=bucket,
-            file_access_id=file_access_id,
+        )
+
+        source_type = manager.source_types.get_from_name(name="CSVTable")
+        manager.sources.add(
+            workflow_id=workflow_id,
+            source_type=source_type,
+            splitter=splitter,
+            field_name=field_name,
+            step=step,
+            file_template_id=file_template_id,
             name=name,
         )
+        manager.commit()
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     elif request.method == "POST":
         logger.error(form.errors)
 
-    file_access_list = get_file_accessors()
+    storage_instances = manager.storage_instances.get_all()
     return render_template(
         "top/add_source/add_csv_table_source.html",
         form=form,
         workflow_id=workflow_id,
-        file_access_list=file_access_list,
+        storage_instances=storage_instances
     )

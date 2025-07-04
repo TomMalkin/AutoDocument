@@ -14,46 +14,36 @@ from flask import (
 )
 from loguru import logger
 from werkzeug.utils import secure_filename
-from dashboard.database import get_manager
+from dashboard.database import get_db_manager
 from ...forms import CreateWorkflowForm, get_form
-from ...models import (
-    get_sources,
-    get_outcomes,
-    get_instances,
-    create_workflow,
-    get_source,
-    get_form_fields_from_source,
-    get_form_fields,
-    get_workflow_name,
-)
+# from ...models import (
+#     get_source,
+#     get_form_fields_from_source,
+# )
 from autodoc import Workflow
 from werkzeug.wrappers.response import Response
 from autodoc.outcome.download_container import DownloadContainer
 
-bp = Blueprint("workflow", __name__)
+# from autodoc.orm import VSource, VOutcome
 
+bp = Blueprint("workflow", __name__)
 
 @bp.route("/workflow/<workflow_id>")
 def workflow(workflow_id: int) -> str:
     """Render the workflow information page."""
-    sources = get_sources(workflow_id)
-    outcomes = get_outcomes(workflow_id)
+    manager = get_db_manager()
 
-    form_fields = get_form_fields(workflow_id)
+    form_fields = manager.form_fields.get_all(workflow_id=workflow_id)
 
-    instances = get_instances(workflow_id)
-
-    manager = get_manager()
+    instances = manager.workflow_instances.get_all(workflow_id=workflow_id)
 
     workflow = Workflow(workflow_id=workflow_id, event_logger=None, manager=manager)
-
-    print(form_fields)
 
     return render_template(
         "top/workflow.html",
         workflow=workflow,
-        sources=sources,
-        outcomes=outcomes,
+        # sources=sources,
+        # outcomes=outcomes,
         instances=instances,
         form_fields=form_fields,
     )
@@ -62,8 +52,9 @@ def workflow(workflow_id: int) -> str:
 @bp.route("/workflow_delete/<workflow_id>")
 def delete_workflow(workflow_id: int) -> Response:
     """Render the workflow information page."""
-    manager = get_manager()
-    manager.delete_workflow(workflow_id=workflow_id)
+    manager = get_db_manager()
+    manager.workflows.delete(workflow_id=workflow_id)
+    manager.commit()
     return redirect(url_for("top.base.index"))
 
 
@@ -74,28 +65,38 @@ def create_workflow_view() -> Response:
     form = CreateWorkflowForm()
 
     if form.validate_on_submit():
-        workflow_id = create_workflow(name=form.name.data)
-        return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
+        if form.name.data:
+            manager = get_db_manager()
+            workflow = manager.workflows.add(name=form.name.data)
+            manager.commit()
+            if workflow:
+                return redirect(url_for("top.workflow.workflow", workflow_id=workflow.Id))
 
     return redirect(url_for("top.base.index"))
 
 
-@bp.route("/source/<source_id>/", methods=["GET"])
-def source(source_id: int) -> Response | str:
-    """Show details about a source."""
-    source_details = get_source(source_id)
-    form_details = get_form_fields_from_source(source_id)
-    source_id = source_details["SourceId"]
-
-    sql_field_form = None
-
-    return render_template(
-        "top/source.html",
-        source_details=source_details,
-        form_details=form_details,
-        sql_field_form=sql_field_form,
-        source_id=source_id,
-    )
+# @bp.route("/source/<source_id>/", methods=["GET"])
+# def source(source_id: int) -> Response | str:
+#     """Show details about a source."""
+#     manager = get_db_manager()
+#     # source_id = source_details["SourceId"]
+#
+#     source, _ = manager.sources.get(source_id=source_id)
+#     workflow_id = source.WorkflowId
+#     form_fields = manager.form_fields.get_all(workflow_id=workflow_id)
+#
+#     # source_details = get_source(source_id)
+#     # form_details = get_form_fields_from_source(source_id)
+#
+#     sql_field_form = None
+#
+#     return render_template(
+#         "top/source.html",
+#         source_details=source,
+#         form_details=form_fields,
+#         sql_field_form=sql_field_form,
+#         source_id=source_id,
+#     )
 
 
 @bp.route("/instance/<workflow_id>/", methods=["GET", "POST"])
@@ -128,7 +129,7 @@ def workflow_instance(workflow_id: int) -> Response | str:
     3) This endpoing is reached by a GET request with url_params
     """
     logger.info(f"Workflow Instance page with {request.method=} and {workflow_id=}")
-    manager = get_manager()
+    manager = get_db_manager()
 
     # for path 3:
     # url_params = request.values
@@ -147,12 +148,12 @@ def workflow_instance(workflow_id: int) -> Response | str:
 
         else:
             logger.info("Form fields and/or upload fields identified, rendering form")
-            workflow_name = get_workflow_name(workflow_id)
+            workflow = manager.workflows.get(workflow_id=workflow_id)
             return render_template(
                 "top/workflow_instance.html",
                 form=form,
                 workflow_id=workflow_id,
-                workflow_name=workflow_name,
+                workflow_name=workflow.Name,
             )
 
     if request.method == "POST":
@@ -189,7 +190,7 @@ def workflow_instance(workflow_id: int) -> Response | str:
             )
 
         else:
-            return render_template_string(form.errors)
+            return render_template_string(str(form.errors))
 
     # workflow has been completed if we are here
     if download_container.has_files():

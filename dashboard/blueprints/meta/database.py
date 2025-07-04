@@ -1,8 +1,11 @@
 """Define the Meta Database blueprint."""
 
-from flask import Blueprint, render_template, redirect, url_for
-from dashboard.database import get_manager
+from typing import cast
+
+from flask import Blueprint, redirect, render_template, url_for
 from flask_login import login_required
+
+from dashboard.database import get_db_manager
 
 from .forms import (
     CreateMetaDatabase,
@@ -15,8 +18,9 @@ bp = Blueprint("db", "db")
 @login_required
 def manage():
     """Manage database connections."""
-    manager = get_manager()
-    databases = manager.get_meta_databases().data
+    manager = get_db_manager()
+    databases = manager.database_meta_sources.get_all()
+
     database_form = CreateMetaDatabase()
 
     database_options = [
@@ -37,8 +41,8 @@ def manage():
 @login_required
 def delete(database_id):
     """Delete a database based on the id."""
-    manager = get_manager()
-    manager.delete_meta_database(database_id=database_id)
+    manager = get_db_manager()
+    manager.database_meta_sources.delete(database_id=database_id)
     return redirect(url_for("meta.db.manage"))
 
 
@@ -46,7 +50,8 @@ def delete(database_id):
 @login_required
 def add():
     """Add a database based on form input."""
-    manager = get_manager()
+    manager = get_db_manager()
+
     form = CreateMetaDatabase()
 
     mapping = {
@@ -57,10 +62,11 @@ def add():
     }
 
     if form.validate_on_submit():
-        name = form.name.data
+        name = cast(str, form.name.data)
         database = form.database.data
         connection_string = form.connection_string.data
         full_connection_string = f"{mapping[database]}://{connection_string}"
-        manager.add_meta_database(name=name, connection_string=full_connection_string)
+        # manager.add_meta_database(name=name, connection_string=full_connection_string)
+        manager.database_meta_sources.add(name=name, connection_string=full_connection_string)
 
     return redirect(url_for("meta.db.manage"))

@@ -1,27 +1,26 @@
 """Expose the various Sources."""
 
-from .csv_source import CSVRecord, CSVTable
-from .form_source import FormSource
-from .sql_source import RecordSetSource, RecordSetTransposeSource, RecordSource
-from .excel_source import ExcelRecord, ExcelTable
+from .csv_source import CSVRecordSourceService, CSVTableSourceService
+from .excel_source import ExcelRecordSourceService, ExcelTableSourceService
+from .sql_source import RecordSetSourceService, RecordSetTransposeSourceService, RecordSourceService
+from .source import SourceService as SourceService
 
-source_map = {
-    "SQL Record": RecordSource,
-    "SQL RecordSet": RecordSetSource,
-    "SQL RecordSet Transpose": RecordSetTransposeSource,
-    "CSVRecord": CSVRecord,
-    "CSVTable": CSVTable,
-    "ExcelRecord": ExcelRecord,
-    "ExcelTable": ExcelTable,
+source_service_map = {
+    "SQL Record": RecordSourceService,
+    "SQL RecordSet": RecordSetSourceService,
+    "SQL RecordSet Transpose": RecordSetTransposeSourceService,
+    "CSVRecord": CSVRecordSourceService,
+    "CSVTable": CSVTableSourceService,
+    "ExcelRecord": ExcelRecordSourceService,
+    "ExcelTable": ExcelTableSourceService,
 }
 
-__all__ = [
-    "RecordSource",
-    "RecordSetSource",
-    "FormSource",
-    "RecordSetTransposeSource",
-    "CSVRecord",
-    "CSVTable",
-    "ExcelRecord",
-    "ExcelTable",
-]
+# __all__ = [
+#     "RecordSourceService",
+#     "RecordSetSourceService",
+#     "RecordSetTransposeSourceService",
+#     "CSVRecordSourceService",
+#     "CSVTableSourceService",
+#     "ExcelRecordSourceService",
+#     "ExcelTableSourceService",
+# ]

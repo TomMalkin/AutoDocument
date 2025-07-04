@@ -6,7 +6,7 @@
             {% include 'svg/csv.html' %}
         </svg>
 
-        {% if multi_type == 'Splitter' %}
+        {% if source.Splitter %}
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
             class="w-12 h-12 text-gray-800 dark:text-white" width="24" height="24">
@@ -29,10 +29,10 @@
         <div class="flex flex-row gap-2 mb-2">
             <h2 class="text-xl font-bold">CSV Table</h2>
             <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.source.delete_source_view', workflow_id=workflow_id, source_id=source_id) }}">delete</a>
+                href="{{ url_for('top.source.delete_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">delete</a>
         </div>
 
-        {% if multi_type == 'Splitter' %}
+        {% if source.Splitter %}
         {% include 'components/cards/splitter.html' %}
         {% else %}
         {% include 'components/cards/field.html' %}
@@ -42,7 +42,7 @@
 
             <p class="font-bold">Loaded From:</p>
             <div class="mt-2 p-1 rounded-lg bg-gray-100" hx-trigger="load"
-                hx-get="{{ url_for('card.source_storage_card', source_id=source_id) }}" hx-swap="outerHTML">
+                hx-get="{{ url_for('card.source_storage_card', source_id=source.Id) }}" hx-swap="outerHTML">
                 <p>hello</p>
             </div>
 

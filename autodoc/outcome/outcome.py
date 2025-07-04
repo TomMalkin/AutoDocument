@@ -1,45 +1,54 @@
 """Template for creating other outcomes."""
 
 from abc import ABC, abstractmethod
-from autodoc.file_access import FileAccess
+from autodoc.storage_service import StorageService, get_storage_service
 from pathlib import Path
-from autodoc.file_access.file_details import TemplateFileDetails, OutputFileDetails
+
+# from autodoc.file_access.file_details import TemplateFileDetails, OutputFileDetails
 from .download_container import DownloadContainer
+from autodoc.data.tables import Outcome
 
-
-class Outcome(ABC):
-    """Interface for Outcomes."""
+class OutcomeService(ABC):
+    """Service layer for an Outcome."""
 
     is_combination: bool
     rendered_output_location: str
 
-    input_file_access: FileAccess
+    input_storage_service:StorageService
     input_path: Path
 
-    output_file_access: FileAccess
+    output_storage_service:StorageService
     output_path: Path
 
     is_file: bool
 
-    def __init__(self, outcome_details: dict, download_container: DownloadContainer | None) -> None:
+    def __init__(self, outcome: Outcome, download_container: DownloadContainer | None) -> None:
         """
         Initialise the object with a dict of outcome details.
 
         if download_container is given, then assume the result is downloaded.
         """
-        self.outcome_details = outcome_details
+        self.outcome = outcome
         self.download_container = download_container
 
-    def set_template_file_accessor(self):
-        """Set the file access for the source if its a file."""
-        self.template_file_details = TemplateFileDetails(self.outcome_details)
-        self.template_file_access = self.template_file_details.get_file_access_class()
-        self.template_path = self.template_file_access.get_file()
+    def set_input_storage_service(self):
+        """Set the input storage service."""
+        template = self.outcome.input_file_template
+        if not template or template.is_download:
+            return
 
-    def set_output_file_accessor(self):
-        """Set the file access for the source if its a file."""
-        self.output_file_details = OutputFileDetails(self.outcome_details)
-        self.output_file_access = self.output_file_details.get_file_access_class()
+        self.input_storage_service = get_storage_service(file_template=template)
+
+        if self.input_storage_service:
+            self.template_path = self.input_storage_service.get_file()
+
+    def set_output_storage_service(self):
+        """Set the output storage service."""
+        template = self.outcome.output_file_template
+        self.output_storage_service = get_storage_service(file_template=template)
+
+        if self.output_storage_service:
+            self.template_path = self.output_storage_service.get_file()
 
     @abstractmethod
     def render(self, data: dict) -> None:

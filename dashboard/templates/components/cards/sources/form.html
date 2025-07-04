@@ -4,19 +4,19 @@
 
     <div class="flex flex-col flex-grow">
 
-        {% for form_field in form_records %}
+        {% for form_field in form_fields %}
         <div class="border rounded-lg flex flex-row p-2 m-1 bg-orange-300 items-center gap-2">
 
-            <p class="font-bold">{{ form_field['Label'] }}: </p>
-            <div class="border rounded p-1 mx-1 border-black bg-yellow-50">{{ form_field['Type'] }}</div>
+            <p class="font-bold">{{ form_field['FieldLabel'] }}: </p>
+            <div class="border rounded p-1 mx-1 border-black bg-yellow-50">{{ form_field['FieldType'] }}</div>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
-            <p>{{ form_field['Name'] }} </p>
+            <p>{{ form_field['FieldName'] }} </p>
             <div class="inline-block min-h-[1em] w-0.5 self-stretch bg-gray-800"></div>
             <a class="rounded inline-block px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.source.delete_form_field_view', form_field_id=form_field['FormFieldId'], workflow_id=workflow_id) }}">delete</a>
+                href="{{ url_for('top.form_field.delete_form_field_view', form_field_id=form_field['Id'], workflow_id=workflow_id) }}">delete</a>
         </div>
         {% endfor %}
 

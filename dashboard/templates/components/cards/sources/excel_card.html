@@ -19,19 +19,19 @@
         <div class="flex flex-row gap-2">
             <h2 class="text-xl font-bold">Excel Record</h2>
             <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.source.delete_source_view', workflow_id=workflow_id, source_id=source_id) }}">delete</a>
+                href="{{ url_for('top.source.delete_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">delete</a>
         </div>
 
         <div class="flex flex-row gap-2 items-center">
             <p class="font-bold">Sheet: </p>
             <div class="p-1 rounded bg-gray-100">
-                <p>{{ sheet_name }}</p>
+                <p>{{ source.SheetName }}</p>
             </div>
         </div>
         <div class="flex flex-row gap-2 items-center">
             <p class="font-bold">Header Row: </p>
             <div class="p-1 rounded bg-gray-100 px-3">
-                <p>{{ header_row }}</p>
+                <p>{{ source.HeaderRow }}</p>
             </div>
         </div>
 
@@ -39,7 +39,7 @@
 
             <p class="font-bold">Loaded From:</p>
             <div class="mt-2 p-1 rounded-lg bg-gray-100" hx-trigger="load"
-                hx-get="{{ url_for('card.source_storage_card', source_id=source_id) }}" hx-swap="outerHTML">
+                hx-get="{{ url_for('card.source_storage_card', source_id=source.Id) }}" hx-swap="outerHTML">
             </div>
 
         </div>

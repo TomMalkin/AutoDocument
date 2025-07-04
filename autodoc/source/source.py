@@ -2,27 +2,32 @@
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from autodoc.file_access import FileAccess
-from autodoc.file_access.file_details import SourceFileDetails
+from autodoc.storage_service import StorageService, get_storage_service
+from autodoc.data.tables import Source
 
 
-class Source(ABC):
+class SourceService(ABC):
     """Base Interface for a Source object."""
 
-    data: dict | list
-    is_multi_record: bool
-    file_access: FileAccess | None
-    path: Path
+    # data: dict | list
+    # is_multi_record: bool
+    # storage_service: StorageService | None
+    # path: Path
 
-    def __init__(self, source_details: dict) -> None:
-        """Initialise the object wih a dict of source details."""
-        self.source_details = source_details
+    def __init__(self, source: Source) -> None:
+        """Initialise the object wih a Source object."""
+        self.source = source
 
-    def set_file_accessor(self):
-        """Set the file access for the source if its a file."""
-        self.file_details = SourceFileDetails(self.source_details)
-        self.file_access = self.file_details.get_file_access_class()
-        self.path = self.file_access.get_file()
+    def set_storage_service(self):
+        """Set the storage service."""
+        template = self.source.file_template
+        if not template or template.is_download:
+            return
+
+        self.storage_service = get_storage_service(file_template=template)
+
+        if self.storage_service:
+            self.path = self.storage_service.get_file()
 
     @abstractmethod
     def load_data(self, current_data: dict) -> None:
