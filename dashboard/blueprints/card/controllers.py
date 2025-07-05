@@ -1,8 +1,8 @@
 """Define cards."""
 
-from flask import Blueprint, render_template, request, redirect, url_for
-
+from flask import Blueprint, redirect, render_template, request, url_for
 from loguru import logger
+
 from dashboard.database import get_db_manager
 
 card_blueprint = Blueprint("card", "card_blueprint", url_prefix="/card")
@@ -171,7 +171,9 @@ def outcome_output_storage_card(outcome_id: int):
     outcome = manager.outcomes.get(outcome_id=outcome_id)
 
     if not outcome.output_file_template or outcome.output_file_template.StorageInstanceId == -1:
-        return render_template("components/cards/file_storages/download.html", name=outcome.Name)
+        return render_template(
+            "components/cards/file_storages/download.html", name=outcome.DownloadName
+        )
 
     file_template = outcome.output_file_template
     storage_instance = file_template.storage_instance

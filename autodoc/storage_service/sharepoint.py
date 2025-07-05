@@ -1,15 +1,14 @@
 """Define the SharePoint compatiable file access class."""
 
-from jinja2 import Template
-
-from .base import StorageService
+import tempfile
 from pathlib import Path
 
-import tempfile
-
+from jinja2 import Template
 from loguru import logger
 from office365.runtime.auth.user_credential import UserCredential
 from office365.sharepoint.client_context import ClientContext
+
+from .base import StorageService
 
 
 class SharePointSiteStorageService(StorageService):

@@ -1,12 +1,13 @@
 """Template for creating other outcomes."""
 
 from abc import ABC, abstractmethod
-from autodoc.storage_service import StorageService, get_storage_service
 from pathlib import Path
 
-# from autodoc.file_access.file_details import TemplateFileDetails, OutputFileDetails
-from .download_container import DownloadContainer
 from autodoc.data.tables import Outcome
+from autodoc.storage_service import StorageService, get_storage_service
+
+from .download_container import DownloadContainer
+
 
 class OutcomeService(ABC):
     """Service layer for an Outcome."""

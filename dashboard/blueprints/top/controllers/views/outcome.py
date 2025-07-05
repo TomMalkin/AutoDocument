@@ -1,10 +1,11 @@
 """Define outcome views."""
 
-from werkzeug.wrappers.response import Response
-from flask import Blueprint, redirect, url_for
-from dashboard.database import get_db_manager
-
 from typing import Union
+
+from flask import Blueprint, redirect, url_for
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
 
 bp = Blueprint("outcome", __name__)
 

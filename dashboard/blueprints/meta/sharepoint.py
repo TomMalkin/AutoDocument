@@ -1,12 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for
+"""Manage SharePoint."""
 
-# from dashboard.database import get_manager
-from dashboard.database import get_db_manager
+from flask import Blueprint, redirect, render_template, url_for
 from flask_login import login_required
 
-from .forms import (
-    CreateMetaSharePoint,
-)
+from dashboard.database import get_db_manager
+
+from .forms import CreateMetaSharePoint
 
 bp = Blueprint("sp", "sp")
 
@@ -33,13 +32,16 @@ def add():
         username = form.microsoft_username.data
         password = form.microsoft_password.data
         library = form.library.data
-        manager.storage_service.add_instance_with_type(
-            storage_type_name="SharePoint",
+
+        storage_type = manager.storage_types.get_by_name(name="SharePoint")
+        manager.storage_instances.add(
+            storage_type=storage_type,
             url=url,
+            remote_path=library,
             username=username,
             password=password,
-            remote_path=library,
         )
+        manager.commit()
 
     return redirect(url_for("meta.sp.manage"))
 

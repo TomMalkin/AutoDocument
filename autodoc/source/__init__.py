@@ -2,8 +2,8 @@
 
 from .csv_source import CSVRecordSourceService, CSVTableSourceService
 from .excel_source import ExcelRecordSourceService, ExcelTableSourceService
-from .sql_source import RecordSetSourceService, RecordSetTransposeSourceService, RecordSourceService
 from .source import SourceService as SourceService
+from .sql_source import RecordSetSourceService, RecordSetTransposeSourceService, RecordSourceService
 
 source_service_map = {
     "SQL Record": RecordSourceService,
@@ -14,13 +14,3 @@ source_service_map = {
     "ExcelRecord": ExcelRecordSourceService,
     "ExcelTable": ExcelTableSourceService,
 }
-
-# __all__ = [
-#     "RecordSourceService",
-#     "RecordSetSourceService",
-#     "RecordSetTransposeSourceService",
-#     "CSVRecordSourceService",
-#     "CSVTableSourceService",
-#     "ExcelRecordSourceService",
-#     "ExcelTableSourceService",
-# ]

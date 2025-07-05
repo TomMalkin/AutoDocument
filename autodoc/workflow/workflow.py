@@ -18,11 +18,6 @@ class Workflow:
     start_time: datetime
     end_time: datetime
 
-    # @staticmethod
-    # def get_form(workflow_id: int, manager: DatabaseManager) -> list[FormField]:
-    #     """Get the initial form details for a given workflow."""
-    #     return manager.form_fields.get_all(workflow_id=workflow_id)
-
     def __init__(
         self,
         workflow_id: int,
@@ -43,26 +38,6 @@ class Workflow:
         self.event_logger = event_logger
         self.instance_id: int
 
-    # def write_instance(self):
-    #     """Write the instance to the database."""
-    #     logger.warning("Writing instance")
-    #     sql = """
-    #         insert into WorkflowInstance
-    #         (ParentInstanceId, WorkflowId, StartTime, EndTime, Completed, Data, Step)
-    #         values
-    #         (:parent_instance_id, :workflow_id, :start_time, :end_time, :completed, :data, :step)
-    #     """
-    #     params = {
-    #         "parent_instance_id": self.parent_instance_id,
-    #         "workflow_id": self.workflow_id,
-    #         "start_time": self.start_time,
-    #         "end_time": self.end_time,
-    #         "completed": 1,
-    #         "data": dumps(self.data),
-    #         "step": None,
-    #     }
-    # self.manager.db.execute(sql, params)
-
     def process(self, download_container: DownloadContainer, upload_mapping=None) -> None:
         """
         Process the sources, and if the sources haven't been split, outcomes.
@@ -81,12 +56,13 @@ class Workflow:
                 start_time=self.start_time,
                 step=self.step,
             )
-            self.instance_id = instance.Id
+            self.instance_id = instance.InstanceId
 
         else:
             instance = self.manager.workflow_instances.add(
                 workflow_id=self.workflow_id, step=self.step
             )
+            self.instance_id = instance.InstanceId
 
         result = self.process_sources(
             download_container=download_container, upload_mapping=upload_mapping

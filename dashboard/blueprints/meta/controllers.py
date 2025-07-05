@@ -1,10 +1,11 @@
 """Define views for meta based controllers."""
 
 from typing import Union
-from werkzeug.wrappers.response import Response
+
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 from loguru import logger
+from werkzeug.wrappers.response import Response
 
 meta_blueprint = Blueprint("meta", "meta_blueprint")
 

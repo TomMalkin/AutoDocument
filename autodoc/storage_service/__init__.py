@@ -1,12 +1,13 @@
 """Expose Storage Service classes."""
 
-from .linux import LinuxStorageService
-from .windows import WindowsStorageService
-from .base import StorageService
-from .s3 import S3StorageService
-from .dropbox import DropboxStorageService
-from .sharepoint import SharePointSiteStorageService
 from autodoc.data.tables import FileTemplate
+
+from .base import StorageService
+from .dropbox import DropboxStorageService
+from .linux import LinuxStorageService
+from .s3 import S3StorageService
+from .sharepoint import SharePointSiteStorageService
+from .windows import WindowsStorageService
 
 storage_service_class_map = {
     "Windows Share": WindowsStorageService,

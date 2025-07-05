@@ -2,8 +2,7 @@
 
 from typing import Optional
 
-
-from .repositories import StorageTypeRepository, StorageInstanceRepository
+from .repositories import StorageInstanceRepository, StorageTypeRepository
 
 
 class StorageService:

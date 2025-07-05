@@ -1,22 +1,27 @@
 """Define CSV forms."""
 
-from .mixins import FileAccessorMixin
 from flask_wtf import FlaskForm
-from wtforms import IntegerField  # type: ignore
-from wtforms import SelectField, StringField, SubmitField, RadioField
-from wtforms.validators import DataRequired, InputRequired  # type: ignore
+from wtforms import (
+    IntegerField,  # type: ignore
+    RadioField,
+    SelectField,
+    StringField,
+    SubmitField,
+)
+from wtforms.validators import DataRequired, InputRequired
+
+from .mixins import FileAccessorMixin
 
 
 class CreateCSVRecordSourceForm(FlaskForm, FileAccessorMixin):
-    """Create a Record Source."""
+    """Create a CSV Record Form."""
 
     orientation = SelectField(
-        "Orientation",
-        choices=[(0, "Horizontal"), (1, "Vertical")],
-        validators=[DataRequired()]
+        "Orientation", choices=[(0, "Horizontal"), (1, "Vertical")], validators=[DataRequired()]
     )
     step = IntegerField("Step", validators=[InputRequired()], default=1)
     submit = SubmitField()
+
 
 class CreateCSVTableSourceForm(FlaskForm, FileAccessorMixin):
     """Create a CSV Table Form."""
@@ -25,4 +30,3 @@ class CreateCSVTableSourceForm(FlaskForm, FileAccessorMixin):
     splitter_choice = RadioField(choices=[("splitter", "splitter"), ("field", "field")])
     field_name = StringField("Field Name")
     submit = SubmitField()
-

@@ -1,13 +1,18 @@
-from flask_wtf import FlaskForm  # type: ignore
-from wtforms import IntegerField  # type: ignore
-from wtforms import StringField, SubmitField
+"""Define dynamic forms."""
 
-# from autodoc.db import DatabaseManager
-from autodoc.data.manager import DatabaseManager
+from typing import Any, Dict, List, Optional
+
+from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from loguru import logger
+from wtforms import (
+    IntegerField,
+    StringField,
+    SubmitField,
+)
 from wtforms.validators import ValidationError
-from typing import Optional, Any, Dict, List
+
+from autodoc.data.manager import DatabaseManager
 
 
 def create_file_extension_check(extensions: list):

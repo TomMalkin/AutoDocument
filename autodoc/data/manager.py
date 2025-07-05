@@ -1,27 +1,23 @@
 """Define the DatabaseManager class that manages a Session and exposes repositories."""
 
-from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
-
-from .repositories import (
-    SQLFieldsRepository,
-    FormFieldRepository,
-    WorkflowRepository,
-    WorkflowInstanceRepository,
-    DatabaseMetaSourceRepository,
-    OutcomeTypeRepository,
-    SourceTypeRepository,
-    StorageTypeRepository,
-    StorageInstanceRepository,
-    FileTemplateRepository,
-    OutcomeRepository,
-    SourceRepository,
-    VFileAccessorsRepository,
-    VOutcomeRepository,
-)
-from .services import StorageService
+from sqlalchemy.orm import Session, sessionmaker
 
 from .base import Base
+from .repositories import (
+    DatabaseMetaSourceRepository,
+    FileTemplateRepository,
+    FormFieldRepository,
+    OutcomeRepository,
+    OutcomeTypeRepository,
+    SourceRepository,
+    SourceTypeRepository,
+    SQLFieldsRepository,
+    StorageInstanceRepository,
+    StorageTypeRepository,
+    WorkflowInstanceRepository,
+    WorkflowRepository,
+)
 
 
 class DatabaseManager:
@@ -30,10 +26,9 @@ class DatabaseManager:
     def __init__(self, db_file: str):
         """Create a Database Manager with a given db_file."""
         self.engine = create_engine(f"sqlite:///{db_file}")
-        # Ensure tables are created if this is the first run
         Base.metadata.create_all(self.engine)
         self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        self._session: Session | None = None  # This will hold the session for the request
+        self._session: Session | None = None
 
     def _get_current_session(self) -> Session:
         """Lazily create and return a SQLAlchemy session for the current request."""
@@ -101,20 +96,20 @@ class DatabaseManager:
         """Provide access to the OutcomeRepository for the current session."""
         return OutcomeRepository(self._get_current_session())
 
-    @property
-    def v_file_accessors(self) -> VFileAccessorsRepository:
-        """Provide access to the VFileAccessorsRepository for the current session."""
-        return VFileAccessorsRepository(self._get_current_session())
+    # @property
+    # def v_file_accessors(self) -> VFileAccessorsRepository:
+    #     """Provide access to the VFileAccessorsRepository for the current session."""
+    #     return VFileAccessorsRepository(self._get_current_session())
+    #
+    # @property
+    # def v_outcomes(self) -> VOutcomeRepository:
+    #     """Provide access to the VOutcomes for the current session."""
+    #     return VOutcomeRepository(self._get_current_session())
 
-    @property
-    def v_outcomes(self) -> VOutcomeRepository:
-        """Provide access to the VOutcomes for the current session."""
-        return VOutcomeRepository(self._get_current_session())
-
-    @property
-    def storage_service(self) -> StorageService:
-        """Return a Storage Service."""
-        return StorageService(instance_repo=self.storage_instances, type_repo=self.storage_types)
+    # @property
+    # def storage_service(self) -> StorageService:
+    #     """Return a Storage Service."""
+    #     return StorageService(instance_repo=self.storage_instances, type_repo=self.storage_types)
 
     def commit(self):
         """Commit the current session's transaction."""
@@ -130,4 +125,4 @@ class DatabaseManager:
         """Close the current session."""
         if self._session:
             self._session.close()
-            self._session = None  # Ensure it's reset for the next request/use
+            self._session = None

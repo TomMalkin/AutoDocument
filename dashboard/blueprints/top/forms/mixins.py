@@ -2,6 +2,7 @@
 
 from wtforms import StringField
 
+
 class FileAccessorMixin:
     """Mixin class for when the dynamic file accessor snippet is used."""
 

@@ -1,9 +1,9 @@
 """Create a base class for sources."""
 
 from abc import ABC, abstractmethod
-from pathlib import Path
-from autodoc.storage_service import StorageService, get_storage_service
+
 from autodoc.data.tables import Source
+from autodoc.storage_service import get_storage_service
 
 
 class SourceService(ABC):

@@ -1,47 +1,43 @@
-"""Define workflow views."""
+"""Define snippet views."""
 
-from flask import Blueprint, render_template, request, render_template_string
-from dashboard.database import get_db_manager
+from flask import Blueprint, render_template, render_template_string, request
 from loguru import logger
 
+from dashboard.database import get_db_manager
 
 bp = Blueprint("snippet", __name__)
 
 
-@bp.route("/snippet/file_accessor_form")
-def file_accessor_form_snippet():
-    """Return a form snippet based on the type of file access id."""
-    file_access_id = request.args.get("option")
-    logger.debug(f"Getting file accessor form snippet for {file_access_id=}")
+@bp.route("/snippet/input_storage_instance_form")
+def input_storage_instance_form_snippet():
+    """Return a form snippet based on the type of storage instance."""
+    storage_instance_id_str = request.args.get("option")
+
+    if not storage_instance_id_str:
+        return render_template_string("")
+
+    storage_instance_id = int(storage_instance_id_str)
+
+    logger.debug(f"Getting file accessor form snippet for {storage_instance_id=}")
 
     manager = get_db_manager()
 
-    if not file_access_id:
-        return render_template_string("")
-
-    if file_access_id == "-1":
+    if storage_instance_id == -1:
         snippet_file = "upload.html"
         root_path = None
 
     else:
+        storage_instance = manager.storage_instances.get(storage_instance_id=storage_instance_id)
 
-        file_access_id = int(file_access_id)
-        file_accessor = manager.v_file_accessors.get(file_access_id)
-
-        file_access_type_id = None
-
-        if file_accessor:
-            file_access_type_id = file_accessor.FileAccessTypeId
-
+        if storage_instance:
             snippet_file_map = {
-                2: "file_system.html",
-                3: "file_system.html",
-                4: "s3.html",
-                5: "sharepoint.html",
+                "Linux Share": "file_system.html",
+                "Windows Share": "file_system.html",
+                "S3": "s3.html",
+                "SharePoint": "sharepoint.html",
             }
-
-            snippet_file = snippet_file_map.get(file_access_type_id)
-            root_path = file_accessor.RemotePath
+            snippet_file = snippet_file_map.get(storage_instance.storage_type.Name)
+            root_path = storage_instance.RemotePath
 
         else:
             raise
@@ -50,40 +46,37 @@ def file_accessor_form_snippet():
     return render_template(snippet_path, root_path=root_path)
 
 
-@bp.route("/snippet/output_file_accessor_form")
-def output_file_accessor_form_snippet():
+@bp.route("/snippet/output_storage_instance_form")
+def output_storage_instance_form_snippet():
     """Return a form snippet based on the type of file access id."""
-    file_access_id = request.args.get("outputoption")
+    storage_instance_id_str = request.args.get("outputoption")
     placeholder = request.args.get("placeholder")
+
+    if not storage_instance_id_str:
+        return render_template_string("")
+
+    storage_instance_id = int(storage_instance_id_str)
+
+    logger.debug(f"Getting file accessor form snippet for {storage_instance_id=}")
 
     manager = get_db_manager()
 
-    if not file_access_id:
-        return render_template_string("")
-
-    if file_access_id == "-1":
+    if storage_instance_id == -1:
         snippet_file = "download.html"
         root_path = None
 
     else:
+        storage_instance = manager.storage_instances.get(storage_instance_id=storage_instance_id)
 
-        file_access_id = int(file_access_id)
-        file_accessor = manager.v_file_accessors.get(file_access_id)
-
-        if file_accessor:
-            file_access_type_id = file_accessor.FileAccessTypeId
-
-            # file_access_type_id = record["FileAccessTypeId"]
-
+        if storage_instance:
             snippet_file_map = {
-                2: "file_system_output.html",
-                3: "file_system_output.html",
-                4: "s3_output.html",
-                5: "sharepoint_output.html",
+                "Linux Share": "file_system_output.html",
+                "Windows Share": "file_system_output.html",
+                "S3": "s3_output.html",
+                "SharePoint": "sharepoint_output.html",
             }
-
-            snippet_file = snippet_file_map.get(file_access_type_id)
-            root_path = file_accessor.RemotePath
+            snippet_file = snippet_file_map.get(storage_instance.storage_type.Name)
+            root_path = storage_instance.RemotePath
 
         else:
             raise

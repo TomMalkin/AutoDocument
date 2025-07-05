@@ -1,12 +1,14 @@
 """Define HTML views."""
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from ...forms import CreateHTMLOutcomeForm
-from ...models import get_optional_new_file_template_id
+from typing import Union
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from werkzeug.wrappers.response import Response
+
 from dashboard.database import get_db_manager
 
-from typing import Union
+from ...forms import CreateHTMLOutcomeForm
+from ...models import get_optional_new_file_template_id
 
 bp = Blueprint("html", __name__)
 

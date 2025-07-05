@@ -1,15 +1,14 @@
 """Define the S3 compatiable file access class."""
 
-from jinja2 import Template
-import boto3
-from botocore.config import Config
-
-from .base import StorageService
+import tempfile
 from pathlib import Path
 
-import tempfile
-
+import boto3
+from botocore.config import Config
+from jinja2 import Template
 from loguru import logger
+
+from .base import StorageService
 
 
 class S3StorageService(StorageService):
@@ -17,9 +16,6 @@ class S3StorageService(StorageService):
 
     def __init__(self, root: str, relative: str, url: str, username: str, password: str):
         """Initialise with the root and relative paths."""
-        # self.url = url
-        # self.access_key = username
-        # self.secret_key = password
         self.bucket = root
         self.filename_raw = relative
 

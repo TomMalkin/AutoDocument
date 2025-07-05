@@ -2,6 +2,7 @@
 
 from loguru import logger
 
+
 class RecordSet:
     """Represents a data container with 1 or more fields and 1 or more rows."""
 

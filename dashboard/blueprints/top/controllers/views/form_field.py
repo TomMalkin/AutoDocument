@@ -1,13 +1,14 @@
-"""Define workflow views."""
-
-from flask import Blueprint, render_template, redirect, url_for
-
-from dashboard.database import get_db_manager
-from ...forms import CreateFormFieldForm
-from werkzeug.wrappers.response import Response
-from loguru import logger
+"""Define form views."""
 
 from typing import Union, cast
+
+from flask import Blueprint, redirect, render_template, url_for
+from loguru import logger
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
+
+from ...forms import CreateFormFieldForm
 
 bp = Blueprint("form_field", __name__)
 

@@ -1,15 +1,17 @@
-"""Define workflow views."""
-
-from flask import Blueprint, render_template, redirect, url_for
-from ...forms import (
-    CreateRecordSourceForm,
-    CreateRecordSetSourceForm,
-    CreateRecordSetTransposeSourceForm,
-)
-from werkzeug.wrappers.response import Response
-from dashboard.database import get_db_manager
+"""Define sql views."""
 
 from typing import Union
+
+from flask import Blueprint, redirect, render_template, url_for
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
+
+from ...forms import (
+    CreateRecordSetSourceForm,
+    CreateRecordSetTransposeSourceForm,
+    CreateRecordSourceForm,
+)
 
 bp = Blueprint("sql", __name__)
 
@@ -23,8 +25,6 @@ def add_record_source_view(workflow_id: int) -> Union[str, Response]:
     database_choices = manager.database_meta_sources.get_all()
     form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
 
-    # form.database.choices = get_meta_database_choices()
-
     if form.validate_on_submit():
         source_type = manager.source_types.get_from_name(name="SQL Record")
         manager.sources.add(
@@ -32,7 +32,7 @@ def add_record_source_view(workflow_id: int) -> Union[str, Response]:
             source_type=source_type,
             sql_text=form.sql_text.data,
             database_id=form.database.data,
-            step=form.step.data or 1
+            step=form.step.data or 1,
         )
         manager.commit()
 
@@ -50,7 +50,6 @@ def add_record_set_source_view(workflow_id: int) -> Union[str, Response]:
     manager = get_db_manager()
     database_choices = manager.database_meta_sources.get_all()
     form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
-    # form.database.choices = get_meta_database_choices()
 
     if form.validate_on_submit():
         splitter = form.splitter_choice.data == "splitter"
@@ -63,18 +62,10 @@ def add_record_set_source_view(workflow_id: int) -> Union[str, Response]:
             database_id=form.database.data,
             field_name=form.field_name.data,
             splitter=splitter,
-            step=form.step.data or 1
+            step=form.step.data or 1,
         )
         manager.commit()
 
-        # add_record_set_source(
-        #     workflow_id=workflow_id,
-        #     sql_text=form.sql_text.data,
-        #     database_id=form.database.data,
-        #     field_name=form.field_name.data,
-        #     splitter=splitter,
-        #     step=form.step.data,
-        # )
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     return render_template(
@@ -89,7 +80,6 @@ def add_record_set_transpose_source_view(workflow_id: int) -> Union[str, Respons
     manager = get_db_manager()
     database_choices = manager.database_meta_sources.get_all()
     form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
-    # form.database.choices = get_meta_database_choices()
 
     if form.validate_on_submit():
         source_type = manager.source_types.get_from_name(name="SQL RecordSet Transpose")
@@ -100,17 +90,9 @@ def add_record_set_transpose_source_view(workflow_id: int) -> Union[str, Respons
             database_id=form.database.data,
             key_field=form.key_field.data,
             value_field=form.value_field.data,
-            step=form.step.data or 1
+            step=form.step.data or 1,
         )
         manager.commit()
-        # add_record_set_transpose_source(
-        #     workflow_id=workflow_id,
-        #     sql_text=form.sql_text.data,
-        #     database_id=form.database.data,
-        #     key_field=form.key_field.data,
-        #     value_field=form.value_field.data,
-        #     step=form.step.data,
-        # )
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     return render_template(

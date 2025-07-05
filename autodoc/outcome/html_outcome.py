@@ -1,13 +1,14 @@
 """Outcome for creating HTML Files."""
 
-from jinja2 import Template
+from typing import Optional
 
-from autodoc.storage_service import LinuxStorageService
+from jinja2 import Template
+from loguru import logger
+
+from autodoc.data.tables import Outcome
 from autodoc.outcome.download_container import DownloadContainer
 from autodoc.outcome.outcome import OutcomeService
-from loguru import logger
-from autodoc.data.tables import Outcome
-from typing import Optional
+from autodoc.storage_service import LinuxStorageService
 
 
 class HTMLOutcomeService(OutcomeService):
@@ -40,12 +41,6 @@ class HTMLOutcomeService(OutcomeService):
         else:
             self.set_input_storage_service()
 
-
-        print(download_container)
-        print(outcome.output_file_template)
-
-        # import pdb; pdb.set_trace()
-
         if download_container and outcome.is_download:
             self.output_storage_service = LinuxStorageService(
                 root=str(download_container.download_dir),
@@ -53,9 +48,6 @@ class HTMLOutcomeService(OutcomeService):
             )
         else:
             self.set_output_storage_service()
-
-        # assert self.input_storage_service
-        # assert self.output_storage_service
 
         self.template = Template(self.input_storage_service.get_text())
 

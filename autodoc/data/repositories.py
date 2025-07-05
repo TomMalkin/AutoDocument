@@ -1,26 +1,23 @@
 """Define the repositories."""
 
 import datetime
-
 from typing import Optional
+
+from sqlalchemy import delete, or_, select
 from sqlalchemy.orm import Session
-from sqlalchemy import select, delete, or_
+
 from .tables import (
+    DatabaseMetaSource,
+    FileTemplate,
     FormField,
+    Outcome,
+    OutcomeType,
+    Source,
+    SourceType,
+    StorageInstance,
+    StorageType,
     Workflow,
     WorkflowInstance,
-    DatabaseMetaSource,
-    OutcomeType,
-    SourceType,
-    StorageType,
-    StorageInstance,
-    FileTemplate,
-    Outcome,
-    Source,
-)
-from .views import (
-    VFileAccessor,
-    VOutcome,
 )
 
 
@@ -118,17 +115,12 @@ class WorkflowInstanceRepository(Repository):
         """Add a new instance based on the splitting of another Workflow."""
         instance = WorkflowInstance(
             ParentInstanceId=parent_instance_id,
-            StartTime=start_time,
+            StartTime=datetime.datetime.now().timestamp(),
             Step=step,
         )
         self.session.add(instance)
         self.session.flush()
         return instance
-
-
-# class WorkflowInstanceEventRepository:
-#     def __init__(self, session: Session):
-#         self.session = session
 
 
 class DatabaseMetaSourceRepository(Repository):
@@ -183,6 +175,10 @@ class StorageTypeRepository(Repository):
 
 class StorageInstanceRepository(Repository):
     """The repository of actions on the StorageInstance Table."""
+
+    def get(self, storage_instance_id: int) -> StorageInstance:
+        """Get a StorageInstance from an Id."""
+        return self.session.get(StorageInstance, storage_instance_id)
 
     def get_all_of_type(self, storage_type: str) -> list[StorageInstance]:
         """Get all Storage Instances of a given type."""
@@ -317,20 +313,6 @@ class SourceRepository(Repository):
         """Get a single Source."""
         return self.session.get(Source, source_id)
 
-    # def get_file_details(
-    #     self, source_id: int
-    # ) -> tuple[Source, FileTemplate, StorageInstance, StorageType]:
-    #     """Get the file template details for a given source."""
-    #     stmt = (
-    #         select(Source, FileTemplate, StorageInstance, StorageType)
-    #         .select_from(Source)
-    #         .join(FileTemplate, isouter=True)
-    #         .join(StorageInstance, isouter=True)
-    #         .join(StorageType, isouter=True)
-    #         .where(Source.Id == source_id)
-    #     )
-    #     return self.session.execute(stmt).tuples().first()
-
     def get_file_uploads(self, workflow_id: int) -> list[Source]:
         """
         Get Sources that require a file upload for a given Workflow.
@@ -422,26 +404,3 @@ class SourceRepository(Repository):
         self.session.add(source)
         self.session.flush()
         return source
-
-
-class VFileAccessorsRepository(Repository):
-    """Repository for the vFileAccessors view."""
-
-    def get_all(self):
-        """Return all current file accessors."""
-        stmt = select(VFileAccessor)
-        return self.session.scalars(stmt)
-
-    def get(self, file_access_id: int) -> Optional[VFileAccessor]:
-        """Get a single file accessor from the vFileAccessors view."""
-        stmt = select(VFileAccessor).where(VFileAccessor.FileAccessId == file_access_id)
-        return self.session.scalars(stmt).first()
-
-
-class VOutcomeRepository(Repository):
-    """Repository for the vOutcomes view."""
-
-    def get_all(self, workflow_id: int):
-        """Return all vOutcomes for a given workflow Id."""
-        stmt = select(VOutcome).where(VOutcome.WorkflowId == workflow_id)
-        return self.session.scalars(stmt)

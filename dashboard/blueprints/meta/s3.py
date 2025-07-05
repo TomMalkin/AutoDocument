@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for
-from dashboard.database import get_db_manager
+"""Manage S3."""
+
+from flask import Blueprint, redirect, render_template, url_for
 from flask_login import login_required
 
-from .forms import (
-    CreateMetaS3,
-)
+from dashboard.database import get_db_manager
+
+from .forms import CreateMetaS3
 
 bp = Blueprint("s3", "s3")
 
@@ -27,15 +28,19 @@ def add():
     form = CreateMetaS3()
 
     if form.validate_on_submit():
-        print("validated")
         url = form.url.data
         username = form.s3_username.data
         password = form.s3_password.data
-        manager.storage_service.add_instance_with_type(
-            storage_type_name="S3", url=url, username=username, password=password
-        )
 
-    print(form.errors)
+        storage_type = manager.storage_types.get_by_name(name="S3")
+        manager.storage_instances.add(
+            storage_type=storage_type,
+            url=url,
+            username=username,
+            password=password,
+        )
+        manager.commit()
+
     return redirect(url_for("meta.s3.manage"))
 
 

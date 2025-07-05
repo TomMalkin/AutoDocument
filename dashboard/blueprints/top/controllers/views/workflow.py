@@ -1,32 +1,30 @@
 """Define workflow views."""
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from flask import (
     Blueprint,
-    render_template,
+    current_app,
     redirect,
+    render_template,
+    render_template_string,
+    request,
     send_file,
     url_for,
-    request,
-    current_app,
-    render_template_string,
 )
 from loguru import logger
 from werkzeug.utils import secure_filename
-from dashboard.database import get_db_manager
-from ...forms import CreateWorkflowForm, get_form
-# from ...models import (
-#     get_source,
-#     get_form_fields_from_source,
-# )
-from autodoc import Workflow
 from werkzeug.wrappers.response import Response
-from autodoc.outcome.download_container import DownloadContainer
 
-# from autodoc.orm import VSource, VOutcome
+from autodoc import Workflow
+from autodoc.outcome.download_container import DownloadContainer
+from dashboard.database import get_db_manager
+
+from ...forms import CreateWorkflowForm, get_form
 
 bp = Blueprint("workflow", __name__)
+
 
 @bp.route("/workflow/<workflow_id>")
 def workflow(workflow_id: int) -> str:
@@ -42,8 +40,6 @@ def workflow(workflow_id: int) -> str:
     return render_template(
         "top/workflow.html",
         workflow=workflow,
-        # sources=sources,
-        # outcomes=outcomes,
         instances=instances,
         form_fields=form_fields,
     )
@@ -73,30 +69,6 @@ def create_workflow_view() -> Response:
                 return redirect(url_for("top.workflow.workflow", workflow_id=workflow.Id))
 
     return redirect(url_for("top.base.index"))
-
-
-# @bp.route("/source/<source_id>/", methods=["GET"])
-# def source(source_id: int) -> Response | str:
-#     """Show details about a source."""
-#     manager = get_db_manager()
-#     # source_id = source_details["SourceId"]
-#
-#     source, _ = manager.sources.get(source_id=source_id)
-#     workflow_id = source.WorkflowId
-#     form_fields = manager.form_fields.get_all(workflow_id=workflow_id)
-#
-#     # source_details = get_source(source_id)
-#     # form_details = get_form_fields_from_source(source_id)
-#
-#     sql_field_form = None
-#
-#     return render_template(
-#         "top/source.html",
-#         source_details=source,
-#         form_details=form_fields,
-#         sql_field_form=sql_field_form,
-#         source_id=source_id,
-#     )
 
 
 @bp.route("/instance/<workflow_id>/", methods=["GET", "POST"])

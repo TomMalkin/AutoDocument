@@ -1,7 +1,7 @@
 <div class="border border-gray-300 rounded p-4 mt-4">
     <label for="option" class="pt-4">{{ file_label or "File:" }}</label>
     <select id="outputoption" name="outputoption" class=" bg-gray-50 mt-4 block w-full p-2 border border-gray-300 rounded-md"
-        hx-get="{{ url_for('top.snippet.output_file_accessor_form_snippet', placeholder=placeholder ) }}" hx-target="#dynamic-fields-output" required>
+        hx-get="{{ url_for('top.snippet.output_storage_instance_form_snippet', placeholder=placeholder ) }}" hx-target="#dynamic-fields-output" required>
         <option selected="true" disabled="disabled" value="">Select...</option>
 
         <option value="-1">Downloaded after Workflow</option>

@@ -1,8 +1,9 @@
 """Define all ORM tables from the sqlite database."""
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Text, ForeignKey, Boolean, Numeric
 from typing import Optional
+
+from sqlalchemy import Boolean, ForeignKey, Numeric, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -188,6 +189,7 @@ class FileTemplate(Base):
 
     @property
     def is_download(self) -> bool:
+        """Return if this file template should be added to the download container."""
         return self.StorageInstanceId == -1
 
 

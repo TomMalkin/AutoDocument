@@ -2,9 +2,10 @@
 
 import pandas as pd
 
-from autodoc.storage_service import LinuxStorageService
-from .source import SourceService
 from autodoc.data.tables import Source
+from autodoc.storage_service import LinuxStorageService
+
+from .source import SourceService
 
 
 class ExcelRecordSourceService(SourceService):

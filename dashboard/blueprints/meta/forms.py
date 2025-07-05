@@ -1,5 +1,7 @@
+"""Define forms for meta objects."""
+
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField, PasswordField
+from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, InputRequired
 
 
@@ -15,7 +17,7 @@ class CreateMetaDatabase(FlaskForm):
         ("mssql", "Microsoft SQL Server"),
     ]
 
-    database= SelectField("Database", choices=database_choices, validators=[InputRequired()])
+    database = SelectField("Database", choices=database_choices, validators=[InputRequired()])
     connection_string = StringField("Connection String", validators=[InputRequired()])
     submit = SubmitField()
 
@@ -23,17 +25,32 @@ class CreateMetaDatabase(FlaskForm):
 class CreateMetaFileSystem(FlaskForm):
     """Form to create a Unix based file system link."""
 
-    local_path = StringField("Container Path", validators=[DataRequired()], render_kw={"placeholder": "/path/in/container"})
-    remote_path = StringField("Linux Path", validators=[DataRequired()], render_kw={"placeholder": "/path/familiar/to/users"})
+    local_path = StringField(
+        "Container Path",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "/path/in/container"},
+    )
+    remote_path = StringField(
+        "Linux Path",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "/path/familiar/to/users"},
+    )
     submit = SubmitField("Add Posix File System")
 
 
 class CreateMetaWindowsFileSystem(FlaskForm):
     """Form to create a file system link to a windows share."""
 
-    local_path = StringField("Local Path", validators=[DataRequired()], render_kw={"placeholder": "/path/in/container"})
-    remote_path = StringField("Windows Path", validators=[DataRequired()], render_kw={"placeholder": r"Letter:\Familiar\Path"})
+    local_path = StringField(
+        "Local Path", validators=[DataRequired()], render_kw={"placeholder": "/path/in/container"}
+    )
+    remote_path = StringField(
+        "Windows Path",
+        validators=[DataRequired()],
+        render_kw={"placeholder": r"Letter:\Familiar\Path"},
+    )
     submit = SubmitField("Add Windows File System")
+
 
 class CreateMetaS3(FlaskForm):
     """Form to create a S3 connection."""
@@ -44,10 +61,15 @@ class CreateMetaS3(FlaskForm):
 
     submit = SubmitField()
 
+
 class CreateMetaSharePoint(FlaskForm):
     """Form to create a S3 connection."""
 
-    url = StringField("URL", validators=[DataRequired()], render_kw={"placeholder": "https://mybusiness.sharepoint.com/sites/MySite/"})
+    url = StringField(
+        "URL",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "https://mybusiness.sharepoint.com/sites/MySite/"},
+    )
     library = StringField("Library", validators=[DataRequired()])
     microsoft_username = StringField("Microsoft User", validators=[DataRequired()])
     microsoft_password = PasswordField("Microsoft Password", validators=[DataRequired()])

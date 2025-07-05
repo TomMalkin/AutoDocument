@@ -1,9 +1,10 @@
 """Define base views."""
 
 from flask import Blueprint, render_template
-from dashboard.database import get_db_manager
-from ...forms import CreateWorkflowForm
 
+from dashboard.database import get_db_manager
+
+from ...forms import CreateWorkflowForm
 
 bp = Blueprint("base", __name__)
 

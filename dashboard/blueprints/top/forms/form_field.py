@@ -1,10 +1,8 @@
 """Define Form Field Forms."""
 
-from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import InputRequired
-
-
 from flask_wtf import FlaskForm
+from wtforms import SelectField, StringField, SubmitField
+from wtforms.validators import InputRequired
 
 
 class CreateFormFieldForm(FlaskForm):

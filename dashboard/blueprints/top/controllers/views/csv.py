@@ -1,15 +1,15 @@
-"""Define workflow views."""
-
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from loguru import logger
-from ...forms import CreateCSVRecordSourceForm, CreateCSVTableSourceForm
-
-from werkzeug.wrappers.response import Response
-from dashboard.database import get_db_manager
-from ...models import get_optional_new_file_template_id
-
+"""Define csv views."""
 
 from typing import Union
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from loguru import logger
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
+
+from ...forms import CreateCSVRecordSourceForm, CreateCSVTableSourceForm
+from ...models import get_optional_new_file_template_id
 
 bp = Blueprint("csv", __name__)
 
@@ -57,7 +57,6 @@ def add_csv_record_source_view(workflow_id: int) -> Union[str, Response]:
     else:
         logger.error(form.errors)
 
-    # file_access_list = manager.v_file_accessors.get_all()
     storage_instances = manager.storage_instances.get_all()
 
     return render_template(

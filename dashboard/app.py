@@ -1,16 +1,18 @@
 """Define the app creation factory."""
 
+import os
 import sys
 from pathlib import Path
-from flask import Flask
-from autodoc.config import TARGET_DB_PATH
-from .blueprints import top_blueprint, meta_blueprint, auth_blueprint, card_blueprint
-from .blueprints.auth.controllers import login_manager
-from dashboard.database import register_db_teardown
-from loguru import logger
-from dotenv import load_dotenv
-import os
 
+from dotenv import load_dotenv
+from flask import Flask
+from loguru import logger
+
+from autodoc.config import TARGET_DB_PATH
+from dashboard.database import register_db_teardown
+
+from .blueprints import auth_blueprint, card_blueprint, meta_blueprint, top_blueprint
+from .blueprints.auth.controllers import login_manager
 
 load_dotenv()
 

@@ -1,13 +1,15 @@
-"""Define workflow views."""
-
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from loguru import logger
-from ...forms import CreateExcelRecordSourceForm, CreateExcelTableSourceForm
-from werkzeug.wrappers.response import Response
-from dashboard.database import get_db_manager
-from dashboard.blueprints.top.models import get_optional_new_file_template_id
+"""Define excel views."""
 
 from typing import Union
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from loguru import logger
+from werkzeug.wrappers.response import Response
+
+from dashboard.blueprints.top.models import get_optional_new_file_template_id
+from dashboard.database import get_db_manager
+
+from ...forms import CreateExcelRecordSourceForm, CreateExcelTableSourceForm
 
 bp = Blueprint("excel", __name__)
 
@@ -61,7 +63,7 @@ def add_excel_record_source_view(workflow_id: int) -> Union[str, Response]:
         "top/add_source/add_excel_record_source.html",
         form=form,
         workflow_id=workflow_id,
-        storage_instances=storage_instances
+        storage_instances=storage_instances,
     )
 
 
@@ -119,5 +121,5 @@ def add_excel_table_source_view(workflow_id: int) -> Union[str, Response]:
         "top/add_source/add_excel_table_source.html",
         form=form,
         workflow_id=workflow_id,
-        storage_instances=storage_instances
+        storage_instances=storage_instances,
     )

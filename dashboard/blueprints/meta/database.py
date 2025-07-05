@@ -7,9 +7,7 @@ from flask_login import login_required
 
 from dashboard.database import get_db_manager
 
-from .forms import (
-    CreateMetaDatabase,
-)
+from .forms import CreateMetaDatabase
 
 bp = Blueprint("db", "db")
 
@@ -66,7 +64,6 @@ def add():
         database = form.database.data
         connection_string = form.connection_string.data
         full_connection_string = f"{mapping[database]}://{connection_string}"
-        # manager.add_meta_database(name=name, connection_string=full_connection_string)
         manager.database_meta_sources.add(name=name, connection_string=full_connection_string)
 
     return redirect(url_for("meta.db.manage"))

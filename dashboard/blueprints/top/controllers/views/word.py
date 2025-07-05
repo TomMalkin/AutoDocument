@@ -1,14 +1,15 @@
 """Define Microsoft Word views."""
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from ...forms import CreateWordOutcomeForm
+from typing import Union
 
-# from ...models import get_file_accessors, add_word_outcome
-from ...models import get_optional_new_file_template_id
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from werkzeug.wrappers.response import Response
+
 from dashboard.database import get_db_manager
 
-from typing import Union
+from ...forms import CreateWordOutcomeForm
+
+from ...models import get_optional_new_file_template_id
 
 bp = Blueprint("word", __name__)
 

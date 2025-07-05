@@ -1,6 +1,7 @@
-"""Define base views."""
+"""Define diagram views."""
 
 from flask import Blueprint, render_template, request
+
 from dashboard.database import get_db_manager
 
 bp = Blueprint("diagram", __name__)

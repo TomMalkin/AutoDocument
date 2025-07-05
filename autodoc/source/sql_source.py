@@ -2,9 +2,9 @@
 
 import regex as re
 
-# from autodoc.data.manager import DatabaseManager
 from autodoc.data.tables import Source
 from autodoc.metasource import MetaDatabase
+
 from .source import SourceService
 
 
