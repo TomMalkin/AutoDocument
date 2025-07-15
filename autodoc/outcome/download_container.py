@@ -1,9 +1,10 @@
 """Define the DownloadContainer class."""
 
-from loguru import logger
-import zipfile
 import os
+import zipfile
 from pathlib import Path
+
+from loguru import logger
 
 
 class DownloadContainer:

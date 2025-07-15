@@ -12,14 +12,14 @@
         <div class="flex flex-row gap-2 mb-2">
             <h2 class="text-xl font-bold">PDF File</h2>
             <a class="rounded inline-block px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.outcome.delete_outcome_view', workflow_id=workflow_id, outcome_id=outcome_id) }}">delete</a>
+                href="{{ url_for('top.outcome.delete_outcome_view', workflow_id=outcome.WorkflowId, outcome_id=outcome.Id) }}">delete</a>
         </div>
 
         <div class="flex flex-row gap-2 mb-5">
 
             <p class="font-bold">Template (.docx) Loaded From:</p>
             <div class="mt-2 p-1 rounded-lg bg-gray-100" hx-trigger="load"
-                hx-get="{{ url_for('card.outcome_storage_card', outcome_id=outcome_id, input_type='input') }}" hx-swap="outerHTML">
+                hx-get="{{ url_for('card.outcome_storage_card', outcome_id=outcome.Id, input_type='input') }}" hx-swap="outerHTML">
             </div>
         </div>
 
@@ -27,7 +27,7 @@
 
             <p class="font-bold">Saved To:</p>
             <div class="mt-2 p-1 rounded-lg bg-gray-100" hx-trigger="load"
-                hx-get="{{ url_for('card.outcome_storage_card', outcome_id=outcome_id, input_type='output') }}" hx-swap="outerHTML">
+                hx-get="{{ url_for('card.outcome_storage_card', outcome_id=outcome.Id, input_type='output') }}" hx-swap="outerHTML">
             </div>
 
         </div>

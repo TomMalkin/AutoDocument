@@ -20,12 +20,13 @@
             <h1 class="text-3xl font-bold">Step {{step}}</h1>
 
             <div class="flex flex-col flex-grow">
-                {% for source_record in sources %}
-                {% if source_record['step'] == step %}
-                <div hx-get="{{ url_for('card.source_card', source_id=source_record['source_id']) }}" hx-trigger="load"
+                {% for source in sources %}
+
+                {% if source.Step == step %}
+                <div hx-get="{{ url_for('card.source_card', source_id=source.Id) }}" hx-trigger="load"
                     hx-swap="outerHTML">
                 </div>
-
+                
                 {% endif %}
                 {% endfor %}
             </div>
@@ -60,7 +61,7 @@
     <div class="flex flex-col flex-grow">
 
         {% for outcome in outcomes %}
-        <div hx-get="{{ url_for('card.outcome_card', outcome_id=outcome['OutcomeId']) }}" hx-trigger="load"
+        <div hx-get="{{ url_for('card.outcome_card', outcome_id=outcome.Id) }}" hx-trigger="load"
             hx-swap="outerHTML">
         </div>
         {% endfor %}

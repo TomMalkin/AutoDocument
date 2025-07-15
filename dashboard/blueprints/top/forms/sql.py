@@ -2,13 +2,13 @@
 
 from flask_wtf import FlaskForm
 from wtforms import (
-    TextAreaField,
-    SelectField,
     BooleanField,
-    StringField,
     IntegerField,
-    SubmitField,
     RadioField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
 )
 from wtforms.validators import InputRequired
 

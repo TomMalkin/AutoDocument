@@ -1,18 +1,17 @@
 """Define the SharePoint compatiable file access class."""
 
-from jinja2 import Template
-
-from .file_access import FileAccess
+import tempfile
 from pathlib import Path
 
-import tempfile
-
+from jinja2 import Template
 from loguru import logger
 from office365.runtime.auth.user_credential import UserCredential
 from office365.sharepoint.client_context import ClientContext
 
+from .base import StorageService
 
-class SharePointSiteFileAccess(FileAccess):
+
+class SharePointSiteStorageService(StorageService):
     """Accessing files on Microsoft SharePoint."""
 
     def __init__(self, root, relative, url, username, password):

@@ -2,7 +2,8 @@
 
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
-from .mixins import FileAccessorMixin, OutputFileAccessorMixin, DownloadAccessorMixin
+
+from .mixins import DownloadAccessorMixin, FileAccessorMixin, OutputFileAccessorMixin
 
 
 class CreatePDFOutcomeForm(

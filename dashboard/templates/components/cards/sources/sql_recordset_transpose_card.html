@@ -17,14 +17,14 @@
         <div class="flex flex-row gap-2 mb-2">
             <h2 class="text-xl font-bold">SQL Transpose Recordset</h2>
             <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.source.delete_source_view', workflow_id=workflow_id, source_id=source_id) }}">delete</a>
+                href="{{ url_for('top.source.delete_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">delete</a>
         </div>
         {% include 'components/cards/transpose.html' %}
-        <p><span class="font-bold">Database:</span> {{ database_name }}</p>
+        <p><span class="font-bold">Database:</span> {{ source.database.Name }}</p>
         <p class="font-bold">Query:</p>
 
         <div class="mt-2 p-1 rounded-lg bg-gray-100 cursor-pointer" hx-trigger="click"
-            hx-get="{{ url_for('card.sql_text', source_id=source_id) }}" hx-swap="innerHTML">
+            hx-get="{{ url_for('card.sql_text', source_id=source.Id) }}" hx-swap="innerHTML">
             <p>(click to load)</p>
         </div>
 

@@ -1,10 +1,15 @@
-"""Define CSV forms."""
+"""Define Excel forms."""
+
+from flask_wtf import FlaskForm
+from wtforms import (
+    IntegerField,
+    RadioField,
+    StringField,
+    SubmitField,
+)
+from wtforms.validators import InputRequired
 
 from .mixins import FileAccessorMixin
-from flask_wtf import FlaskForm
-from wtforms import IntegerField  # type: ignore
-from wtforms import StringField, SubmitField, RadioField
-from wtforms.validators import InputRequired  # type: ignore
 
 
 class CreateExcelRecordSourceForm(FlaskForm, FileAccessorMixin):

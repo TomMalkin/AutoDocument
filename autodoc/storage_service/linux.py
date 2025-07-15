@@ -1,19 +1,24 @@
 """Define the linux filesystem based file access."""
 
-from .file_access import FileAccess
-from pathlib import Path
-from jinja2 import Template
 import shutil
+from pathlib import Path
+
+from jinja2 import Template
 from loguru import logger
 
+from .base import StorageService
 
-class LinuxFileAccess(FileAccess):
+
+class LinuxStorageService(StorageService):
     """Accessing files on linux based file shares."""
 
-    def __init__(self, root, relative, url=None, username=None, password=None):
+    def __init__(self, root: str, relative: str, **kwargs):
         """Initialise with the root and relative paths."""
         self.root_path_raw = root
         self.relative_path_raw = relative
+
+        if not self.relative_path_raw:
+            raise
 
         # rendered later
         self.root_path: str
@@ -22,13 +27,20 @@ class LinuxFileAccess(FileAccess):
 
         self.temp_file_name: str = ""
 
-    def render(self, data):
-        """Render the relative path of the file."""
+    def render(self, data: dict):
+        """
+        Render the relative path of the file by substituting fields in the raw path.
+
+        For example if data = {"client_id": 28}:
+            "/home/tom/{{ client_id }} - invoice.docx"
+            -> "/home/tom/28 - invoice.docx"
+
+        """
         self.relative_path = Template(self.relative_path_raw).render(**data)
         self.root_path = Template(self.root_path_raw).render(**data)
         self.path = Path(self.root_path) / Path(self.relative_path)
 
-    def get_text(self):
+    def get_text(self) -> str:
         """
         Get the text of the file.
 
@@ -39,7 +51,7 @@ class LinuxFileAccess(FileAccess):
         with open(path, "r") as f:
             return f.read()
 
-    def get_file(self):
+    def get_file(self) -> Path:
         """Get the path of the file."""
         return Path(self.root_path_raw) / Path(self.relative_path_raw)
 
@@ -48,7 +60,7 @@ class LinuxFileAccess(FileAccess):
         with open(self.path, "w") as f:
             f.write(text)
 
-    def save_file(self):
+    def save_file(self) -> None:
         """Save the temporary file to storage."""
         if not self.temp_file_name:
             return

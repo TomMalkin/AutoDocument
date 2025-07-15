@@ -1,20 +1,27 @@
 """Define an instance logger that logs to the WorkflowInstanceEvent table."""
 
-from typing import Optional
+from flask import Flask, current_app, g
 
-from flask import current_app, g
-
-from autodoc.db import Database, DatabaseManager
-from autodoc.workflow import EventLoggerInterface
+from autodoc.data import DatabaseManager
 
 
-def get_manager():
-    """Load database manager from application context."""
-    if not hasattr(g, "manager"):
-        DB_PATH = current_app.config["DB_PATH"]
-        g.manager = DatabaseManager(db=Database(db_file=DB_PATH))
+def get_db_manager() -> DatabaseManager:
+    """Load and return the database manager from Flask's application context."""
+    if "db_manager" not in g:
+        DB_PATH = current_app.config.get("DB_PATH", "./database/autodoc.db")
+        g.db_manager = DatabaseManager(db_file=DB_PATH)
+    return g.db_manager
 
-    return g.manager
+
+def register_db_teardown(app: Flask):
+    """Register a teardown function to ensure the database session is closed."""
+
+    @app.teardown_appcontext
+    def close_db_session(exception):
+        """Ensure the database session is closed at the end of the request."""
+        db_manager = g.pop("db_manager", None)
+        if db_manager:
+            db_manager.close()
 
 
 def close_db(e=None):
@@ -28,26 +35,3 @@ def close_db(e=None):
 def init_app(app):
     """Add teardown to the app."""
     app.teardown_appcontext(close_db)
-
-
-class InstanceLog(EventLoggerInterface):
-    """Provide database actions for logging instances."""
-
-    def __init__(self) -> None:
-        """Initialise the instance logger."""
-        # self.cm = cm
-
-    def write_source_event(
-        self,
-        instance_id: int,
-        source_id: Optional[int],
-        source_data: dict,
-        source_data_ongoing: dict,
-    ) -> None:
-        """Write a source event to the instance table."""
-
-    def write_outcome_event(self, instance_id: int, outcome_id: int, outcome_location: str) -> None:
-        """Write an outcome event to the event log table."""
-
-
-instance_log = InstanceLog()

@@ -1,13 +1,14 @@
-"""Define Microsoft Word views."""
-
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from ...forms import CreatePDFOutcomeForm
-from ...models import get_file_accessors, add_pdf_outcome
-from werkzeug.wrappers.response import Response
-from loguru import logger
-from dashboard.database import get_manager
+"""Define PFD views."""
 
 from typing import Union
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
+
+from ...forms import CreatePDFOutcomeForm
+from ...models import get_optional_new_file_template_id
 
 bp = Blueprint("pdf", __name__)
 
@@ -16,61 +17,48 @@ bp = Blueprint("pdf", __name__)
 def add_pdf_outcome_view(workflow_id: int) -> Union[str, Response]:
     """Add a PDF outcome."""
     form = CreatePDFOutcomeForm()
+    manager = get_db_manager()
 
     if form.validate_on_submit():
-        location = form.location.data
-        bucket = form.bucket.data
         name = form.name.data
 
-        if name:
-            sql = "select Name from Source where WorkflowId = :workflow_id"
-            params = {"workflow_id": workflow_id}
-            current_names = get_manager().db.recordset(sql=sql, params=params).column("Name")
+        if name and manager.sources.name_exists(name=name):
+            flash(f"{name} already exists, choose another name", "error")
+            return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
-            if name in current_names:
-                logger.info(f"attempted add of {name} when existing names are {current_names}")
-                flash(f"{name} already exists, choose another name", "error")
-                return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
-
-        file_access_id = None
-
-        if request.form["option"]:
-            file_access_id = int(request.form["option"])
-            if file_access_id == -1:
-                file_access_id = None
-
-        output_location = form.output_location.data
-        output_bucket = form.output_bucket.data
-        output_file_access_id = None
-
-        download_name = form.download_name.data
-
-        if download_name:
-            output_location = download_name
-
-        if request.form["outputoption"]:
-            output_file_access_id = int(request.form["outputoption"])
-            if output_file_access_id == -1:
-                output_file_access_id = get_manager().get_download_access_id()
-
-        add_pdf_outcome(
-            workflow_id,
-            input_file_access_id=file_access_id,
-            input_location=location,
-            input_bucket=bucket,
-            output_file_access_id=output_file_access_id,
-            output_location=output_location,
-            output_bucket=output_bucket,
-            name=name,
+        input_file_template_id = get_optional_new_file_template_id(
+            manager=manager,
+            storage_instance_id=int(request.form["option"]),
+            location=form.location.data,
+            bucket=form.bucket.data,
         )
+
+        output_file_template_id = get_optional_new_file_template_id(
+            manager=manager,
+            storage_instance_id=int(request.form["outputoption"]),
+            location=form.output_location.data,
+            bucket=form.output_bucket.data,
+        )
+
+        outcome_type = manager.outcome_types.get_from_name(name="PDF")
+
+        manager.outcomes.add(
+            workflow_id=workflow_id,
+            outcome_type=outcome_type,
+            name=name,
+            input_instance_id=input_file_template_id,
+            output_instance_id=output_file_template_id,
+            download_name=form.download_name.data,
+        )
+        manager.commit()
 
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
-    file_access_list = get_file_accessors()
+    storage_instances = manager.storage_instances.get_all()
 
     return render_template(
         "top/add_outcome/add_pdf_outcome.html",
         form=form,
         workflow_id=workflow_id,
-        file_access_list=file_access_list,
+        storage_instances=storage_instances,
     )

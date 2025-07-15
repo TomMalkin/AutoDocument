@@ -1,6 +1,6 @@
 """Define Authentication views."""
 
-from flask import Blueprint, request, flash, render_template, redirect, url_for, current_app
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user
 from loguru import logger
 
@@ -10,12 +10,16 @@ auth_blueprint = Blueprint("auth", "auth_blueprint", url_prefix="/auth")
 
 
 class User(UserMixin):
+    """User class for Flask login."""
+
     def __init__(self, id):
+        """Init the user as per Flask Login docs."""
         self.id = id
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    """User loader."""
     return User(user_id)
 
 

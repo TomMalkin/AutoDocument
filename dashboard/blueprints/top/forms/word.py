@@ -1,9 +1,10 @@
 """Define Microsoft Word based forms."""
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FileField, SelectField, IntegerField
+from wtforms import FileField, IntegerField, SelectField, StringField, SubmitField
 from wtforms.validators import InputRequired
-from .mixins import FileAccessorMixin, OutputFileAccessorMixin, DownloadAccessorMixin
+
+from .mixins import DownloadAccessorMixin, FileAccessorMixin, OutputFileAccessorMixin
 
 
 class CreateWordOutcomeForm(

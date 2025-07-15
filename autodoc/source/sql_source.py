@@ -1,27 +1,34 @@
 """Define SQL based Sources."""
 
-from autodoc.db import DatabaseManager, get_sql_fields
-from loguru import logger
+import regex as re
 
-from autodoc.source.source import Source
+from autodoc.data.tables import Source
 from autodoc.metasource import MetaDatabase
 
+from .source import SourceService
 
-class RecordSource(Source):
+
+def get_sql_fields(sql: str) -> list:
+    """Return the sql fields that are required to render sql text."""
+    pattern = r"(?<=[\s\(]:)([A-Z0-9a-z\_]*)"
+    field_names = re.findall(pattern, sql)
+    return field_names
+
+
+class RecordSourceService(SourceService):
     """A single row of SQL data."""
 
-    def __init__(self, source_details: dict, manager: DatabaseManager, **_) -> None:
+    def __init__(self, source: Source) -> None:
         """Source several values from a single record from a SQL query."""
         self.data = {}
 
-        self.sql = source_details["SQLText"]
-        self.database_id = source_details["DatabaseId"]
+        self.sql = source.SQLText
+        self.database_id = source.DatabaseId
 
         self.field_names = get_sql_fields(sql=self.sql)
         self.is_multi_record = False
 
-        self.meta_database = MetaDatabase(database_id=self.database_id, manager=manager)
-
+        self.meta_database = MetaDatabase(database=self.source.database)
 
     def load_data(self, current_data: dict) -> None:
         """
@@ -31,7 +38,6 @@ class RecordSource(Source):
         we can't pass everything across. The resulting params are applied to the
         self.sql text and the scalar is returned, and then set to the self.data dict.
         """
-        logger.info(f"field names are {self.field_names}")
         params = {k: v for k, v in current_data.items() if k in self.field_names}
 
         record = self.meta_database.record(
@@ -41,20 +47,21 @@ class RecordSource(Source):
 
         self.data = record.data
 
-class RecordSetSource(Source):
-    """Multi row of SQL data."""
 
-    def __init__(self, source_details: dict, manager: DatabaseManager, **_) -> None:
+class RecordSetSourceService(SourceService):
+    """Multiple rows of SQL data."""
+
+    def __init__(self, source: Source) -> None:
         """Source several values from a single record from a SQL query."""
         self.data = {}
 
-        self.sql = source_details["SQLText"]
-        self.database_id = source_details["DatabaseId"]
+        self.sql = source.SQLText
+        self.database_id = source.DatabaseId
 
         self.field_names = get_sql_fields(sql=self.sql)
         self.is_multi_record = True
 
-        self.meta_database = MetaDatabase(database_id=self.database_id, manager=manager)
+        self.meta_database = MetaDatabase(database=self.source.database)
 
     def load_data(self, current_data: dict) -> None:
         """
@@ -74,25 +81,23 @@ class RecordSetSource(Source):
         self.data = recordset.data
 
 
-class RecordSetTransposeSource(Source):
+class RecordSetTransposeSourceService(SourceService):
     """Multirow recordset that is transposed based on 2 columns: the key and the value."""
 
-    def __init__(self, source_details: dict, manager: DatabaseManager, **_) -> None:
+    def __init__(self, source: Source) -> None:
         """Source several values from a single record from a SQL query."""
         self.data = {}
 
-        self.sql = source_details["SQLText"]
-        self.database_id = source_details["DatabaseId"]
+        self.sql = source.SQLText
+        self.database_id = source.DatabaseId
 
         self.field_names = get_sql_fields(sql=self.sql)
         self.is_multi_record = False
 
-        self.meta_database = MetaDatabase(database_id=self.database_id, manager=manager)
+        self.meta_database = MetaDatabase(database=self.source.database)
 
-        self.key_field = source_details["KeyField"]
-        self.value_field = source_details["ValueField"]
-
-        self.is_multi_record = False
+        self.key_field = source.KeyField
+        self.value_field = source.ValueField
 
     def load_data(self, current_data: dict) -> None:
         """

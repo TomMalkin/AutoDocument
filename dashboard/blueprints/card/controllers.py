@@ -1,8 +1,9 @@
 """Define cards."""
 
-from flask import Blueprint, render_template, request
-from dashboard.database import get_manager
+from flask import Blueprint, redirect, render_template, request, url_for
 from loguru import logger
+
+from dashboard.database import get_db_manager
 
 card_blueprint = Blueprint("card", "card_blueprint", url_prefix="/card")
 
@@ -10,225 +11,206 @@ card_blueprint = Blueprint("card", "card_blueprint", url_prefix="/card")
 @card_blueprint.route("/form_card/<workflow_id>")
 def form_card(workflow_id: str):
     """Render a card that shows all form fields."""
-    sql = """
-        select
-            SourceFormField.FieldType Type,
-            SourceFormField.FieldName Name,
-            SourceFormField.FieldLabel Label,
-            SourceFormField.Id FormFieldId
-        from Source
-        join SourceFormField
-            on Source.Id = SourceFormField.SourceId
-        where Source.WorkflowId = :workflow_id
-    """
-    params = {"workflow_id": workflow_id}
-    form_records = get_manager().db.recordset(sql=sql, params=params).data
+    manager = get_db_manager()
+    form_fields = manager.form_fields.get_all(workflow_id=workflow_id)
     return render_template(
         "components/cards/sources/form.html",
-        form_records=form_records,
+        form_fields=form_fields,
         workflow_id=workflow_id,
     )
 
 
-@card_blueprint.route("/source_card/<source_id>")
-def source_card(source_id: str):
+@card_blueprint.route("/source_card/<int:source_id>")
+def source_card(source_id: int):
     """Return the source card of a given source id."""
     logger.debug(f"Source Card GET with {source_id=}")
-    manager = get_manager()
-    sql = " select * from vSource where SourceId = :source_id and TypeName != 'Form'"
-    params = {"source_id": int(source_id)}
-    source_record = manager.db.record(sql=sql, params=params).data
+    manager = get_db_manager()
+    source = manager.sources.get(source_id=source_id)
+    source_type = source.source_type
 
-    if source_record["TypeName"] == "CSVRecord":
-        orientation = source_record["Orientation"]
+    if source_type.Name == "CSVRecord":
+        return render_template("components/cards/sources/csv_card.html", source=source)
+
+    if source_type.Name == "CSVTable":
+        return render_template("components/cards/sources/csv_table_card.html", source=source)
+
+    if source_type.Name == "ExcelRecord":
+        return render_template("components/cards/sources/excel_card.html", source=source)
+
+    if source_type.Name == "ExcelTable":
+        return render_template("components/cards/sources/excel_table_card.html", source=source)
+
+    if source_type.Name == "SQL Record" and source.database:
+        return render_template("components/cards/sources/sql_record_card.html", source=source)
+
+    if source_type.Name == "SQL RecordSet" and source.database:
+        return render_template("components/cards/sources/sql_recordset_card.html", source=source)
+
+    if source_type.Name == "SQL RecordSet Transpose" and source.database:
         return render_template(
-            "components/cards/sources/csv_card.html",
-            source_id=int(source_id),
-            orientation=orientation,
-            workflow_id=source_record["WorkflowId"],
+            "components/cards/sources/sql_recordset_transpose_card.html", source=source
         )
 
-    if source_record["TypeName"] == "CSVTable":
-        return render_template(
-            "components/cards/sources/csv_table_card.html",
-            multi_type="Splitter" if source_record["Splitter"] else "Field",
-            source_id=int(source_id),
-            field_name=source_record["FieldName"],
-            workflow_id=source_record["WorkflowId"],
-        )
-
-    if source_record["TypeName"] == "ExcelRecord":
-        return render_template(
-            "components/cards/sources/excel_card.html",
-            source_id=int(source_id),
-            workflow_id=source_record["WorkflowId"],
-            sheet_name=source_record["SheetName"],
-            header_row=source_record["HeaderRow"],
-        )
-
-    if source_record["TypeName"] == "ExcelTable":
-        return render_template(
-            "components/cards/sources/excel_table_card.html",
-            multi_type="Splitter" if source_record["Splitter"] else "Field",
-            source_id=int(source_id),
-            field_name=source_record["FieldName"],
-            workflow_id=source_record["WorkflowId"],
-            sheet_name=source_record["SheetName"],
-            header_row=source_record["HeaderRow"],
-        )
-
-    if source_record["TypeName"] == "SQL Record":
-        database_name = source_record["DatabaseName"]
-        return render_template(
-            "components/cards/sources/sql_record_card.html",
-            source_id=int(source_id),
-            database_name=database_name,
-            workflow_id=source_record["WorkflowId"],
-        )
-
-    if source_record["TypeName"] == "SQL RecordSet":
-        database_name = source_record["DatabaseName"]
-        return render_template(
-            "components/cards/sources/sql_recordset_card.html",
-            multi_type="Splitter" if source_record["Splitter"] else "Field",
-            source_id=int(source_id),
-            field_name=source_record["FieldName"],
-            database_name=database_name,
-            workflow_id=source_record["WorkflowId"],
-        )
-
-    if source_record["TypeName"] == "SQL RecordSet Transpose":
-        database_name = source_record["DatabaseName"]
-        key_field = source_record["KeyField"]
-        value_field = source_record["ValueField"]
-        return render_template(
-            "components/cards/sources/sql_recordset_transpose_card.html",
-            source_id=int(source_id),
-            database_name=database_name,
-            key_field=key_field,
-            value_field=value_field,
-            workflow_id=source_record["WorkflowId"],
-        )
+    raise
 
 
-@card_blueprint.route("/source_storage_card")
-def source_storage_card():
+@card_blueprint.route("/source_storage_card/<int:source_id>")
+def source_storage_card(source_id: int):
     """Return a storage card for file based sources."""
-    manager = get_manager()
-    source_id = request.args.get("source_id")
-    sql = "select * from vSource where SourceId = :source_id"
-    params = {"source_id": source_id}
-    record = manager.db.record(sql=sql, params=params).data
+    manager = get_db_manager()
+    # source_id = int(request.args.get("source_id"))
+    source = manager.sources.get(source_id=source_id)
 
-    if record["FileAccessTypeName"] == "S3":
-        url = record["URL"]
-        bucket = record["Bucket"]
-        location = record["Location"]
+    if not source.file_template or source.file_template.StorageInstanceId == -1:
+        return render_template("components/cards/file_storages/upload.html", name=source.Name)
+
+    file_template = source.file_template
+    storage_instance = file_template.storage_instance
+    storage_type = storage_instance.storage_type
+
+    if storage_type.Name == "S3":
+        url = storage_instance.URL
+        bucket = file_template.Bucket
+        location = file_template.Location
         return render_template(
             "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
         )
 
-    if record["FileAccessTypeName"] == "SharePoint":
-        site = record["URL"]
-        library = record["RemotePath"]
-        path = record["Location"]
+    if storage_type.Name == "SharePoint":
+        site = storage_instance.URL
+        library = storage_instance.RemotePath
+        path = file_template.Location
         return render_template(
             "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
         )
 
-    if record["FileAccessTypeName"] == "Linux Share":
-        path = record["RemotePath"] + record["Location"]
+    if storage_type.Name == "Linux Share":
+        path = storage_instance.RemotePath + file_template.Location
         return render_template("components/cards/file_storages/linux.html", path=path)
 
-    if record["FileAccessTypeName"] == "Windows Share":
-        path = record["RemotePath"] + record["Location"]
+    if storage_type.Name == "Windows Share":
+        path = storage_instance.RemotePath + file_template.Location
         return render_template("components/cards/file_storages/windows.html", path=path)
 
-    return render_template("components/cards/file_storages/upload.html", name=record["SourceName"])
+    return render_template("components/cards/file_storages/upload.html", name=source["Name"])
 
 
-@card_blueprint.route("/sql_text")
-def sql_text():
+@card_blueprint.route("/sql_text/<int:source_id>")
+def sql_text(source_id: int):
     """Return the SQL text of a given source id."""
-    source_id = request.args.get("source_id")
-    sql = "select SQLText from Source where ID = :source_id"
-    params = {"source_id": source_id}
-    text = get_manager().db.record(sql=sql, params=params).data["SQLText"]
-    return render_template("components/cards/sql_text.html", text=text)
+    # source_id = request.args.get("source_id")
+    manager = get_db_manager()
+    source = manager.sources.get(source_id=source_id)
+    return render_template("components/cards/sql_text.html", source=source)
 
 
-@card_blueprint.route("/outcome_card/<outcome_id>")
-def outcome_card(outcome_id: str):
+@card_blueprint.route("/outcome_card/<int:outcome_id>")
+def outcome_card(outcome_id: int):
     """Return the source card of a given source id."""
     logger.info(f"outcome card of id {outcome_id}")
-    manager = get_manager()
-    sql = " select * from vOutcome where OutcomeId = :outcome_id"
-    params = {"outcome_id": int(outcome_id)}
-    outcome_record = manager.db.record(sql=sql, params=params).data
-    workflow_id = outcome_record["WorkflowId"]
+    manager = get_db_manager()
+    outcome = manager.outcomes.get(outcome_id=outcome_id)
 
-    if outcome_record["OutcomeTypeName"] == "HTML":
+    if outcome.outcome_type.Name == "HTML":
+        return render_template("components/cards/outcomes/html_card.html", outcome=outcome)
+
+    if outcome.outcome_type.Name == "Microsoft Word":
+        return render_template("components/cards/outcomes/word_card.html", outcome=outcome)
+
+    if outcome.outcome_type.Name == "PDF":
+        return render_template("components/cards/outcomes/pdf_card.html", outcome=outcome)
+
+    raise
+
+
+@card_blueprint.route("/input_storage_card/<int:outcome_id>")
+def outcome_input_storage_card(outcome_id: int):
+    """Return a storage card for an outcome for it's input file template."""
+    manager = get_db_manager()
+    # outcome_id = request.args.get("outcome_id")
+    outcome = manager.outcomes.get(outcome_id=outcome_id)
+
+    if not outcome.input_file_template or outcome.input_file_template.StorageInstanceId == -1:
+        return render_template("components/cards/file_storages/upload.html", name=outcome.Name)
+
+    file_template = outcome.input_file_template
+    storage_instance = file_template.storage_instance
+    storage_type = storage_instance.storage_type
+
+    if storage_type.Name == "S3":
+        url = storage_instance.URL
+        bucket = file_template.Bucket
+        location = file_template.Location
         return render_template(
-            "components/cards/outcomes/html_card.html",
-            outcome_id=int(outcome_id),
-            workflow_id=workflow_id,
+            "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
         )
 
-    if outcome_record["OutcomeTypeName"] == "Microsoft Word":
+    if storage_type.Name == "SharePoint":
+        site = storage_instance.URL
+        library = storage_instance.RemotePath
+        path = file_template.Location
         return render_template(
-            "components/cards/outcomes/word_card.html",
-            outcome_id=int(outcome_id),
-            workflow_id=workflow_id,
+            "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
         )
 
-    if outcome_record["OutcomeTypeName"] == "PDF":
+    if storage_type.Name == "Linux Share":
+        path = storage_instance.RemotePath + file_template.Location
+        return render_template("components/cards/file_storages/linux.html", path=path)
+
+    if storage_type.Name == "Windows Share":
+        path = storage_instance.RemotePath + file_template.Location
+        return render_template("components/cards/file_storages/windows.html", path=path)
+
+    return render_template("components/cards/file_storages/upload.html", name=outcome.Name)
+
+
+@card_blueprint.route("/output_storage_card/<int:outcome_id>")
+def outcome_output_storage_card(outcome_id: int):
+    """Return a storage card for an outcome for it's input file template."""
+    manager = get_db_manager()
+    outcome = manager.outcomes.get(outcome_id=outcome_id)
+
+    if not outcome.output_file_template or outcome.output_file_template.StorageInstanceId == -1:
         return render_template(
-            "components/cards/outcomes/pdf_card.html",
-            outcome_id=int(outcome_id),
-            workflow_id=workflow_id,
+            "components/cards/file_storages/download.html", name=outcome.DownloadName
         )
+
+    file_template = outcome.output_file_template
+    storage_instance = file_template.storage_instance
+    storage_type = storage_instance.storage_type
+
+    if storage_type.Name == "S3":
+        url = storage_instance.URL
+        bucket = file_template.Bucket
+        location = file_template.Location
+        return render_template(
+            "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
+        )
+
+    if storage_type.Name == "SharePoint":
+        site = storage_instance.URL
+        library = storage_instance.RemotePath
+        path = file_template.Location
+        return render_template(
+            "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
+        )
+
+    if storage_type.Name == "Linux Share":
+        path = storage_instance.RemotePath + file_template.Location
+        return render_template("components/cards/file_storages/linux.html", path=path)
+
+    if storage_type.Name == "Windows Share":
+        path = storage_instance.RemotePath + file_template.Location
+        return render_template("components/cards/file_storages/windows.html", path=path)
+
+    return render_template("components/cards/file_storages/download.html", name=outcome.Name)
 
 
 @card_blueprint.route("/storage_card/<input_type>")
 def outcome_storage_card(input_type: str):
     """Return a storage card for file based outcomes."""
-    manager = get_manager()
     outcome_id = request.args.get("outcome_id")
-    sql = "select * from vOutcome where OutcomeId = :outcome_id"
-    params = {"outcome_id": outcome_id}
-    record = manager.db.record(sql=sql, params=params).data
 
-    column = "InputFileTypeName" if input_type == "input" else "OutputFileTypeName"
-    remote_column = "InputRemotePath" if input_type == "input" else "OutputRemotePath"
-    location_column = "InputFileLocation" if input_type == "input" else "OutputFileLocation"
-    url_column = "InputURL" if input_type == "input" else "OutputURL"
-    bucket_column = "InputFileBucket" if input_type == "input" else "OutputFileBucket"
-
-    if record[column] == "S3":
-        url = record[url_column]
-        bucket = record[bucket_column]
-        location = record[location_column]
-        return render_template(
-            "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
-        )
-
-    if record[column] == "SharePoint":
-        site = record[url_column]
-        library = record[remote_column]
-        path = record[remote_column]
-        return render_template(
-            "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
-        )
-
-    if record[column] == "Linux Share":
-        path = record[remote_column] + record[location_column]
-        return render_template("components/cards/file_storages/linux.html", path=path)
-
-    if record[column] == "Windows Share":
-        path = record[remote_column] + record[location_column]
-        return render_template("components/cards/file_storages/windows.html", path=path)
-
-    if input_type == "output":
-        return render_template("components/cards/file_storages/download.html", name=record["OutputFileLocation"])
-
-    return render_template("components/cards/file_storages/upload.html", name=record["OutcomeName"])
+    if input_type == "input":
+        return redirect(url_for("card.outcome_input_storage_card", outcome_id=outcome_id))
+    return redirect(url_for("card.outcome_output_storage_card", outcome_id=outcome_id))

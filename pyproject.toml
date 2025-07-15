@@ -1,14 +1,89 @@
+[project]
+name = "AutoDocument"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "babel==2.15.0",
+    "blinker==1.8.2",
+    "boto3==1.34.144",
+    "botocore==1.34.144",
+    "certifi==2024.7.4",
+    "cffi==1.16.0",
+    "chardet==5.2.0",
+    "charset-normalizer==3.3.2",
+    "click==8.1.7",
+    "cryptography==43.0.0",
+    "docx-mailmerge==0.5.0",
+    "docxcompose==1.4.0",
+    "docxtpl==0.17.0",
+    "dropbox>=12.0.2",
+    "et-xmlfile==1.1.0",
+    "flask==3.0.3",
+    "flask-login==0.6.3",
+    "flask-sqlalchemy>=3.1.1",
+    "flask-wtf==1.2.1",
+    "greenlet==3.0.3",
+    "gunicorn==22.0.0",
+    "idna==3.7",
+    "itsdangerous==2.2.0",
+    "jinja2==3.1.4",
+    "jmespath==1.0.1",
+    "loguru==0.7.2",
+    "lxml==5.2.2",
+    "markupsafe==2.1.5",
+    "msal==1.30.0",
+    "mysql-connector-python==9.0.0",
+    "numpy==2.0.0",
+    "office365-rest-python-client==2.5.11",
+    "openpyxl==3.1.5",
+    "packaging==24.1",
+    "pandas==2.2.2",
+    "pendulum==3.0.0",
+    "psycopg2-binary==2.9.9",
+    "pycparser==2.22",
+    "pyjwt==2.8.0",
+    "pymysql==1.1.1",
+    "pyodbc==5.1.0",
+    "python-dateutil==2.9.0.post0",
+    "python-docx==1.1.2",
+    "python-dotenv==1.0.1",
+    "pytz==2024.1",
+    "pyyaml==6.0.1",
+    "regex==2024.5.15",
+    "requests==2.32.3",
+    "s3transfer==0.10.2",
+    "setuptools==70.1.0",
+    "six==1.16.0",
+    "sqlalchemy==2.0.31",
+    "time-machine==2.14.1",
+    "typing-extensions==4.12.2",
+    "tzdata==2024.1",
+    "urllib3==2.2.2",
+    "werkzeug==3.0.3",
+    "wtforms==3.1.2",
+]
+
 [tool.black]
 line-length = 100
 
 [tool.ruff]
 line-length = 100
-select = ["E", "F", "D", "W", "B", "C90"]
-ignore = ["D212"]
+lint.select = ["E", "F", "D", "W", "B", "C90"]
+lint.ignore = ["D212", "D203"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
-[tool.mypy]
-disallow_untyped_defs = true
+[tool.ty.rules]
+possibly-unresolved-reference = "error"
+possibly-unbound-attribute = "error"
+
+[dependency-groups]
+dev = [
+    "vulture>=2.14",
+]
+
+# [tool.mypy]
+# disallow_untyped_defs = true
 # ignore_missing_imports = true

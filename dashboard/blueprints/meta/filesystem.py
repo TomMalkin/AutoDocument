@@ -1,8 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for
-from dashboard.database import get_manager
-from typing import Union
-from werkzeug.wrappers.response import Response
+"""Manage Linux and Windows Filesystems."""
+
+from typing import Union, cast
+
+from flask import Blueprint, redirect, render_template, url_for
 from flask_login import login_required
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
 
 from .forms import (
     CreateMetaFileSystem,
@@ -16,32 +20,38 @@ bp = Blueprint("fs", "fs")
 @login_required
 def manage():
     """Manage Windows and Posix file systems."""
-    manager = get_manager()
-    windows_filesystems = manager.get_windows_filesystems().data
+    manager = get_db_manager()
+    windows_filesystems = manager.storage_instances.get_all_of_type(storage_type="Windows Share")
     windows_filesystem_form = CreateMetaWindowsFileSystem()
-    posix_filesystems = manager.get_posix_filesystems().data
-    posix_filesystem_form = CreateMetaFileSystem()
+    linux_filesystems = manager.storage_instances.get_all_of_type(storage_type="Linux Share")
+    linux_filesystem_form = CreateMetaFileSystem()
     return render_template(
         "meta/file_system.html",
         windows_filesystems=windows_filesystems,
         windows_form=windows_filesystem_form,
-        posix_filesystems=posix_filesystems,
-        posix_form=posix_filesystem_form,
+        linux_filesystems=linux_filesystems,
+        linux_form=linux_filesystem_form,
     )
 
 
-@bp.route("/add_posix", methods=["POST"])
+@bp.route("/add_linux", methods=["POST"])
 @login_required
-def add_posix() -> Union[str, Response]:
-    """Add a posix filesystem."""
-    manager = get_manager()
+def add_linux() -> Union[str, Response]:
+    """Add a linux filesystem."""
+    manager = get_db_manager()
     form = CreateMetaFileSystem()
 
     if form.validate_on_submit():
-        local_path = form.local_path.data.rstrip("/") + "/"
-        remote_path = form.remote_path.data.rstrip("/") + "/"
+        local_path = cast(str, form.local_path.data).rstrip("/") + "/"
+        remote_path = cast(str, form.remote_path.data).rstrip("/") + "/"
 
-        manager.add_posix_filesystem(local_path=local_path, remote_path=remote_path)
+        storage_type = manager.storage_types.get_by_name(name="Linux Share")
+        manager.storage_instances.add(
+            storage_type=storage_type,
+            local_path=local_path,
+            remote_path=remote_path,
+        )
+        manager.commit()
 
     return redirect(url_for("meta.fs.manage"))
 
@@ -49,21 +59,28 @@ def add_posix() -> Union[str, Response]:
 @bp.route("/add_windows", methods=["POST"])
 def add_windows() -> Union[str, Response]:
     """Add a windows filesystem."""
-    manager = get_manager()
+    manager = get_db_manager()
     form = CreateMetaWindowsFileSystem()
 
     if form.validate_on_submit():
-        local_path = form.local_path.data.rstrip("/") + "/"
-        remote_path = form.remote_path.data.rstrip("\\") + "\\"
-        manager.add_windows_filesystem(local_path=local_path, remote_path=remote_path)
+        local_path = cast(str, form.local_path.data).rstrip("/") + "/"
+        remote_path = cast(str, form.remote_path.data).rstrip("\\") + "\\"
+        storage_type = manager.storage_types.get_by_name(name="Windows Share")
+        manager.storage_instances.add(
+            storage_type=storage_type,
+            local_path=local_path,
+            remote_path=remote_path,
+        )
+        manager.commit()
 
     return redirect(url_for("meta.fs.manage"))
 
 
-@bp.route("/delete/<file_access_id>")
+@bp.route("/delete/<int:storage_instance_id>")
 @login_required
-def delete(file_access_id):
+def delete(storage_instance_id: int):
     """Endpoint to remove a filesystem."""
-    manager = get_manager()
-    manager.remove_file_access(file_access_id)
+    manager = get_db_manager()
+    manager.storage_instances.delete(storage_instance_id=storage_instance_id)
+    manager.commit()
     return redirect(url_for("meta.fs.manage"))

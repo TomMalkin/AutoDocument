@@ -1,20 +1,17 @@
-"""Define workflow views."""
-
-from flask import Blueprint, render_template, redirect, url_for
-from ...forms import (
-    CreateRecordSourceForm,
-    CreateRecordSetSourceForm,
-    CreateRecordSetTransposeSourceForm,
-)
-from ...models import (
-    get_meta_database_choices,
-    add_record_source,
-    add_record_set_source,
-    add_record_set_transpose_source,
-)
-from werkzeug.wrappers.response import Response
+"""Define sql views."""
 
 from typing import Union
+
+from flask import Blueprint, redirect, render_template, url_for
+from werkzeug.wrappers.response import Response
+
+from dashboard.database import get_db_manager
+
+from ...forms import (
+    CreateRecordSetSourceForm,
+    CreateRecordSetTransposeSourceForm,
+    CreateRecordSourceForm,
+)
 
 bp = Blueprint("sql", __name__)
 
@@ -23,15 +20,22 @@ bp = Blueprint("sql", __name__)
 def add_record_source_view(workflow_id: int) -> Union[str, Response]:
     """Add a record source view."""
     form = CreateRecordSourceForm()
-    form.database.choices = get_meta_database_choices()
+
+    manager = get_db_manager()
+    database_choices = manager.database_meta_sources.get_all()
+    form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
 
     if form.validate_on_submit():
-        add_record_source(
+        source_type = manager.source_types.get_from_name(name="SQL Record")
+        manager.sources.add(
             workflow_id=workflow_id,
+            source_type=source_type,
             sql_text=form.sql_text.data,
             database_id=form.database.data,
-            step=form.step.data,
+            step=form.step.data or 1,
         )
+        manager.commit()
+
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     return render_template(
@@ -43,19 +47,25 @@ def add_record_source_view(workflow_id: int) -> Union[str, Response]:
 def add_record_set_source_view(workflow_id: int) -> Union[str, Response]:
     """Add a record set source view."""
     form = CreateRecordSetSourceForm()
-    form.database.choices = get_meta_database_choices()
+    manager = get_db_manager()
+    database_choices = manager.database_meta_sources.get_all()
+    form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
 
     if form.validate_on_submit():
         splitter = form.splitter_choice.data == "splitter"
 
-        add_record_set_source(
+        source_type = manager.source_types.get_from_name(name="SQL RecordSet")
+        manager.sources.add(
             workflow_id=workflow_id,
+            source_type=source_type,
             sql_text=form.sql_text.data,
             database_id=form.database.data,
             field_name=form.field_name.data,
             splitter=splitter,
-            step=form.step.data,
+            step=form.step.data or 1,
         )
+        manager.commit()
+
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     return render_template(
@@ -67,17 +77,22 @@ def add_record_set_source_view(workflow_id: int) -> Union[str, Response]:
 def add_record_set_transpose_source_view(workflow_id: int) -> Union[str, Response]:
     """Add a record set source view."""
     form = CreateRecordSetTransposeSourceForm()
-    form.database.choices = get_meta_database_choices()
+    manager = get_db_manager()
+    database_choices = manager.database_meta_sources.get_all()
+    form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
 
     if form.validate_on_submit():
-        add_record_set_transpose_source(
+        source_type = manager.source_types.get_from_name(name="SQL RecordSet Transpose")
+        manager.sources.add(
             workflow_id=workflow_id,
+            source_type=source_type,
             sql_text=form.sql_text.data,
             database_id=form.database.data,
             key_field=form.key_field.data,
             value_field=form.value_field.data,
-            step=form.step.data,
+            step=form.step.data or 1,
         )
+        manager.commit()
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
     return render_template(

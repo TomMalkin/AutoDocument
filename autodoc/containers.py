@@ -2,13 +2,14 @@
 
 from loguru import logger
 
+
 class RecordSet:
     """Represents a data container with 1 or more fields and 1 or more rows."""
 
     def __init__(self, columns, data):
         """Create the container with headings and data."""
         self.headings = columns
-        self.data = [dict(zip(columns, row)) for row in data]
+        self.data = [dict(zip(columns, row, strict=False)) for row in data]
 
     def __bool__(self):
         """Return if this container has data."""
@@ -39,7 +40,7 @@ class Record:
             data = data[0]
 
         if data:
-            self.data = dict(zip(columns, data))
+            self.data = dict(zip(columns, data, strict=False))
 
         logger.debug(f"final data is {self.data=}")
 

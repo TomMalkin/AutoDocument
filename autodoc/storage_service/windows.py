@@ -1,12 +1,14 @@
 """Define the Windows File Access class."""
 
-from .file_access import FileAccess
-from pathlib import Path, PureWindowsPath
-from jinja2 import Template
 import shutil
+from pathlib import Path, PureWindowsPath
+
+from jinja2 import Template
+
+from .base import StorageService
 
 
-class WindowsFileAccess(FileAccess):
+class WindowsStorageService(StorageService):
     """Accessing files on Windows based file shares."""
 
     def __init__(self, root, relative, url=None, username=None, password=None):
