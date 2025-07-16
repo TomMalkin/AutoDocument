@@ -36,8 +36,10 @@ class Record:
         self.headings = columns
         self.data = {}
 
-        if isinstance(data, list):
+        if isinstance(data, list) and data:
             data = data[0]
+        else:
+            data = {}
 
         if data:
             self.data = dict(zip(columns, data, strict=False))
