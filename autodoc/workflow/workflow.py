@@ -150,7 +150,7 @@ class Workflow:
             outcome_type = outcome.outcome_type.Name
             outcome_service_class = outcome_service_map[outcome_type]
             outcome_service = outcome_service_class(
-                outcome,
+                outcome=outcome,
                 download_container=download_container if outcome.is_download else None,
                 template_uploaded_filename=uploaded_filename,
             )

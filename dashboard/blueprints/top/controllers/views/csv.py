@@ -54,7 +54,7 @@ def add_csv_record_source_view(workflow_id: int) -> Union[str, Response]:
 
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
-    else:
+    elif request.method == "POST":
         logger.error(form.errors)
 
     storage_instances = manager.storage_instances.get_all()

@@ -65,5 +65,6 @@ def add():
         connection_string = form.connection_string.data
         full_connection_string = f"{mapping[database]}://{connection_string}"
         manager.database_meta_sources.add(name=name, connection_string=full_connection_string)
+        manager.commit()
 
     return redirect(url_for("meta.db.manage"))

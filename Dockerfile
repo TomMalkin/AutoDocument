@@ -7,6 +7,11 @@ ENV PYTHONUNBUFFERED=1
 ENV ACCEPT_EULA=Y
 ENV DEBIAN_FRONTEND=noninteractive
 
+ENV FLASK_APP=dashboard:create_app
+ENV FLASK_ENV=production
+
+ENV TARGET_DB_PATH=/app/database/autodoc.db
+
 # Install LibreOffice in headless mode and other dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -45,6 +50,20 @@ COPY init /app/init
 # Expose the port on which the Flask app will run
 EXPOSE 4605
 
+# Copy and set permissions for the entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Set the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Set the default command to run after the entrypoint script
+CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605"]
+
+# COPY entrypoint.sh /app/entrypoint.sh
+# RUN chmod +x /app/entrypoint.sh
+# CMD ["/app/entrypoint.sh"]
+
 # Command to run the Flask app using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:4605", "dashboard:create_app()"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:4605", "dashboard:create_app()"]
 

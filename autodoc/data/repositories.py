@@ -20,6 +20,8 @@ from .tables import (
     WorkflowInstance,
 )
 
+from loguru import logger
+
 
 class Repository:
     """Base class Repository with generic init."""
@@ -153,6 +155,27 @@ class OutcomeTypeRepository(Repository):
         outcome_type = self.session.scalars(stmt).first()
         return outcome_type
 
+    def seed(self):
+        """Ensure type tables include up to date types."""
+        outcome_types_required = [
+            OutcomeType(Name="HTML", IsFile=1),
+            OutcomeType(Name="Microsoft Word", IsFile=1),
+            OutcomeType(Name="PDF", IsFile=1),
+        ]
+        outcome_types_to_add = []
+
+        existing_types = set(self.session.scalars(select(OutcomeType.Name)))
+
+        for outcome_type in outcome_types_required:
+            if outcome_type.Name not in existing_types:
+                outcome_types_to_add.append(outcome_type)
+
+        if outcome_types_to_add:
+            self.session.add_all(outcome_types_to_add)
+
+        else:
+            logger.info(f"{outcome_types_to_add=}")
+
 
 class SourceTypeRepository(Repository):
     """The repository of actions on the SourceType Table."""
@@ -163,6 +186,30 @@ class SourceTypeRepository(Repository):
         source_type = self.session.scalars(stmt).first()
         return source_type
 
+    def seed(self):
+        """Ensure type tables include up to date types."""
+        source_types_required = [
+            SourceType(Name="YAML", IsSlow=0, IsFile=1, IsMulti=0),
+            SourceType(Name="RecordScalar", IsSlow=0, IsFile=0, IsMulti=0),
+            SourceType(Name="SQL Record", IsSlow=0, IsFile=0, IsMulti=0),
+            SourceType(Name="SQL RecordSet", IsSlow=0, IsFile=0, IsMulti=1),
+            SourceType(Name="SQL RecordSet Transpose", IsSlow=0, IsFile=1, IsMulti=0),
+            SourceType(Name="CSVRecord", IsSlow=0, IsFile=1, IsMulti=0),
+            SourceType(Name="CSVTable", IsSlow=0, IsFile=1, IsMulti=1),
+            SourceType(Name="ExcelRecord", IsSlow=0, IsFile=1, IsMulti=0),
+            SourceType(Name="ExcelTable", IsSlow=0, IsFile=1, IsMulti=1),
+        ]
+        source_types_to_add = []
+
+        existing_types = set(self.session.scalars(select(SourceType.Name)))
+
+        for source_type in source_types_required:
+            if source_type.Name not in existing_types:
+                source_types_to_add.append(source_type)
+
+        if source_types_to_add:
+            self.session.add_all(source_types_to_add)
+
 
 class StorageTypeRepository(Repository):
     """The repository of actions on the StorageType Table."""
@@ -171,6 +218,26 @@ class StorageTypeRepository(Repository):
         """Get a StorageType based on it's name."""
         stmt = select(StorageType).where(StorageType.Name == name)
         return self.session.scalars(stmt).first()
+
+    def seed(self):
+        """Ensure type tables include up to date types."""
+        storage_types_required = [
+            StorageType(Name="Download"),
+            StorageType(Name="Windows Share"),
+            StorageType(Name="Linux Share"),
+            StorageType(Name="S3"),
+            StorageType(Name="SharePoint"),
+        ]
+        storage_types_to_add = []
+
+        existing_types = set(self.session.scalars(select(StorageType.Name)))
+
+        for storage_type in storage_types_required:
+            if storage_type.Name not in existing_types:
+                storage_types_to_add.append(storage_type)
+
+        if storage_types_to_add:
+            self.session.add_all(storage_types_to_add)
 
 
 class StorageInstanceRepository(Repository):
