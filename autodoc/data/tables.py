@@ -77,11 +77,11 @@ class WorkflowInstance(Base):
     __tablename__ = "WorkflowInstance"
     InstanceId: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     ParentInstanceId: Mapped[int] = mapped_column(nullable=True)
-    WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"))
-    StartTime: Mapped[float] = mapped_column(Numeric)
-    EndTime: Mapped[str] = mapped_column(Text)
+    WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"), nullable=True)
+    StartTime: Mapped[float] = mapped_column(Numeric, nullable=True)
+    EndTime: Mapped[str] = mapped_column(Text, nullable=True)
     Completed: Mapped[bool] = mapped_column(Boolean, default=False)
-    Data: Mapped[str] = mapped_column(Text)
+    Data: Mapped[str] = mapped_column(Text, nullable=True)
     Step: Mapped[int] = mapped_column(default=1)
 
     workflow: Mapped["Workflow"] = relationship(back_populates="instances")
