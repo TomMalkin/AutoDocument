@@ -11,11 +11,11 @@
 
         {% for fs in s3s %}
         <tr>
-            <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ fs['URL'] }}</td>
-            <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ fs['Username'] }}</td>
+            <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ fs.URL }}</td>
+            <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ fs.Username }}</td>
             <td class="whitespace-nowrap px-4 py-2">
                 <a class="inline-block rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                    href="{{ url_for('meta.s3.delete', file_access_id=fs['FileAccessId'] )}}">delete</a>
+                    href="{{ url_for('meta.s3.delete', storage_instance_id=fs.Id )}}">delete</a>
             </td>
         </tr>
         {% endfor %}

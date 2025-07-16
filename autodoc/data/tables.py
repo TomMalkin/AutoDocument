@@ -156,12 +156,12 @@ class StorageInstance(Base):
     __tablename__ = "StorageInstance"
     Id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     StorageTypeId: Mapped[int] = mapped_column(ForeignKey("StorageType.Id"))
-    LocalPath: Mapped[str] = mapped_column(Text)
-    RemotePath: Mapped[str] = mapped_column(Text)
-    TopLevel: Mapped[str] = mapped_column(Text)
-    URL: Mapped[str] = mapped_column(Text)
-    Username: Mapped[str] = mapped_column(Text)
-    Password: Mapped[str] = mapped_column(Text)
+    LocalPath: Mapped[str] = mapped_column(Text, nullable=True)
+    RemotePath: Mapped[str] = mapped_column(Text, nullable=True)
+    TopLevel: Mapped[str] = mapped_column(Text, nullable=True)
+    URL: Mapped[str] = mapped_column(Text, nullable=True)
+    Username: Mapped[str] = mapped_column(Text, nullable=True)
+    Password: Mapped[str] = mapped_column(Text, nullable=True)
 
     storage_type: Mapped["StorageType"] = relationship(back_populates="storage_instances")
     file_templates: Mapped[list["FileTemplate"]] = relationship(back_populates="storage_instance")
@@ -173,8 +173,8 @@ class FileTemplate(Base):
     __tablename__ = "FileTemplate"
     Id: Mapped[int] = mapped_column(primary_key=True)
     StorageInstanceId: Mapped[int] = mapped_column(ForeignKey("StorageInstance.Id"))
-    Location: Mapped[str] = mapped_column(Text)
-    Bucket: Mapped[str] = mapped_column(Text)
+    Location: Mapped[str] = mapped_column(Text, nullable=True)
+    Bucket: Mapped[str] = mapped_column(Text, nullable=True)
 
     storage_instance: Mapped["StorageInstance"] = relationship(back_populates="file_templates")
 
@@ -206,9 +206,9 @@ class Outcome(Base):
     WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"))
     OutcomeTypeId: Mapped[int] = mapped_column(ForeignKey("OutcomeType.Id"))
     FileUpload: Mapped[bool] = mapped_column(default=False)
-    FilterField: Mapped[str] = mapped_column(Text)
-    FilterValue: Mapped[str] = mapped_column(Text)
-    Name: Mapped[str] = mapped_column(Text)
+    FilterField: Mapped[str] = mapped_column(Text, nullable=True)
+    FilterValue: Mapped[str] = mapped_column(Text, nullable=True)
+    Name: Mapped[str] = mapped_column(Text, nullable=True)
     ParentOutcomeId: Mapped[int] = mapped_column(nullable=True)
     DocumentOrder: Mapped[int] = mapped_column(nullable=True)
     InputFileTemplateId: Mapped[int] = mapped_column(ForeignKey("FileTemplate.Id"), nullable=True)
@@ -239,20 +239,20 @@ class Source(Base):
     WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"))
     TypeId: Mapped[int] = mapped_column(ForeignKey("SourceType.Id"))
     FileTemplateId: Mapped[int] = mapped_column(ForeignKey("FileTemplate.Id"), nullable=True)
-    ZIndex: Mapped[int]
+    # ZIndex: Mapped[int]
     DatabaseId: Mapped[int] = mapped_column(
         ForeignKey("DatabaseMetaSource.DatabaseId"), nullable=True
     )
-    SQLText: Mapped[str] = mapped_column(Text)
+    SQLText: Mapped[str] = mapped_column(Text, nullable=True)
     Splitter: Mapped[int] = mapped_column(default=0)
-    FieldName: Mapped[str] = mapped_column(Text)
+    FieldName: Mapped[str] = mapped_column(Text, nullable=True)
     Step: Mapped[int] = mapped_column(default=1, nullable=False)
-    KeyField: Mapped[str] = mapped_column(Text)
-    ValueField: Mapped[str] = mapped_column(Text)
-    Orientation: Mapped[str] = mapped_column(Text)
-    Name: Mapped[str] = mapped_column(Text)
-    SheetName: Mapped[str] = mapped_column(Text)
-    HeaderRow: Mapped[int]
+    KeyField: Mapped[str] = mapped_column(Text, nullable=True)
+    ValueField: Mapped[str] = mapped_column(Text, nullable=True)
+    Orientation: Mapped[str] = mapped_column(Text, nullable=True)
+    Name: Mapped[str] = mapped_column(Text, nullable=True)
+    SheetName: Mapped[str] = mapped_column(Text, nullable=True)
+    HeaderRow: Mapped[int] = mapped_column(nullable=True)
 
     workflow: Mapped["Workflow"] = relationship("Workflow", back_populates="sources")
     source_type: Mapped["SourceType"] = relationship("SourceType", back_populates="sources")

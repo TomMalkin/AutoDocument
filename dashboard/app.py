@@ -9,7 +9,11 @@ from flask import Flask
 from loguru import logger
 
 from autodoc.config import TARGET_DB_PATH
+from autodoc.data.initialise import initialise_database
 from dashboard.database import register_db_teardown
+
+import click
+from flask.cli import with_appcontext
 
 from .blueprints import auth_blueprint, card_blueprint, meta_blueprint, top_blueprint
 from .blueprints.auth.controllers import login_manager
@@ -34,6 +38,13 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
 logger.add("log.log")
 
 
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    """Initialise the Database."""
+    initialise_database(TARGET_DB_PATH)
+
+
 def create_app(template_folder="templates", static_folder="static") -> Flask:
     """Flask app factory."""
     template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
@@ -47,10 +58,11 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
     app.config["ADMIN_PASSWORD"] = ADMIN_PASSWORD
     app.secret_key = "your_secret_key"
 
+
+    app.cli.add_command(init_db_command)
+
     # init_app(app)
     register_db_teardown(app)
-
-    # initialise_database(initial_db=INIT_DB_PATH, target_db=TARGET_DB_PATH)
 
     app.register_blueprint(top_blueprint, url_prefix="/")
     app.register_blueprint(meta_blueprint, url_prefix="/meta")
