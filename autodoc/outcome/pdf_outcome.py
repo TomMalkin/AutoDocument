@@ -32,7 +32,7 @@ class PDFOutcomeService(OutcomeService):
         self.outcome = outcome
         self.download_container = download_container
 
-        logger.info(f"Creating HTMLOutcome class with {template_uploaded_filename=}")
+        logger.info(f"Creating PDFOutcomeService class with {template_uploaded_filename=}")
 
         if template_uploaded_filename:
             self.input_storage_service = LinuxStorageService(
@@ -44,8 +44,7 @@ class PDFOutcomeService(OutcomeService):
 
         if download_container:
             self.output_storage_service = LinuxStorageService(
-                root=str(download_container.download_dir),
-                relative=outcome.DownloadName
+                root=str(download_container.download_dir), relative=outcome.DownloadName
             )
         else:
             self.set_output_storage_service()
@@ -62,9 +61,12 @@ class PDFOutcomeService(OutcomeService):
 
     def save(self) -> None:
         """Save the document."""
-        temp_file = self.output_storage_service.temp_file()  # final pdf file
+        temp_file = self.output_storage_service.temp_file()  # docx file
+        logger.info(f"the temp file is {temp_file}")
+
         self.document.save(temp_file)  # docx file
-        temp_file_parent = Path(temp_file).parent
+
+        temp_file_parent = str(Path(temp_file).parent)
 
         command = [
             "libreoffice",
@@ -81,5 +83,6 @@ class PDFOutcomeService(OutcomeService):
         subprocess.run(command)
         self.output_storage_service.temp_file_name += ".pdf"
         self.output_storage_service.save_file()
+
         if self.download_container:
             self.download_container.add_file(file_path=self.output_storage_service.path)

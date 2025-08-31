@@ -9,6 +9,8 @@ from dashboard.database import get_db_manager
 
 from .forms import CreateMetaDatabase
 
+from loguru import logger
+
 bp = Blueprint("db", "db")
 
 
@@ -41,6 +43,7 @@ def delete(database_id):
     """Delete a database based on the id."""
     manager = get_db_manager()
     manager.database_meta_sources.delete(database_id=database_id)
+    manager.commit()
     return redirect(url_for("meta.db.manage"))
 
 
@@ -64,6 +67,7 @@ def add():
         database = form.database.data
         connection_string = form.connection_string.data
         full_connection_string = f"{mapping[database]}://{connection_string}"
+        logger.info(f"Adding database {database} with connection {full_connection_string}")
         manager.database_meta_sources.add(name=name, connection_string=full_connection_string)
         manager.commit()
 

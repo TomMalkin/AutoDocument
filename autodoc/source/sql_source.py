@@ -18,9 +18,10 @@ def get_sql_fields(sql: str) -> list:
 class RecordSourceService(SourceService):
     """A single row of SQL data."""
 
-    def __init__(self, source: Source) -> None:
+    def __init__(self, source: Source, uploaded_filename=None) -> None:
         """Source several values from a single record from a SQL query."""
         self.data = {}
+        self.source = source
 
         self.sql = source.SQLText
         self.database_id = source.DatabaseId
@@ -51,9 +52,10 @@ class RecordSourceService(SourceService):
 class RecordSetSourceService(SourceService):
     """Multiple rows of SQL data."""
 
-    def __init__(self, source: Source) -> None:
+    def __init__(self, source: Source, uploaded_filename=None) -> None:
         """Source several values from a single record from a SQL query."""
         self.data = {}
+        self.source = source
 
         self.sql = source.SQLText
         self.database_id = source.DatabaseId
@@ -84,9 +86,10 @@ class RecordSetSourceService(SourceService):
 class RecordSetTransposeSourceService(SourceService):
     """Multirow recordset that is transposed based on 2 columns: the key and the value."""
 
-    def __init__(self, source: Source) -> None:
+    def __init__(self, source: Source, uploaded_filename=None) -> None:
         """Source several values from a single record from a SQL query."""
         self.data = {}
+        self.source = source
 
         self.sql = source.SQLText
         self.database_id = source.DatabaseId
