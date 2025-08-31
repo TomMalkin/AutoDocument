@@ -12,21 +12,31 @@ ENV FLASK_ENV=production
 
 ENV TARGET_DB_PATH=/app/database/autodoc.db
 
-# Install LibreOffice in headless mode and other dependencies
+
+# Install general system dependencies.
+# IMPORTANT: We have REMOVED unixodbc and unixodbc-dev from this step to avoid conflicts.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libreoffice \
     curl \
     apt-transport-https \
-    unixodbc \
-    unixodbc-dev \
-    gnupg2 \
+    gnupg \
     build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list
+# Add the Microsoft GPG key and repository using the modern, secure method
+RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg && \
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list
+
+# Now, install the MS ODBC Driver and its development files from the Microsoft repo.
+# This will pull in the correct, compatible unixodbc dependencies automatically.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    msodbcsql17 \
+    unixodbc-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -59,11 +69,3 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Set the default command to run after the entrypoint script
 CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605"]
-
-# COPY entrypoint.sh /app/entrypoint.sh
-# RUN chmod +x /app/entrypoint.sh
-# CMD ["/app/entrypoint.sh"]
-
-# Command to run the Flask app using Gunicorn
-# CMD ["gunicorn", "--bind", "0.0.0.0:4605", "dashboard:create_app()"]
-
