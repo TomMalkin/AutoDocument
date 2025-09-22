@@ -51,6 +51,11 @@ def source_card(source_id: int):
             "components/cards/sources/sql_recordset_transpose_card.html", source=source
         )
 
+    if source_type.Name == "LLM":
+        return render_template(
+            "components/cards/sources/llm_card.html", source=source
+        )
+
     raise
 
 
@@ -102,6 +107,14 @@ def sql_text(source_id: int):
     manager = get_db_manager()
     source = manager.sources.get(source_id=source_id)
     return render_template("components/cards/sql_text.html", source=source)
+
+@card_blueprint.route("/prompt_template/<int:source_id>")
+def prompt_template(source_id: int):
+    """Return the prompt template of a given source id."""
+    # source_id = request.args.get("source_id")
+    manager = get_db_manager()
+    source = manager.sources.get(source_id=source_id)
+    return render_template("components/cards/prompt_text.html", source=source)
 
 
 @card_blueprint.route("/outcome_card/<int:outcome_id>")

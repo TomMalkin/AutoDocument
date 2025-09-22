@@ -8,13 +8,14 @@ from loguru import logger
 def initialise_database(db_file: str):
     """Create the schema for a new database and seed type tables."""
     manager = DatabaseManager(db_file=db_file)
-    logger.info("Creating all")
-    Base.metadata.create_all(manager.engine)
+    # logger.info("Creating all")
+    # Base.metadata.create_all(manager.engine)
 
     logger.info("seeding type tables")
 
     manager.source_types.seed()
     manager.outcome_types.seed()
     manager.storage_types.seed()
+    manager.llm_providers.seed()
 
     manager.commit()

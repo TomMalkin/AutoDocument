@@ -3,13 +3,16 @@
 import datetime
 from typing import Optional
 
-from sqlalchemy import delete, or_, select
+from loguru import logger
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from .tables import (
+    LLM,
     DatabaseMetaSource,
     FileTemplate,
     FormField,
+    LLMProvider,
     Outcome,
     OutcomeType,
     Source,
@@ -19,8 +22,6 @@ from .tables import (
     Workflow,
     WorkflowInstance,
 )
-
-from loguru import logger
 
 
 class Repository:
@@ -45,8 +46,9 @@ class FormFieldRepository(Repository):
 
     def delete(self, form_field_id: int):
         """Delete a form field."""
-        stmt = delete(FormField).where(FormField.Id == form_field_id)
-        self.session.execute(stmt)
+        form_field = self.session.get(FormField, form_field_id)
+        if form_field:
+            self.session.delete(form_field)
 
     def form_exists(self, workflow_id: int) -> bool:
         """Return if form fields exist for a given Workflow."""
@@ -84,8 +86,9 @@ class WorkflowRepository(Repository):
 
     def delete(self, workflow_id: int):
         """Delete a Workflow."""
-        stmt = delete(Workflow).where(Workflow.Id == workflow_id)
-        self.session.execute(stmt)
+        workflow = self.session.get(Workflow, workflow_id)
+        if workflow:
+            self.session.delete(workflow)
 
 
 class WorkflowInstanceRepository(Repository):
@@ -135,8 +138,9 @@ class DatabaseMetaSourceRepository(Repository):
 
     def delete(self, database_id: int):
         """Delete a database meta source."""
-        stmt = delete(DatabaseMetaSource).where(DatabaseMetaSource.DatabaseId == database_id)
-        self.session.execute(stmt)
+        database = self.session.get(DatabaseMetaSource, database_id)
+        if database:
+            self.session.delete(database)
 
     def add(self, name: str, connection_string: str) -> DatabaseMetaSource:
         """Add a database meta source."""
@@ -198,6 +202,7 @@ class SourceTypeRepository(Repository):
             SourceType(Name="CSVTable", IsSlow=0, IsFile=1, IsMulti=1),
             SourceType(Name="ExcelRecord", IsSlow=0, IsFile=1, IsMulti=0),
             SourceType(Name="ExcelTable", IsSlow=0, IsFile=1, IsMulti=1),
+            SourceType(Name="LLM", IsSlow=0, IsFile=0, IsMulti=0),
         ]
         source_types_to_add = []
 
@@ -259,8 +264,9 @@ class StorageInstanceRepository(Repository):
 
     def delete(self, storage_instance_id: int):
         """Delete a StorageInstance."""
-        stmt = delete(StorageInstance).where(StorageInstance.Id == storage_instance_id)
-        self.session.execute(stmt)
+        storage_instance = self.session.get(StorageInstance, storage_instance_id)
+        if storage_instance:
+            self.session.delete(storage_instance)
 
     def add(
         self,
@@ -336,8 +342,9 @@ class OutcomeRepository(Repository):
 
     def delete(self, outcome_id: int):
         """Delete an outcome."""
-        stmt = delete(Outcome).where(Outcome.Id == outcome_id)
-        self.session.execute(stmt)
+        outcome = self.session.get(Outcome, outcome_id)
+        if outcome:
+            self.session.delete(outcome)
 
     def get_all(self, workflow_id: int) -> list[Outcome]:
         """Get all outcomes for a given workflow."""
@@ -431,8 +438,9 @@ class SourceRepository(Repository):
 
     def delete(self, source_id: int):
         """Delete a Source and any associated form fields."""
-        stmt = delete(Source).where(Source.Id == source_id)
-        self.session.execute(stmt)
+        source = self.session.get(Source, source_id)
+        if source:
+            self.session.delete(source)
 
     def add(
         self,
@@ -450,6 +458,9 @@ class SourceRepository(Repository):
         orientation: Optional[str] = None,
         sheet_name: Optional[str] = None,
         header_row: Optional[int] = None,
+        llm: Optional[LLM] = None,
+        llm_prompt_template: Optional[str] = None,
+        llm_system_prompt: Optional[str] = None,
     ) -> Source:
         """Add a new source of any type."""
         source = Source(
@@ -467,7 +478,95 @@ class SourceRepository(Repository):
             HeaderRow=header_row,
             Step=step,
             Name=name,
+            llm=llm,
+            LLMPromptTemplate=llm_prompt_template,
+            LLMSystemPrompt=llm_system_prompt,
         )
         self.session.add(source)
         self.session.flush()
         return source
+
+
+class LLMProviderRepository(Repository):
+    """Repository for the LLMProvider Table."""
+
+    def get_all(self) -> list[LLMProvider]:
+        """Get all LLM Providers."""
+        stmt = select(LLMProvider)
+        return self.session.scalars(stmt).all()
+
+    def get(self, provider_id) -> LLMProvider:
+        """Get a LLM Provider from its Id."""
+        return self.session.get(LLMProvider, provider_id)
+
+    def seed(self):
+        """Ensure type tables include up to date types."""
+        llm_providers_required = [
+            LLMProvider(CommonName="OpenAI", LangChainName="openai"),
+            LLMProvider(CommonName="Anthropic", LangChainName="anthropic"),
+            LLMProvider(CommonName="Azure OpenAI", LangChainName="azure_openai"),
+            LLMProvider(CommonName="Azure AI", LangChainName="azure_ai"),
+            LLMProvider(CommonName="Google VertexAI", LangChainName="google_vertexai"),
+            LLMProvider(CommonName="Google GenAI", LangChainName="google_genai"),
+            LLMProvider(CommonName="Bedrock", LangChainName="bedrock"),
+            LLMProvider(CommonName="Bedrock Converse", LangChainName="bedrock_converse"),
+            LLMProvider(CommonName="Cohere", LangChainName="cohere"),
+            LLMProvider(CommonName="Fireworks", LangChainName="fireworks"),
+            LLMProvider(CommonName="Together", LangChainName="together"),
+            LLMProvider(CommonName="MistralAI", LangChainName="mistralai"),
+            LLMProvider(CommonName="Huggingface", LangChainName="huggingface"),
+            LLMProvider(CommonName="Groq", LangChainName="groq"),
+            LLMProvider(CommonName="Ollama", LangChainName="ollama"),
+            LLMProvider(
+                CommonName="Google Anthropic Vertex", LangChainName="google_anthropic_vertex"
+            ),
+            LLMProvider(CommonName="Deepseek", LangChainName="deepseek"),
+            LLMProvider(CommonName="IBM", LangChainName="ibm"),
+            LLMProvider(CommonName="Nvidia", LangChainName="nvidia"),
+            LLMProvider(CommonName="XAI", LangChainName="xai"),
+            LLMProvider(CommonName="Perplexity", LangChainName="perplexity"),
+        ]
+        llm_providers_to_add = []
+
+        existing_types = set(self.session.scalars(select(LLMProvider.CommonName)))
+
+        for llm_provider in llm_providers_required:
+            if llm_provider.CommonName not in existing_types:
+                llm_providers_to_add.append(llm_provider)
+
+        if llm_providers_to_add:
+            self.session.add_all(llm_providers_to_add)
+
+
+class LLMRepository(Repository):
+    """Repository for the LLMProvider Table."""
+
+    def get_all(self) -> list[LLM]:
+        """Get all LLMs."""
+        stmt = select(LLM)
+        return self.session.scalars(stmt).all()
+
+    def get(self, llm_id: int) -> LLM:
+        """Get a LLM from an Id."""
+        return self.session.get(LLM, llm_id)
+
+    def delete(self, llm_id: int):
+        """Delete a LLM."""
+        llm = self.session.get(LLM, llm_id)
+        if llm:
+            self.session.delete(llm)
+
+    def add(
+        self, provider: LLMProvider, model: str, base_url: str, api_key: str, system_prompt: str
+    ) -> LLM:
+        """Add a form field to a Workflow."""
+        llm = LLM(
+            provider=provider,
+            ModelName=model,
+            BaseURL=base_url,
+            APIKey=api_key,
+            SystemPrompt=system_prompt,
+        )
+        self.session.add(llm)
+        self.session.flush()
+        return llm

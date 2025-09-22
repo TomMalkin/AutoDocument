@@ -1,7 +1,7 @@
 """Define forms for meta objects."""
 
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, SelectField, StringField, SubmitField
+from wtforms import PasswordField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired
 
 
@@ -75,3 +75,19 @@ class CreateMetaSharePoint(FlaskForm):
     microsoft_password = PasswordField("Microsoft Password", validators=[DataRequired()])
 
     submit = SubmitField("Add SharePoint Library")
+
+
+class CreateLLM(FlaskForm):
+    """Form to specify an LLM to use."""
+
+    provider = SelectField("Provider", validators=[DataRequired()])
+    base_url = StringField("Base URL")
+    model = StringField("Model", validators=[DataRequired()])
+    api_key = StringField("API Key")
+    system_prompt = TextAreaField(
+        "System Prompt Default",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "E.g., You are a helpful AI assistant."}
+    )
+
+    submit = SubmitField()

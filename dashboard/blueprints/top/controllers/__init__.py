@@ -15,6 +15,7 @@ from .views.source import bp as source_bp
 from .views.sql import bp as sql_bp
 from .views.word import bp as word_bp
 from .views.workflow import bp as workflow_bp
+from .views.llm import bp as llm_bp
 
 top_blueprint = Blueprint("top", "top_blueprint")
 
@@ -31,3 +32,4 @@ top_blueprint.register_blueprint(source_bp)
 top_blueprint.register_blueprint(outcome_bp)
 top_blueprint.register_blueprint(diagram_bp)
 top_blueprint.register_blueprint(excel_bp)
+top_blueprint.register_blueprint(llm_bp)

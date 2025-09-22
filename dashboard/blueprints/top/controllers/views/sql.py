@@ -23,7 +23,7 @@ def add_record_source_view(workflow_id: int) -> Union[str, Response]:
 
     manager = get_db_manager()
     database_choices = manager.database_meta_sources.get_all()
-    form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
+    form.database.choices = [(db.Id, db.Name) for db in database_choices]
 
     if form.validate_on_submit():
         source_type = manager.source_types.get_from_name(name="SQL Record")
@@ -49,7 +49,7 @@ def add_record_set_source_view(workflow_id: int) -> Union[str, Response]:
     form = CreateRecordSetSourceForm()
     manager = get_db_manager()
     database_choices = manager.database_meta_sources.get_all()
-    form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
+    form.database.choices = [(db.Id, db.Name) for db in database_choices]
 
     if form.validate_on_submit():
         splitter = form.splitter_choice.data == "splitter"
@@ -79,7 +79,7 @@ def add_record_set_transpose_source_view(workflow_id: int) -> Union[str, Respons
     form = CreateRecordSetTransposeSourceForm()
     manager = get_db_manager()
     database_choices = manager.database_meta_sources.get_all()
-    form.database.choices = [(db.DatabaseId, db.Name) for db in database_choices]
+    form.database.choices = [(db.Id, db.Name) for db in database_choices]
 
     if form.validate_on_submit():
         source_type = manager.source_types.get_from_name(name="SQL RecordSet Transpose")

@@ -17,6 +17,8 @@ from .repositories import (
     StorageTypeRepository,
     WorkflowInstanceRepository,
     WorkflowRepository,
+    LLMProviderRepository,
+    LLMRepository,
 )
 
 
@@ -95,6 +97,17 @@ class DatabaseManager:
     def outcomes(self) -> OutcomeRepository:
         """Provide access to the OutcomeRepository for the current session."""
         return OutcomeRepository(self._get_current_session())
+
+    @property
+    def llms(self) -> LLMRepository:
+        """Provide access to the LLMRepository for the current session."""
+        return LLMRepository(self._get_current_session())
+
+    @property
+    def llm_providers(self) -> LLMProviderRepository:
+        """Provide access to the LLMProviderRepository for the current session."""
+        return LLMProviderRepository(self._get_current_session())
+
 
     # @property
     # def v_file_accessors(self) -> VFileAccessorsRepository:

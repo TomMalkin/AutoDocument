@@ -90,3 +90,14 @@ def output_storage_instance_form_snippet():
 def download_preparing():
     """Return a template that says Download Preparing."""
     return render_template_string("Download Preparing")
+
+
+@bp.route("/snippet/get_system_prompt", methods=["GET"])
+def get_system_prompt():
+    """Get the default system prompt for a given LLM Id."""
+    llm_id = request.values.get("llm")
+    manager = get_db_manager()
+    llm = manager.llms.get(llm_id=llm_id)
+    return llm.SystemPrompt if llm else "Error"
+
+

@@ -56,13 +56,13 @@ class Workflow:
                 start_time=self.start_time,
                 step=self.step,
             )
-            self.instance_id = instance.InstanceId
+            self.instance_id = instance.Id
 
         else:
             instance = self.manager.workflow_instances.add(
                 workflow_id=self.workflow_id, step=self.step
             )
-            self.instance_id = instance.InstanceId
+            self.instance_id = instance.Id
 
         result = self.process_sources(
             download_container=download_container, upload_mapping=upload_mapping
