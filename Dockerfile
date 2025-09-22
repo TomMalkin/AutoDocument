@@ -29,8 +29,6 @@ RUN apt-get update && \
 RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg && \
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list
 
-# Now, install the MS ODBC Driver and its development files from the Microsoft repo.
-# This will pull in the correct, compatible unixodbc dependencies automatically.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     msodbcsql17 \
@@ -47,6 +45,7 @@ WORKDIR /app
 
 # Copy the requirements file to the working directory
 COPY requirements.txt .
+COPY alembic.ini .
 
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -56,6 +55,7 @@ RUN mkdir -p /app/database
 COPY dashboard /app/dashboard
 COPY autodoc /app/autodoc 
 COPY init /app/init
+COPY alembic /app/alembic
 
 # Expose the port on which the Flask app will run
 EXPOSE 4605

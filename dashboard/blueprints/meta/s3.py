@@ -50,4 +50,5 @@ def delete(storage_instance_id: int):
     """Remove a S3 Object Storage."""
     manager = get_db_manager()
     manager.storage_instances.delete(storage_instance_id=storage_instance_id)
+    manager.commit()
     return redirect(url_for("meta.s3.manage"))

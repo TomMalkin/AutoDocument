@@ -39,14 +39,14 @@
                             {% for database in databases %}
                             <tr>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{
-                                    database['DatabaseId'] }}</td>
+                                    database['Id'] }}</td>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ database['Name'] }}
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{
                                     database['ConnectionString'] }}</td>
                                 <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
                                         <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                                        href="{{ url_for('meta.db.delete', database_id=database['DatabaseId']) }}">delete</a>
+                                        href="{{ url_for('meta.db.delete', database_id=database['Id']) }}">delete</a>
                                 </td>
                             </tr>
                             {% endfor %}

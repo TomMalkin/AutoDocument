@@ -75,7 +75,7 @@ class WorkflowInstance(Base):
     """Represents a specific instance of a workflow, tracking its progress and data."""
 
     __tablename__ = "WorkflowInstance"
-    InstanceId: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    Id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     ParentInstanceId: Mapped[int] = mapped_column(nullable=True)
     WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"), nullable=True)
     StartTime: Mapped[float] = mapped_column(Numeric, nullable=True)
@@ -109,7 +109,7 @@ class DatabaseMetaSource(Base):
     """Stores metadata for database sources, including connection strings."""
 
     __tablename__ = "DatabaseMetaSource"
-    DatabaseId: Mapped[int] = mapped_column(primary_key=True)
+    Id: Mapped[int] = mapped_column(primary_key=True)
     Name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     ConnectionString: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -192,11 +192,10 @@ class FileTemplate(Base):
         """Return if this file template should be added to the download container."""
         return self.StorageInstanceId == -1
 
-
-
     def get_root(self) -> str:
         """Get the root for a File Template Service."""
         return self.storage_instance.LocalPath or self.Bucket or self.storage_instance.RemotePath
+
 
 class Outcome(Base):
     """Represents a specific outcome of a workflow."""
@@ -240,9 +239,7 @@ class Source(Base):
     TypeId: Mapped[int] = mapped_column(ForeignKey("SourceType.Id"))
     FileTemplateId: Mapped[int] = mapped_column(ForeignKey("FileTemplate.Id"), nullable=True)
     # ZIndex: Mapped[int]
-    DatabaseId: Mapped[int] = mapped_column(
-        ForeignKey("DatabaseMetaSource.DatabaseId"), nullable=True
-    )
+    DatabaseId: Mapped[int] = mapped_column(ForeignKey(DatabaseMetaSource.Id), nullable=True)
     SQLText: Mapped[str] = mapped_column(Text, nullable=True)
     Splitter: Mapped[int] = mapped_column(default=0)
     FieldName: Mapped[str] = mapped_column(Text, nullable=True)
@@ -254,6 +251,12 @@ class Source(Base):
     SheetName: Mapped[str] = mapped_column(Text, nullable=True)
     HeaderRow: Mapped[int] = mapped_column(nullable=True)
 
+    LLMId: Mapped[int] = mapped_column(ForeignKey("LLM.Id"), nullable=True)
+    llm: Mapped["LLM"] = relationship("LLM", back_populates="sources")
+
+    LLMPromptTemplate: Mapped[str] = mapped_column(Text, nullable=True)
+    LLMSystemPrompt: Mapped[str] = mapped_column(Text, nullable=True)
+
     workflow: Mapped["Workflow"] = relationship("Workflow", back_populates="sources")
     source_type: Mapped["SourceType"] = relationship("SourceType", back_populates="sources")
     database: Mapped["DatabaseMetaSource"] = relationship(
@@ -261,3 +264,41 @@ class Source(Base):
     )
     file_template: Mapped["FileTemplate"] = relationship("FileTemplate", back_populates="source")
     fields: Mapped[list["SQLFields"]] = relationship(back_populates="source")
+
+    @property
+    def system_prompt(self):
+        """Get the system prompt which may have been overridden by the source."""
+        return self.LLMSystemPrompt or self.llm.SystemPrompt
+
+
+class LLMProvider(Base):
+    """Options for an AI provider."""
+
+    __tablename__ = "LLMProvider"
+    Id: Mapped[int] = mapped_column(primary_key=True)
+    # the name that will be user facing
+    CommonName: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # the option used to create langchain's init_chat_model
+    LangChainName: Mapped[str] = mapped_column(Text, nullable=False)
+    llms: Mapped[list["LLM"]] = relationship(back_populates="provider")
+
+
+class LLM(Base):
+    """Represents a metadata LLM option."""
+
+    __tablename__ = "LLM"
+    Id: Mapped[int] = mapped_column(primary_key=True)
+    # Name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+
+    ProviderId: Mapped[int] = mapped_column(ForeignKey("LLMProvider.Id"), nullable=False)
+    provider: Mapped["LLMProvider"] = relationship("LLMProvider", back_populates="llms")
+
+    ModelName: Mapped[str] = mapped_column(Text, nullable=False)
+    BaseURL: Mapped[str] = mapped_column(Text, nullable=True)
+    APIKey: Mapped[str] = mapped_column(Text, nullable=True)
+
+    # this is the default system prompt unless another is specified at the source level
+    SystemPrompt: Mapped[str] = mapped_column(Text, nullable=True)
+
+    sources: Mapped[list["Source"]] = relationship(back_populates="llm")
