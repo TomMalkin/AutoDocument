@@ -1,5 +1,5 @@
 """Expse the Workflow Class."""
 
-from .workflow import EventLoggerInterface, Workflow
+from .workflow import Workflow
 
 __all__ = ["Workflow", "EventLoggerInterface"]

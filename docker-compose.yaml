@@ -1,0 +1,75 @@
+services:
+  redis:
+    image: "docker.io/redis:7-alpine"
+
+  app:
+    build: .
+    image: tommalkin/autodocument:latest
+    ports:
+      - "4605:4605"
+    volumes:
+      # Required shared volumes
+      - download_dir:/download_dir
+      - upload_dir:/upload_dir
+      - db_data:/db_data
+
+      # add your own here
+      # - local_mount:/local_mount
+
+    depends_on:
+      - redis
+    environment:
+      - DOWNLOAD_DIR=/download_dir
+      - UPLOAD_DIR=/upload_dir
+      - DB_PATH=/db_data/autodoc.db
+      - REDIS_HOST=redis
+
+  worker:
+    build: 
+      context: .
+      dockerfile: worker/Dockerfile
+    image: tommalkin/autodocument-worker:latest
+    volumes:
+      - download_dir:/download_dir
+      - upload_dir:/upload_dir
+      - db_data:/db_data
+
+      # add your own here. Make sure they match the app service exactly.
+      # - local_mount:/local_mount
+    depends_on:
+      - redis
+    environment:
+      - DOWNLOAD_DIR=/download_dir
+      - UPLOAD_DIR=/upload_dir
+      - DB_PATH=/db_data/autodoc.db
+      - REDIS_HOST=redis
+    command: ["dramatiq", "autodoc.tasks", "--processes", "1"]
+
+volumes:
+  download_dir: {}
+  upload_dir: {}
+
+  # ---
+  # Choose 1 depending on whether you want to backup your workflows.:
+
+  # 1) docker defined persistent database - database will persist only in a docker volume
+  db_data: {}
+
+  # -- or --
+
+  # 2) locally defined persistent database - database will persist at a given path.
+  # db_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: ./data
+  #     o: bind
+  # ---
+
+  # Any file mounts to save outcomes to go here
+  # local_mount:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /some/path/to/add
+  #     o: bind

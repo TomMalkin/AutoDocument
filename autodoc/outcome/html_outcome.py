@@ -1,12 +1,13 @@
 """Outcome for creating HTML Files."""
 
+from pathlib import Path
 from typing import Optional
 
 from jinja2 import Template
 from loguru import logger
 
 from autodoc.data.tables import Outcome
-from autodoc.outcome.download_container import DownloadContainer
+
 from autodoc.outcome.outcome import OutcomeService
 from autodoc.storage_service import LinuxStorageService
 
@@ -19,8 +20,8 @@ class HTMLOutcomeService(OutcomeService):
     def __init__(
         self,
         outcome: Outcome,
+        download_dir: Optional[Path],
         template_uploaded_filename: Optional[str] = None,
-        download_container: Optional[DownloadContainer] = None,
     ) -> None:
         """
         Initialise the outcome with the template and output locations.
@@ -29,7 +30,6 @@ class HTMLOutcomeService(OutcomeService):
         """
         self.outcome = outcome
         self.rendered_text: str
-        self.download_container = download_container
 
         logger.info(f"Creating HTMLOutcomeService class with {template_uploaded_filename=}")
 
@@ -41,9 +41,11 @@ class HTMLOutcomeService(OutcomeService):
         else:
             self.set_input_storage_service()
 
-        if download_container and outcome.is_download:
+        if outcome.is_download:
+            logger.info("using a download storage service.")
+
             self.output_storage_service = LinuxStorageService(
-                root=str(download_container.download_dir),
+                root=str(download_dir),
                 relative=outcome.DownloadName,
             )
         else:
@@ -61,5 +63,3 @@ class HTMLOutcomeService(OutcomeService):
         """Save the HTML document using standard write."""
         if self.output_storage_service:
             self.output_storage_service.save_text(self.rendered_text)
-            if self.download_container:
-                self.download_container.add_file(file_path=self.output_storage_service.path)

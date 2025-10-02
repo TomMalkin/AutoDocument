@@ -1,11 +1,11 @@
 """Define workflow views."""
 
 import os
-from pathlib import Path
 
 from flask import (
     Blueprint,
     current_app,
+    make_response,
     redirect,
     render_template,
     render_template_string,
@@ -14,11 +14,15 @@ from flask import (
     url_for,
 )
 from loguru import logger
+from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from werkzeug.wrappers.response import Response
 
 from autodoc import Workflow
-from autodoc.outcome.download_container import DownloadContainer
+from autodoc.tasks import process_instance
+from autodoc.config import DOWNLOAD_DIRECTORY
+
+# from autodoc.outcome.download_container import DownloadContainer
 from dashboard.database import get_db_manager
 
 from ...forms import CreateWorkflowForm, get_form
@@ -35,7 +39,7 @@ def workflow(workflow_id: int) -> str:
 
     instances = manager.workflow_instances.get_all(workflow_id=workflow_id)
 
-    workflow = Workflow(workflow_id=workflow_id, event_logger=None, manager=manager)
+    workflow = Workflow(workflow_id=workflow_id, manager=manager)
 
     return render_template(
         "top/workflow.html",
@@ -107,16 +111,15 @@ def workflow_instance(workflow_id: int) -> Response | str:
     # url_params = request.values
     url_params = {}
     form = get_form(workflow_id, url_params=url_params, manager=manager)
-    download_container = DownloadContainer(download_dir=current_app.config["DOWNLOAD_DIR"])
 
     if request.method == "GET":
         logger.info("GET request identified")
 
         if form is None:
             logger.info("No form fields or upload fields identified, skipping form generation")
-            workflow = Workflow(workflow_id=workflow_id, event_logger=None, manager=manager)
-
-            workflow.process(download_container=download_container)
+            workflow = Workflow(workflow_id=workflow_id, manager=manager)
+            workflow.create_instance()
+            process_instance.send(instance_id=workflow.instance.Id, upload_mapping={}, form_data={})
 
         else:
             logger.info("Form fields and/or upload fields identified, rendering form")
@@ -128,15 +131,12 @@ def workflow_instance(workflow_id: int) -> Response | str:
                 workflow_name=workflow.Name,
             )
 
-    if request.method == "POST":
+    else:  # if request.method == "POST":
         assert form is not None
         logger.info("POST request identified")
 
         if form.validate_on_submit():
             data = {k: v for k, v in form.data.items() if k not in ["submit", "csrf_token"]}
-            workflow = Workflow(
-                workflow_id=workflow_id, form_data=data, event_logger=None, manager=manager
-            )
 
             name_to_file_mapping = {}  # will be like {"Client Record": "client_record.csv"}
             if form.upload_file_fields:
@@ -148,7 +148,9 @@ def workflow_instance(workflow_id: int) -> Response | str:
                     # save the file
                     file = form[upload_file_field].data
                     filename = secure_filename(file.filename)
-                    uploaded_file_path = os.path.join(current_app.config["UPLOAD_DIR"], filename)
+                    uploaded_file_path = os.path.join(
+                        current_app.config["UPLOAD_DIRECTORY"], filename
+                    )
                     file.save(uploaded_file_path)
 
                     logger.info(f"saving to {uploaded_file_path}")
@@ -156,20 +158,133 @@ def workflow_instance(workflow_id: int) -> Response | str:
                     # e.g. "Client Record" -> dashboard/files/client_record.csv
                     name_to_file_mapping[upload_file_field] = uploaded_file_path
 
-            workflow.process(
-                download_container=download_container,
+            # TEMP: running async task
+            workflow = Workflow(
+                workflow_id=workflow_id,
+                form_data=data,
+                manager=manager,
                 upload_mapping=name_to_file_mapping,
             )
+
+            workflow.create_instance()
+
+            # process_instance(
+            #     instance_id=workflow.instance.Id,
+            #     upload_mapping=name_to_file_mapping,
+            #     form_data=data,
+            # )
+
+            useable_data = {k: v for k, v in data.items() if not isinstance(v, FileStorage)}
+            process_instance.send(
+                instance_id=workflow.instance.Id,
+                upload_mapping=name_to_file_mapping,
+                form_data=useable_data,
+            )
+
+            # workflow.process()
 
         else:
             return render_template_string(str(form.errors))
 
-    # workflow has been completed if we are here
-    if download_container.has_files():
-        download_container.zip_files()
-        zip_path = Path(current_app.config["DOWNLOAD_DIR"]).resolve() / "output.zip"
-        logger.info(f"Downloads exist, so zipping to {zip_path=} and sending.")
+    # return redirect(url_for("top.base.index"))
+    return redirect(url_for("top.workflow.instance_review", instance_id=workflow.instance.Id))
 
+
+@bp.route("/instance_review/<instance_id>/", methods=["GET"])
+def instance_review(instance_id: int) -> Response | str:
+    """Return a page that shows the ongoing status of a workflow instance."""
+    manager = get_db_manager()
+
+    workflow_instance = manager.workflow_instances.get(instance_id=instance_id)
+
+    return render_template(
+        "top/instance_review.html",
+        workflow_instance=workflow_instance,
+    )
+
+
+@bp.route("/download/<instance_id>/", methods=["GET"])
+def download(instance_id: int):
+    """Download the zip file for a given instance Id."""
+    manager = get_db_manager()
+    instance = manager.workflow_instances.get(instance_id=instance_id)
+
+    if instance.Status == "Complete" and instance.workflow.has_download:
+        download_dir = DOWNLOAD_DIRECTORY / str(instance.Id)
+        zip_filename = download_dir.name + ".zip"
+        zip_path = download_dir.parent / zip_filename
         return send_file(zip_path)
 
-    return redirect(url_for("top.base.index"))
+@bp.route("/component/source_table/<instance_id>", methods=["GET"])
+def source_table(instance_id: int):
+    """Table component of source statuses designed to be polled by the instance review page."""
+    manager = get_db_manager()
+    instance = manager.workflow_instances.get(instance_id=instance_id)
+
+    source_instances = instance.source_instances
+
+    num_processing = len(
+        [
+            source_instance
+            for source_instance in source_instances
+            if source_instance.Status != "Loaded"
+        ]
+    )
+
+    num_complete = len(source_instances) - num_processing
+
+    if instance.Status == "Complete":
+        text = render_template(
+            "components/sources_status.html",
+            num_processing=num_processing,
+            num_complete=num_complete,
+            instance=instance
+        )
+        response = make_response(text)
+        response.status_code = 286
+        return response
+
+    return render_template(
+        "components/sources_status.html",
+        num_processing=num_processing,
+        num_complete=num_complete,
+        instance=instance
+    )
+
+@bp.route("/component/outcome_table/<instance_id>", methods=["GET"])
+def outcome_table(instance_id: int):
+    """Table component of outcome statuses designed to be polled by the instance review page."""
+    manager = get_db_manager()
+    instance = manager.workflow_instances.get(instance_id=instance_id)
+
+    outcome_instances = instance.outcome_instances
+
+    num_processing = len(
+        [
+            outcome_instance
+            for outcome_instance in outcome_instances
+            if outcome_instance.Status != "Complete"
+        ]
+    )
+
+    num_complete = len(outcome_instances) - num_processing
+
+    if instance.Status == "Complete":
+        text = render_template(
+            "components/outcomes_status.html",
+            num_processing=num_processing,
+            num_complete=num_complete,
+            has_download=instance.workflow.has_download,
+            instance=instance
+        )
+        response = make_response(text)
+        response.status_code = 286
+        return response
+
+    return render_template(
+        "components/outcomes_status.html",
+        num_processing=num_processing,
+        num_complete=num_complete,
+        has_download=instance.workflow.has_download,
+        instance=instance
+    )
