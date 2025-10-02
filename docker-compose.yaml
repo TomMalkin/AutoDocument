@@ -3,7 +3,6 @@ services:
     image: "docker.io/redis:7-alpine"
 
   app:
-    build: .
     image: tommalkin/autodocument:latest
     ports:
       - "4605:4605"
@@ -25,9 +24,6 @@ services:
       - REDIS_HOST=redis
 
   worker:
-    build: 
-      context: .
-      dockerfile: worker/Dockerfile
     image: tommalkin/autodocument-worker:latest
     volumes:
       - download_dir:/download_dir
