@@ -10,6 +10,8 @@ USERNAME="tommalkin"
 WEB_IMAGE="$USERNAME/autodocument"
 WORKER_IMAGE="$USERNAME/autodocument-worker"
 
+docker compose -f build.docker-compose.yaml build app worker
+
 # Tag images
 docker tag "$WEB_IMAGE:latest" "$WEB_IMAGE:$VERSION"
 docker tag "$WORKER_IMAGE:latest" "$WORKER_IMAGE:$VERSION"

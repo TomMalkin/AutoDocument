@@ -2,7 +2,7 @@
 
 from typing import Union
 
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for, request
 from loguru import logger
 from werkzeug.wrappers.response import Response
 
@@ -19,11 +19,12 @@ def add_llm_source_view(workflow_id: int) -> Union[str, Response]:
     form = CreateLLMSourceForm()
     manager = get_db_manager()
 
-    llm_choices = manager.llms.get_all()
-    form.llm.choices = [
-        (llm.Id, f"{llm.provider.CommonName}: {llm.ModelName}") for llm in llm_choices
+    llms = manager.llms.get_all()
+    llm_choices = [
+        (llm.Id, f"{llm.provider.CommonName}: {llm.ModelName}") for llm in llms
     ]
 
+    form.llm.choices = llm_choices
     if form.validate_on_submit():
         llm_id = form.llm.data
         field_name = form.field_name.data
@@ -49,11 +50,12 @@ def add_llm_source_view(workflow_id: int) -> Union[str, Response]:
 
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
 
-    else:
+    elif request.method == "POST":
         logger.error(form.errors)
 
     return render_template(
         "top/add_source/add_llm_source.html",
         form=form,
         workflow_id=workflow_id,
+        llm_choices=llm_choices,
     )

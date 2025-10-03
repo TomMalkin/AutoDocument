@@ -48,7 +48,13 @@
 
         <div class="flex gap-4">
             {{ form.llm.label(class='block mt-4 text-sm font-medium text-gray-900') }}
-                        <select class="mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm" hx-get="/snippet/get_system_prompt" hx-on::after-request="document.getElementById('system_prompt').placeholder = event.detail.xhr.responseText" hx-swap="none" hx-target="#system_prompt" hx-trigger="load, change" id="llm" name="llm"></select>
+                        <select class="mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm" hx-get="/snippet/get_system_prompt" hx-on::after-request="document.getElementById('system_prompt').placeholder = event.detail.xhr.responseText" hx-swap="none" hx-target="#system_prompt" hx-trigger="load, change" id="llm" name="llm">
+                            {% for llm in llm_choices %}
+                                <option value="{{ llm[0] }}">{{ llm[1] }}</option>
+                            {% endfor %}
+
+
+                        </select>
         </div>
 
         <div class="flex gap-4">
