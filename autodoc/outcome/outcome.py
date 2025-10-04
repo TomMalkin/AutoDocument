@@ -2,11 +2,10 @@
 
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Optional
 
 from autodoc.data.tables import Outcome
 from autodoc.storage_service import StorageService, get_storage_service
-
-from .download_container import DownloadContainer
 
 
 class OutcomeService(ABC):
@@ -23,14 +22,14 @@ class OutcomeService(ABC):
 
     is_file: bool
 
-    def __init__(self, outcome: Outcome, download_container: DownloadContainer | None) -> None:
-        """
-        Initialise the object with a dict of outcome details.
-
-        if download_container is given, then assume the result is downloaded.
-        """
-        self.outcome = outcome
-        self.download_container = download_container
+    # def __init__(self, outcome: Outcome, download_dir: Optional[Path]) -> None:
+    #     """
+    #     Initialise the object with a dict of outcome details.
+    #
+    #     if download_container is given, then assume the result is downloaded.
+    #     """
+    #     self.outcome = outcome
+    #     self.download_dir = download_dir
 
     def set_input_storage_service(self):
         """Set the input storage service."""

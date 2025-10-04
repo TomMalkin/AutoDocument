@@ -4,7 +4,7 @@ import datetime
 from typing import Optional
 
 from loguru import logger
-from sqlalchemy import or_, select
+from sqlalchemy import or_, select, update
 from sqlalchemy.orm import Session
 
 from .tables import (
@@ -14,8 +14,10 @@ from .tables import (
     FormField,
     LLMProvider,
     Outcome,
+    OutcomeInstance,
     OutcomeType,
     Source,
+    SourceInstance,
     SourceType,
     StorageInstance,
     StorageType,
@@ -94,19 +96,23 @@ class WorkflowRepository(Repository):
 class WorkflowInstanceRepository(Repository):
     """The repository of actions on the WorkflowInstance Table."""
 
+    def get(self, instance_id: int) -> WorkflowInstance:
+        """Get a WorkflowInstance."""
+        return self.session.get(WorkflowInstance, instance_id)
+
     def get_all(self, workflow_id: int) -> list[WorkflowInstance]:
         """Get all instances of a workflow."""
         stmt = select(WorkflowInstance).where(WorkflowInstance.WorkflowId == workflow_id)
         return self.session.scalars(stmt).all()
 
-    def add(self, workflow_id: int, step: int) -> WorkflowInstance:
+    def add(self, workflow_id: int, step: int = 1) -> WorkflowInstance:
         """Add a new workflow instance."""
         instance = WorkflowInstance(
-            ParentInstanceId=None,
+            # ParentInstanceId=None,
             WorkflowId=workflow_id,
             StartTime=datetime.datetime.now().timestamp(),
             EndTime=None,
-            Completed=False,
+            Status="Ongoing",
             Data="",
             Step=step,
         )
@@ -114,18 +120,28 @@ class WorkflowInstanceRepository(Repository):
         self.session.flush()
         return instance
 
-    def add_split(
-        self, parent_instance_id: int, start_time: datetime.datetime, step: int
-    ) -> WorkflowInstance:
-        """Add a new instance based on the splitting of another Workflow."""
-        instance = WorkflowInstance(
-            ParentInstanceId=parent_instance_id,
-            StartTime=datetime.datetime.now().timestamp(),
-            Step=step,
+    def update_status(self, instance_id: int, status: str):
+        """Update the status of an instance."""
+        stmt = (
+            update(WorkflowInstance)
+            .where(WorkflowInstance.Id == instance_id)
+            .values(Status=status)
         )
-        self.session.add(instance)
-        self.session.flush()
-        return instance
+        self.session.execute(stmt)
+
+    # def add_split(
+    #     self, parent_instance_id: int, start_time: datetime.datetime, step: int
+    # ) -> WorkflowInstance:
+    # def add_split(self, parent_instance_id: int, step: int) -> WorkflowInstance:
+    #     """Add a new instance based on the splitting of another Workflow."""
+    #     instance = WorkflowInstance(
+    #         ParentInstanceId=parent_instance_id,
+    #         StartTime=datetime.datetime.now().timestamp(),
+    #         Step=step,
+    #     )
+    #     self.session.add(instance)
+    #     self.session.flush()
+    #     return instance
 
 
 class DatabaseMetaSourceRepository(Repository):
@@ -570,3 +586,70 @@ class LLMRepository(Repository):
         self.session.add(llm)
         self.session.flush()
         return llm
+
+
+class SourceInstanceRepository(Repository):
+    """Repository for the SourceInstance Table."""
+
+    def get_all(self, instance_id: int) -> list[SourceInstance]:
+        """Get all Source Instances for a given Instance Id."""
+        stmt = select(SourceInstance).where(SourceInstance.InstanceId == instance_id)
+        return self.session.scalars(stmt).all()
+
+    def add(self, source_id: int, instance_id: int) -> SourceInstance:
+        """Add a new Source Instance."""
+        source_instance = SourceInstance(
+            SourceId=source_id,
+            InstanceId=instance_id,
+            Status="Ongoing",
+        )
+        self.session.add(source_instance)
+        self.session.flush()
+        return source_instance
+
+    def set_loaded(self, source_instance_id: int) -> None:
+        """Set a given SourceInstance as 'loaded'."""
+        stmt = (
+            update(SourceInstance)
+            .where(SourceInstance.Id == source_instance_id)
+            .values(Status="Loaded")
+        )
+        self.session.execute(stmt)
+
+
+class OutcomeInstanceRepository(Repository):
+    """Repository for the OutcomeInstance Table."""
+
+    def get_all(self, instance_id: int) -> list[OutcomeInstance]:
+        """Get all Outcome Instances for a given Instance Id."""
+        stmt = select(OutcomeInstance).where(OutcomeInstance.InstanceId == instance_id)
+        return self.session.scalars(stmt).all()
+
+    def add(self, outcome_id: int, instance_id: int) -> OutcomeInstance:
+        """Add a new Outcome Instance."""
+        outcome_instance = OutcomeInstance(
+            OutcomeId=outcome_id,
+            InstanceId=instance_id,
+            Status="Ongoing",
+        )
+        self.session.add(outcome_instance)
+        self.session.flush()
+        return outcome_instance
+
+    def set_complete(self, outcome_instance_id: int) -> None:
+        """Set a given OutcomeInstance as 'loaded'."""
+        stmt = (
+            update(OutcomeInstance)
+            .where(OutcomeInstance.Id == outcome_instance_id)
+            .values(Status="Complete")
+        )
+        self.session.execute(stmt)
+
+    def set_rendered_name(self, outcome_instance_id: int, rendered_name: str) -> None:
+        """Set the RenderedName of a given OutcomeInstance."""
+        stmt = (
+            update(OutcomeInstance)
+            .where(OutcomeInstance.Id == outcome_instance_id)
+            .values(RenderedName=rendered_name)
+        )
+        self.session.execute(stmt)

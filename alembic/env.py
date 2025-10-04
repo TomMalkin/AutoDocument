@@ -1,9 +1,9 @@
+import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, create_engine
-from sqlalchemy import pool
-import os
 from dotenv import load_dotenv
+from sqlalchemy import create_engine, pool
+
 load_dotenv()
 
 from alembic import context
@@ -18,18 +18,17 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-config.config_args.update({
-    "TARGET_DB_PATH": os.getenv("TARGET_DB_PATH")
-})
+config.config_args.update({"DB_PATH": os.getenv("DB_PATH")})
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 from autodoc.data.base import Base
+
 target_metadata = Base.metadata
 # target_metadata = None
 
 # DATABASE_URL = "sqlite:///./{x}".format(x=os.getenv("TARGET_DB_PATH", "/app/database/autodoc.db"))
-target_db_path = os.getenv("TARGET_DB_PATH", "/app/database/autodoc.db")
+target_db_path = os.getenv("DB_PATH", "/app/database/autodoc.db")
 DATABASE_URL = f"sqlite:///{target_db_path}"
 print(f"alembic {DATABASE_URL=}")
 # other values from the config, defined by the needs of env.py,
@@ -39,7 +38,8 @@ print(f"alembic {DATABASE_URL=}")
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
+    """
+    Run migrations in 'offline' mode.
 
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable

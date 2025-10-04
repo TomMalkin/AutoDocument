@@ -1,0 +1,33 @@
+<div class="p-4 bg-white rounded-lg">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Outcomes</h1>
+
+  <div class="space-y-4 flex-col">
+    <p class="text-lg text-gray-700">Processing: <span class="font-semibold text-blue-600">{{ num_processing }}</span></p>
+    <p class="text-lg text-gray-700">Complete: <span class="font-semibold text-green-600">{{ num_complete }}</span></p>
+
+    {% if has_download %}
+        {% if instance.Status == "Complete" %}
+            <div class="space-y-4">
+                <a href="{{url_for('top.workflow.download', instance_id=instance.Id)}}"
+                   class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg
+                          hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                          transition ease-in-out duration-150">
+                    Download
+                </a>
+            </div>
+
+        {% else %}
+
+            <div class="space-y-4">
+                <a class="inline-block px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg
+                          focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50
+                          transition ease-in-out duration-150 cursor-not-allowed pointer-events-none" disabled>
+                    Processing...
+                </a>
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+  </div>
+</div>

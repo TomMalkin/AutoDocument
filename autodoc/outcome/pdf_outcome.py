@@ -2,12 +2,12 @@
 
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 from docxtpl import DocxTemplate
 from loguru import logger
 
 from autodoc.data.tables import Outcome
-from autodoc.outcome.download_container import DownloadContainer
 from autodoc.outcome.outcome import OutcomeService
 from autodoc.storage_service import LinuxStorageService
 
@@ -25,12 +25,11 @@ class PDFOutcomeService(OutcomeService):
     def __init__(
         self,
         outcome: Outcome,
+        download_dir: Optional[Path],
         template_uploaded_filename=None,
-        download_container: DownloadContainer | None = None,
     ) -> None:
         """Initialise Word Outcome."""
         self.outcome = outcome
-        self.download_container = download_container
 
         logger.info(f"Creating PDFOutcomeService class with {template_uploaded_filename=}")
 
@@ -42,15 +41,15 @@ class PDFOutcomeService(OutcomeService):
         else:
             self.set_input_storage_service()
 
-        if download_container:
+        if outcome.is_download:
+            logger.info("using a download storage service.")
+
             self.output_storage_service = LinuxStorageService(
-                root=str(download_container.download_dir), relative=outcome.DownloadName
+                root=str(download_dir),
+                relative=outcome.DownloadName,
             )
         else:
             self.set_output_storage_service()
-
-        assert self.input_storage_service
-        assert self.output_storage_service
 
         self.document = DocxTemplate(self.input_storage_service.get_file())
 
@@ -83,6 +82,3 @@ class PDFOutcomeService(OutcomeService):
         subprocess.run(command)
         self.output_storage_service.temp_file_name += ".pdf"
         self.output_storage_service.save_file()
-
-        if self.download_container:
-            self.download_container.add_file(file_path=self.output_storage_service.path)

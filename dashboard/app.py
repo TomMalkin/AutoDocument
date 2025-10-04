@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from loguru import logger
 
-from autodoc.config import TARGET_DB_PATH
+from autodoc.config import DB_PATH, DOWNLOAD_DIRECTORY, UPLOAD_DIRECTORY
 from autodoc.data.initialise import initialise_database
 from dashboard.database import register_db_teardown
 
@@ -23,15 +23,17 @@ load_dotenv()
 logger.remove()
 logger.add(sys.stderr, level="INFO")
 
-UPLOAD_DIR = Path("dashboard/files/")
-if not UPLOAD_DIR.is_dir():
-    print("creating upload folder: ", UPLOAD_DIR)
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# UPLOAD_DIR = Path("dashboard/files/")
+# if not UPLOAD_DIR.is_dir():
+#     print("creating upload folder: ", UPLOAD_DIR)
+#     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-DOWNLOAD_DIR = Path("dashboard/files/download/")
-if not DOWNLOAD_DIR.is_dir():
-    print("creating upload folder: ", DOWNLOAD_DIR)
-    DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+
+# if not DOWNLOAD_DIRECTORY.is_dir():
+#     print("creating upload folder: ", DOWNLOAD_DIRECTORY)
+#     DOWNLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
 
@@ -42,7 +44,7 @@ logger.add("log.log")
 @with_appcontext
 def init_db_command():
     """Initialise the Database."""
-    initialise_database(TARGET_DB_PATH)
+    initialise_database(DB_PATH)
 
 
 def create_app(template_folder="templates", static_folder="static") -> Flask:
@@ -52,9 +54,10 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
 
     app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
     app.config["SECRET_KEY"] = "any secret string"
-    app.config["UPLOAD_DIR"] = UPLOAD_DIR
-    app.config["DOWNLOAD_DIR"] = DOWNLOAD_DIR
-    app.config["DB_PATH"] = TARGET_DB_PATH
+    # app.config["UPLOAD_DIR"] = UPLOAD_DIR
+    app.config["DOWNLOAD_DIRECTORY"] = DOWNLOAD_DIRECTORY
+    app.config["UPLOAD_DIRECTORY"] = UPLOAD_DIRECTORY
+    app.config["DB_PATH"] = DB_PATH
     app.config["ADMIN_PASSWORD"] = ADMIN_PASSWORD
     app.secret_key = "your_secret_key"
 

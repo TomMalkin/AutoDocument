@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from sqlalchemy import Boolean, ForeignKey, Numeric, Text
+from sqlalchemy import ForeignKey, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -70,22 +70,43 @@ class Workflow(Base):
         back_populates="workflow", cascade="all, delete-orphan"
     )
 
+    @property
+    def has_download(self) -> bool:
+        """Return whether any of the outcomes are downloaded."""
+        return any([outcome.DownloadName is not None for outcome in self.outcomes])
+
 
 class WorkflowInstance(Base):
     """Represents a specific instance of a workflow, tracking its progress and data."""
 
     __tablename__ = "WorkflowInstance"
     Id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    ParentInstanceId: Mapped[int] = mapped_column(nullable=True)
-    WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"), nullable=True)
+    # ParentInstanceId: Mapped[int] = mapped_column(nullable=True)
+    WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"), nullable=False)
     StartTime: Mapped[float] = mapped_column(Numeric, nullable=True)
     EndTime: Mapped[str] = mapped_column(Text, nullable=True)
-    Completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    Status: Mapped[str] = mapped_column(Text, default="Ongoing")
     Data: Mapped[str] = mapped_column(Text, nullable=True)
     Step: Mapped[int] = mapped_column(default=1)
 
     workflow: Mapped["Workflow"] = relationship(back_populates="instances")
     # events: Mapped[list["WorkflowInstanceEvent"]] = relationship(back_populates="instance")
+
+    source_instances: Mapped[list["SourceInstance"]] = relationship(
+        back_populates="workflow_instance", cascade="all, delete-orphan"
+    )
+
+    outcome_instances: Mapped[list["OutcomeInstance"]] = relationship(
+        back_populates="workflow_instance", cascade="all, delete-orphan"
+    )
+
+    @property
+    def is_complete(self) -> bool:
+        """Return if this instance is complete."""
+        """NOT NEEDED, DELETE"""
+        return all(
+            [outcome_instance.Status == "Complete" for outcome_instance in self.outcome_instances]
+        )
 
 
 # class WorkflowInstanceEvent(Base):
@@ -224,6 +245,10 @@ class Outcome(Base):
         back_populates="output_file_template", foreign_keys=OutputFileTemplateId
     )
 
+    instances: Mapped[list["OutcomeInstance"]] = relationship(
+        back_populates="outcome", cascade="all, delete-orphan"
+    )
+
     @property
     def is_download(self) -> bool:
         """Return if this outcome is downloaded."""
@@ -265,6 +290,10 @@ class Source(Base):
     file_template: Mapped["FileTemplate"] = relationship("FileTemplate", back_populates="source")
     fields: Mapped[list["SQLFields"]] = relationship(back_populates="source")
 
+    instances: Mapped[list["SourceInstance"]] = relationship(
+        back_populates="source", cascade="all, delete-orphan"
+    )
+
     @property
     def system_prompt(self):
         """Get the system prompt which may have been overridden by the source."""
@@ -302,3 +331,38 @@ class LLM(Base):
     SystemPrompt: Mapped[str] = mapped_column(Text, nullable=True)
 
     sources: Mapped[list["Source"]] = relationship(back_populates="llm")
+
+
+class SourceInstance(Base):
+    """Represents an instance of a Source."""
+
+    __tablename__ = "SourceInstance"
+    Id: Mapped[int] = mapped_column(primary_key=True)
+
+    SourceId: Mapped[int] = mapped_column(ForeignKey(Source.Id), nullable=False)
+    source: Mapped["Source"] = relationship("Source", back_populates="instances")
+
+    InstanceId: Mapped[int] = mapped_column(ForeignKey(WorkflowInstance.Id), nullable=False)
+    workflow_instance: Mapped["WorkflowInstance"] = relationship(
+        "WorkflowInstance", back_populates="source_instances"
+    )
+
+    Status: Mapped[str] = mapped_column(Text, nullable=False, default="Ongoing")
+
+
+class OutcomeInstance(Base):
+    """Represents an instance of an Outcome."""
+
+    __tablename__ = "OutcomeInstance"
+    Id: Mapped[int] = mapped_column(primary_key=True)
+
+    OutcomeId: Mapped[int] = mapped_column(ForeignKey(Outcome.Id), nullable=False)
+    outcome: Mapped["Outcome"] = relationship("Outcome", back_populates="instances")
+
+    InstanceId: Mapped[int] = mapped_column(ForeignKey(WorkflowInstance.Id), nullable=False)
+    workflow_instance: Mapped["WorkflowInstance"] = relationship(
+        "WorkflowInstance", back_populates="outcome_instances"
+    )
+
+    Status: Mapped[str] = mapped_column(Text, nullable=False, default="Ongoing")
+    RenderedName: Mapped[str] = mapped_column(Text, nullable=False, default="Ongoing")
