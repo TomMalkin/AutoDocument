@@ -1,127 +1,146 @@
 {% raw %}
 
+## Tutorial 1: The Basics of AutoDocument
 
-# Tutorials
+Let's start by creating a simple workflow that asks a user for their name and age, then uses this information to generate a Word document.
 
-Once you've got a fresh installation of AutoDocument ready to go:
+First, create a new workflow on your AutoDocument Home Screen and name it "Tutorial 1".
 
-## Tutorial 1: The Basics
+### 1. Setting Up Your Form
 
-We're going to ask the user for Name and Age and then populate a Word Document.
+Your form collects the information AutoDocument will use.
+Click "Add Form Field" to add your first input:
 
-AutoDocument uses repeatable Workflows. On the Home Screen create one called "Tutorial 1".
+*   **For the Name Field:**
+    *   **Name:** `name` (This is the unique keyword AutoDocument uses for substitution.)
+    *   **Label:** `Client's Name` (This is what the user sees on the form.)
+    *   **Data Type:** `String` (Since a name is text.)
+*   **For the Age Field:**
+    *   **Name:** `age`
+    *   **Label:** `Client's Age`
+    *   **Data Type:** `Number`
 
-**Creating The Form**
+### 2. Creating Your Document Outcome
 
-Add the Name Field: Click on "Add Form Field"
+Next, let's define what AutoDocument will produce.
+If you have Microsoft Word, create a new `.docx` file with the following content:
 
-The Name of the field is the keyword that will be substituted later. Type "name"
+```
+Hi {{name}}, your age is {{age}}.
+```
 
-The Label of the field is what the user will see on the Form. Type "Client's Name"
+*(The double curly braces `{{ }}` tell AutoDocument to replace these with values from your form fields.)*
 
-This is some text - so select "String" as the Data Type
+Now, back in AutoDocument, navigate to the "Outcomes" section and click "Add Microsoft Word":
 
-Add the Age Field: Click on "Add Form Field"
+*   **Template:** Select "Uploaded during Workflow" and give it the Unique Name: `Template`.
+    *(This means you'll upload your Word document when you run the workflow.)*
+*   **Output File:** Select "Downloaded after Workflow" and set the output name: `{{name}}.docx`.
+    *(Yes, AutoDocument can use your field values to name the output file!)*
 
-The Name of the field is the keyword that will be substituted later. Type "age"
+Click "Submit". Your workflow is now ready!
 
-The Label of the field is what the user will see on the Form. Type "Client's Age"
+### 3. Running Your Workflow
 
-Select "Number" as the Data Type
+1.  On the workflow page, click "Run".
+2.  You'll see a form asking for the "Client's Name" and "Client's Age". Enter details like "Bob" and "25".
+3.  You'll also be prompted to upload your Word document template.
+4.  Click "Submit".
 
-**Creating The Outcome**
-
-If you have access to a Microsoft Word Document, then create a .docx file somewhere.
-
-`Hi {{name}}, your age is {{age}}.`
-
-(The double "Curly Braces", { and }, tell AutoDocument that it is a field. ")
-
-In AutoDocument, click "Add Microsoft Word" in the Outcomes Section.
-
-We need to select where the template is coming from and how the output will be saved. Because we haven't linked any File Storages yet, we will upload the template and download the output.
-
-Under Template, select "Uploaded during Workflow" with the Unique Name: "Template".
-
-Under Output File, select Downloaded after Workflow with the output name: "{{ '{{name}}' }}.docx" (Yes, field substitutions work in file names!)
-
-Submit
-
-Our Workflow is ready to go!
-
-**Running the Workflow**
-
-Click Run on the workflow page. We are asked for the Client's Name and Age. Fill in some details like "Bob" aged 25. We also need to upload our Word Document from before. Hit Submit.
-
-All going well, you should have downloaded a "output.zip" file, which when extracted has a **Bob.docx** (or **Bob.txt**) file in it. Open it to see the fields have been replaced with the values supplied on the form!
+AutoDocument will display the live progress. Once complete, a "Download" button will appear. Click it to download a `.zip` file. Inside, you'll find a file named `Bob.docx`. Open it to confirm that "Bob" and "25" have replaced the placeholders in the document!
 
 ---
 
-## Tutorial 2: Multi Record Sources
+## Tutorial 2: Multi-Record Processing with CSV Files
 
-AutoDocument shines with Workflows that "Split" with Multi Record Sources, like a .csv with many records. We will create a workflow with a CSV file with 3 records in it, and generate a Word Document for each record.
+AutoDocument excels at generating multiple documents from a single source of data, like a `.csv` file. In this tutorial, we'll create a workflow that uses a CSV to produce a separate Word document for each record.
 
-Create a new Workflow called Tutorial 2
+Start by creating a new workflow and naming it "Tutorial 2".
 
-Click: Add a CSV Table. A MultiRecord Source like a CSV Table can either be used as a "Splitter", where the Workflow will spawn multiple child Workflows that will calculate their Outcomes separately, or as a "Field", where the multiple records are attached to a field name, and can be looped over in a template.
+### 1. Setting Up Your CSV Data Source
 
-Check "Splitter".
+Click "Add a CSV Table". This type of source can either "Split" your workflow into separate runs for each record, or load all records into a single field.
 
-We will upload the csv when we run the Workflow, similar to Tutorial 1. Choose "Uploaded during Workflow" and set the Unique Name as "Client Records". Submit.
+*   Check the "Splitter" box.
+    *(This tells AutoDocument to process each row in your CSV as a separate document.)*
+*   **Source:** Select "Uploaded during Workflow" and give it the Unique Name: `Client Records`.
+    *(You'll upload your CSV file when you run the workflow.)*
+*   Click "Submit".
 
-Somewhere, create a .csv file with some records that can populate the same Word Document as Tutorial 1. For example:
+### 2. Prepare Your CSV File
 
-`ClientRecords.csv:`
+Create a `.csv` file, for example `ClientRecords.csv`, with the following content:
 
-| name       | age |
-|------------|-----|
-| John Doe   | 48  |
-| Jane Doe   | 35  |
-| Alice Bob  | 28  |
+````csv
+name,age
+John Doe,48
+Jane Doe,35
+Alice Bob,28
+````
 
-Now we can add the Microsoft Word Outcome again. Click "Add Microsoft Word". Choose "Uploaded during Workflow" with a Unique Name of "Template", and Output File of "Downloaded after Workflow" with an Output Name of "{{name}}.docx"
+### 3. Creating Your Document Outcome
 
-When we run the Workflow now, we will download an output.zip file with 3 Word documents - one for each record.
+Now, let's define the output document, similar to Tutorial 1. Click "Add Microsoft Word" in the Outcomes section:
 
-## Tutorial 3: Source Chaining - Example
+*   **Template:** Select "Uploaded during Workflow" with a Unique Name of `Template`.
+    *(You can reuse the same Word document template from Tutorial 1, `Hi {{name}}, your age is {{age}}.`)*
+*   **Output File:** Select "Downloaded after Workflow" and set the Output Name to `{{name}}.docx`.
+*   Click "Submit".
 
-You can construct advanced Workflows by chaining sources together. This tutorial is more difficult to follow along because it assumes some infrastructure setup. But it demonstrates as an example the kinds of thing you can do with AutoDocument.
+### 4. Running Your Workflow
 
-Lets say you had 3 classes of clients: A, B and C. And you wanted to generate invoices for each client within a category from a database. Each Invoice has a list of items that have been ordered, which we want listed in the invoice. We want to save each invoice in the client's folder on a shared Windows Drive called N:
+When you run this workflow, you'll upload your `ClientRecords.csv` file and your Word template. The downloaded `.zip` file will contain *three* Word documents—one for "John Doe", one for "Jane Doe", and one for "Alice Bob"—each personalized with the details from your CSV!
 
-**Setup**
+---
 
-We will assume we have a Database connected, called "Business Database" (see [Databases](/databases.md) for more info).
+## Tutorial 3: Advanced Source Chaining (Example)
 
-We also assume we have a Windows File Storage set up (see [File Storages](/file_storages.md) for more info)
+You can build powerful, complex workflows by combining multiple data sources. This tutorial illustrates an advanced example, assuming some initial setup of databases and file storage.
 
-Step 1 after creating the Workflow is to ask the user what category of Client. So we'll add a form with a name of "category", a label of "Client Category" and datatype of String.
+Imagine you manage clients in categories (A, B, C) and need to generate invoices for each client within a chosen category. Each invoice needs to list all ordered items, and then be saved to a client-specific folder on a shared network drive.
 
-Next we'll get a list of clients from our database using the answer to the "Category" question in the form.
+### Prerequisites (Assumed Setup)
 
-If we add a SQL RecordSet, we can use an example query like:
+*   **Database:** You have a database connected, perhaps named "Business Database" (see [Databases](databases.md) for setup).
+*   **File Storage:** You have a Windows File Storage connected for network drives (see [File Storages](file_storages.md) for setup).
 
-`SELECT client_id, client_name from Client where category = :category`
+### The Workflow Steps
 
-The :category in the query tells AutoDocument to insert the value for "category" from any previous Source into the query. (It is also safe from SQL injection). We'll set it as a splitter, and leave it as Step 1.
+1.  **Client Category Form:**
+    *   First, create a form field to ask the user for the client category.
+    *   **Name:** `category`
+    *   **Label:** `Client Category`
+    *   **Data Type:** `String`
 
-This Workflow now splits for each record in this recordset, and will have the value "category", and one set of client_id and client_name in each Workflow.
+2.  **Retrieve Clients from Database (SQL RecordSet 1):**
+    *   Add a "SQL RecordSet" source.
+    *   Use a query like:
+        ````sql
+        SELECT client_id, client_name FROM Client WHERE category = :category
+        ````
+        *(The `:category` placeholder tells AutoDocument to use the value from the previous "category" form field.)*
+    *   **Splitter:** Check this box.
+        *(This will split the workflow for each client found, so each client gets their own invoice.)*
+    *   Set this as **Step 1**.
+    *   Now, each split workflow run will have `category`, `client_id`, and `client_name` available.
 
-We can use those values for the next step: another recordset. This time the query could be something like:
+3.  **Retrieve Ordered Items from Database (SQL RecordSet 2):**
+    *   Add another "SQL RecordSet" source.
+    *   Use a query like:
+        ````sql
+        SELECT item_name, quantity FROM ItemOrder WHERE client_id = :client_id
+        ````
+        *(Each workflow split from the previous step will have a unique `client_id` for this query.)*
+    *   **Field:** Check this box.
+    *   **Field Name:** Set this to `items`.
+        *(This will gather all items for the current client into a list named `items`, rather than splitting the workflow further.)*
+    *   Set this as **Step 2** (it relies on `client_id` from Step 1).
 
-`SELECT item_name, quantity from ItemOrder where client_id = :client_id`
+### 4. Invoice Template Example
 
-(Yes we could have used an inner join to just use one query but lets assume we can't.)
+You can now design your Word template to loop through the `items` list:
 
-Note, each Workflow split from the original will have a different client_id, which has been sourced from the first query.
-
-This time we aren't splitting the Workflow, because we want all the item details to be shown on the one invoice. Instead, we'll set the Field Name to be "items" and keep splitter unchecked. Now the results of this query will be saved as a list inside "items".
-
-Make sure we set this query to Step 2, because it relies on data from a source within Step 1 (client_id).
-
-We can loop through those items in a template like this:
-
-```
+````
 Hi '{{ client_name }}',
 
 Here is your invoice for your purchase of items:
@@ -129,12 +148,16 @@ Here is your invoice for your purchase of items:
 {% for item in items %}
 {{ item['quantity'] }} units of {{ item['item_name'] }}.
 {% endfor %}
-```
+````
 
-Now when we add our Microsoft Word document outcome lets use the Windows Share we setup previously. We'll set the template to be something like "Templates\InvoiceTemplate.docx"
+### 5. Saving Invoices to Network Drive (Microsoft Word Outcome)
 
-The Output File can use the client_id to build the path, something like "Invoices\{{client_id}}\Invoice.docx", which would render to something like "\Invoices\123456\Invoice.docx"
+Finally, configure your "Microsoft Word" outcome:
 
-We now have a repeatable Workflow that can generate all the Invoices for each client category.
+*   **Template:** Set the template path, e.g., `Templates\InvoiceTemplate.docx`.
+    *(This assumes your template is stored in your configured Windows File Storage.)*
+*   **Output File:** Set the output path using dynamic fields, e.g., `Invoices\{{client_id}}\Invoice.docx`.
+    *(This will create a path like `\Invoices\123456\Invoice.docx` for client ID 123456.)*
 
+You now have a robust workflow that can generate all invoices for a specific client category, dynamically pulling data from your database and saving them in organized folders on your network drive!
 {% endraw %}

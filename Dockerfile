@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV FLASK_APP=dashboard:create_app
 ENV FLASK_ENV=production
 
-ENV DB_PATH=/app/database/autodoc.db
+ENV DB_PATH=/db_data/autodoc.db
 
 
 # Install general system dependencies.

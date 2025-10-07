@@ -1,7 +1,8 @@
 {% raw %}
+
 # File Storages
 
-File Storages are a way to standardise the load and save locations of your sources, templates and outcomes in AutoDocument. A File Storage is added by the Admin in the Advanced Section of the dashboard. So far the options are Posix filesystems, Windows filesystems, S3 Object Store and SharePoint Libraries.
+File Storages are a way to standardise the load and save locations of your sources, templates and outcomes in AutoDocument. A File Storage is added by the Admin in the Advanced Section of the dashboard, and then used in Workflows. So far the options are Posix filesystems, Windows filesystems, S3 Object Store and SharePoint Libraries.
 
 ## Windows Filesystem
 
@@ -11,13 +12,26 @@ You can map a remote Windows Filesystem like a Network Share to a local path in 
 
 This requires a couple of steps.
 
-1) The Windows drive is mounted on the host that is running the AutoDocument Container. For example:
+1) The Windows drive is mounted on the host that is running the AutoDocument Container. For example, if you have mounted MyHost:/ClientData to /mnt/ClientData:
 
 `sudo mount -t nfs -o vers=4 MyHost:/ClientData /mnt/ClientData`
 
 2) The mounted drive is set as a volume in the container, for example:
 
+We can define the bind volume 
+
 `docker run autodocument -p 4605:4605 -v /mnt/ClientData:/app/mnt/ClientData`
+
+```yaml
+volumes:
+  local_mount:
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/ClientData
+      device: /ClientData
+      o: bind
+```
 
 3) The Windows Share is now added to AutoDocument using the Add Windows FileSystem form in Advanced. Using the above setup, the Host and Remote Paths would be:
 
