@@ -58,6 +58,7 @@ class LinuxStorageService(StorageService):
     def save_text(self, text) -> None:
         """Save a text to storage."""
         with open(self.path, "w") as f:
+            logger.info(f"Saving to {self.path}")
             f.write(text)
 
     def save_file(self) -> None:

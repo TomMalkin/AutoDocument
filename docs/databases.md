@@ -1,11 +1,15 @@
 # Databases
 
-Databases can be added by Admins from the Advanced page.
+To add a new database, an Admin needs to go to the **Advanced page**.
 
-Specify an identifiable name of the database, such as "Business Data" or "Client Data" etc. This will be used to reference this databases later.
+When you add a database, give it a clear and memorable name like "Business Data" or "Client Records." This name will be used to identify your database later on.
 
-The Connection String will determine how to connect to the database. Since the Connection String may have sensitive info in it, it is omitted when selecting databases, instead AutoDocument references each by the Name you supply.
+You'll also need to provide a **Connection String**. This is special information that tells our system how to connect to your database. Because connection strings often contain sensitive details, we only show your chosen database's name, not the full connection string, once it's set up.
 
-So far the supported databases are: MySQL (and MariaDb), PostgreSQL, Microsoft SQL Server and SQLite.
+We currently support the following database types:
+*   MySQL (and MariaDB)
+*   PostgreSQL
+*   Microsoft SQL Server
+*   SQLite
 
-See [this](https://www.connectionstrings.com/) great resource for Connection String Options depending on your individual database setup.
+For help with creating your connection string, you can check out this helpful resource: [ConnectionStrings.com](https://www.connectionstrings.com/).

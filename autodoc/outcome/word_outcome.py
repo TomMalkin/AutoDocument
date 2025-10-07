@@ -1,10 +1,12 @@
 """Define Word based outcomes."""
 
+from pathlib import Path
+from typing import Optional
+
 from docxtpl import DocxTemplate
 from loguru import logger
 
 from autodoc.data.tables import Outcome
-from autodoc.outcome.download_container import DownloadContainer
 from autodoc.outcome.outcome import OutcomeService
 from autodoc.storage_service import LinuxStorageService
 
@@ -18,14 +20,13 @@ class WordOutcomeService(OutcomeService):
     def __init__(
         self,
         outcome: Outcome,
+        download_dir: Optional[Path],
         template_uploaded_filename=None,
-        download_container: DownloadContainer | None = None,
     ) -> None:
         """Initialise Word Outcome."""
         self.outcome = outcome
-        self.download_container = download_container
 
-        logger.info(f"Creating HTMLOutcome class with {template_uploaded_filename=}")
+        logger.info(f"Creating WordOutcome class with {template_uploaded_filename=}")
 
         if template_uploaded_filename:
             self.input_storage_service = LinuxStorageService(
@@ -35,9 +36,11 @@ class WordOutcomeService(OutcomeService):
         else:
             self.set_input_storage_service()
 
-        if download_container:
+        if outcome.is_download:
+            logger.info("using a download storage service.")
+
             self.output_storage_service = LinuxStorageService(
-                root=str(download_container.download_dir),
+                root=str(download_dir),
                 relative=outcome.DownloadName,
             )
         else:
@@ -55,5 +58,3 @@ class WordOutcomeService(OutcomeService):
         temp_file = self.output_storage_service.temp_file()
         self.document.save(temp_file)
         self.output_storage_service.save_file()
-        if self.download_container:
-            self.download_container.add_file(file_path=self.output_storage_service.path)

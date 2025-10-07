@@ -1,0 +1,76 @@
+services:
+  app:
+    image: tommalkin/autodocument:latest
+    ports:
+      - "4605:4605"
+    volumes:
+      # Required shared volumes
+      - download_dir:/download_dir
+      - upload_dir:/upload_dir
+      - db_data:/db_data
+
+      # add your own volumes here if you wish to read and write
+      # directly to filesystems:
+      #
+      # Example
+      #
+      # - local_mount:/local_mount
+
+    depends_on:
+      - redis
+
+  worker:
+    image: tommalkin/autodocument-worker:latest
+    volumes:
+      - download_dir:/download_dir
+      - upload_dir:/upload_dir
+      - db_data:/db_data
+
+      # If you have specified extra volumes in the app service,
+      # they must match exactly here:
+      # Example
+      #
+      # - local_mount:/local_mount
+    depends_on:
+      - redis
+
+    # The dramatiq command is specified here so arguments can be changed.
+    # If you are expecting to generate multiple workflows simultaneously,
+    # you can increase --processes and --threads etc. See dramatiq
+    # documentation for more details.
+    command: ["dramatiq", "autodoc.tasks", "--processes", "1"]
+
+  # Redis cache layer.
+  # If you have your own redis deployment elsewhere, you can remove this
+  # and update the REDIS_HOST environment variable in the other services
+  redis:
+    image: "docker.io/redis:6-alpine"
+
+volumes:
+  download_dir: {}
+  upload_dir: {}
+
+  # ---
+  # db_data must either be a docker named volume or a locally bound folder:
+
+  # 1) docker defined persistent database - database will persist only in a docker volume
+  db_data: {}
+
+  # -- or --
+
+  # 2) locally defined persistent database - database will persist at a given path.
+  # db_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: ./data
+  #     o: bind
+  # ---
+
+  # Any file mounts to save outcomes to go here
+  # local_mount:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /some/path/to/add
+  #     o: bind

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.html" %}
+{% from 'macros/workflow_diagram.html' import workflow_diagram %}
+
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        {% include "components/side-menu.html" %}
+
+
+        <!-- Main content -->
+        <div class="col-span-6 flex-1 p-6 space-y-6">
+            <h1 class="text-3xl font-semibold mb-4">Instance - (ID: {{workflow_instance.Id}})</h1>
+            <h1 class="text-3xl font-semibold mb-4">Workflow - {{workflow_instance.workflow.Name}}</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                <div class="flex flex-col col-span-1 gap-4">
+                    <div>
+                         <div
+                          hx-get="{{url_for('top.workflow.source_table', instance_id=workflow_instance.Id)}}"
+                          hx-trigger="load, every 1s"
+                          hx-swap="innerHTML"
+                        ></div>
+                    </div>
+
+                    <div>
+                         <div
+                          hx-get="{{url_for('top.workflow.outcome_table', instance_id=workflow_instance.Id)}}"
+                          hx-trigger="load, every 1s"
+                          hx-swap="innerHTML"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+
+                <div class="col-span-1">
+                    <h1 class="inline-flex font-bold text-2xl pb-4">Current Workflow</h1>
+                    {{ workflow_diagram(workflow_instance.WorkflowId) }}
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</body>
+
+</html>
