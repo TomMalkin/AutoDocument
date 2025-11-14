@@ -88,6 +88,7 @@ class WorkflowInstance(Base):
     Status: Mapped[str] = mapped_column(Text, default="Ongoing")
     Data: Mapped[str] = mapped_column(Text, nullable=True)
     Step: Mapped[int] = mapped_column(default=1)
+    FailureReasons: Mapped[str] = mapped_column(default=None, nullable=True)
 
     workflow: Mapped["Workflow"] = relationship(back_populates="instances")
     # events: Mapped[list["WorkflowInstanceEvent"]] = relationship(back_populates="instance")
@@ -287,7 +288,9 @@ class Source(Base):
     database: Mapped["DatabaseMetaSource"] = relationship(
         "DatabaseMetaSource", back_populates="sources"
     )
-    file_template: Mapped["FileTemplate"] = relationship("FileTemplate", back_populates="source")
+    file_template: Mapped["FileTemplate"] = relationship(
+        "FileTemplate", back_populates="source"
+    )
     fields: Mapped[list["SQLFields"]] = relationship(back_populates="source")
 
     instances: Mapped[list["SourceInstance"]] = relationship(

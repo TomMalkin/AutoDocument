@@ -1,5 +1,7 @@
 """Define SQL based Sources."""
 
+from typing import Optional
+
 import regex as re
 
 from autodoc.data.tables import Source
@@ -48,6 +50,14 @@ class RecordSourceService(SourceService):
 
         self.data = record.data
 
+    def check(self) -> tuple[bool, Optional[str]]:
+        """Check if this source can be loaded. Returns (can be loaded, reason why not)."""
+        is_connected = self.meta_database.check_connection()
+        if not is_connected:
+            error_message = f"Failed to connect to database: {self.source.database.Name}"
+            return False, error_message
+        return True, None
+
 
 class RecordSetSourceService(SourceService):
     """Multiple rows of SQL data."""
@@ -81,6 +91,14 @@ class RecordSetSourceService(SourceService):
         )
 
         self.data = recordset.data
+
+    def check(self) -> tuple[bool, Optional[str]]:
+        """Check if this source can be loaded. Returns (can be loaded, reason why not)."""
+        is_connected = self.meta_database.check_connection()
+        if not is_connected:
+            error_message = f"Failed to connect to database: {self.source.database.Name}"
+            return False, error_message
+        return True, None
 
 
 class RecordSetTransposeSourceService(SourceService):
@@ -122,3 +140,7 @@ class RecordSetTransposeSourceService(SourceService):
             value = record[self.value_field]
 
             self.data[key] = value
+
+    def check(self) -> bool:
+        """Check if you can connect to the database."""
+        return self.meta_database.check_connection()

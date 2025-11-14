@@ -233,7 +233,8 @@ def source_table(instance_id: int):
 
     num_complete = len(source_instances) - num_processing
 
-    if instance.Status == "Complete":
+    logger.info(f"The instance.Status is {instance.Status}")
+    if instance.Status in ["Complete", "Failure"]:
         text = render_template(
             "components/sources_status.html",
             num_processing=num_processing,
@@ -269,7 +270,7 @@ def outcome_table(instance_id: int):
 
     num_complete = len(outcome_instances) - num_processing
 
-    if instance.Status == "Complete":
+    if instance.Status in ["Complete", "Failure"]:
         text = render_template(
             "components/outcomes_status.html",
             num_processing=num_processing,

@@ -1,9 +1,20 @@
 <div class="p-4 bg-white rounded-lg">
   <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Sources</h1>
 
+    {% if instance.Status == "Failure" %}
+
+        <h1 class="text-3xl font-bold text-red-200">Sources Load Failure!</h1>
+
+    {% for failure_reason in instance.FailureReasons.split("|") %}
+    <p class="text-lg text-gray-700">{{ failure_reason }}</p>
+    {% endfor %}
+
+    {% else %}
+
   <div class="space-y-4 flex-col">
     <p class="text-lg text-gray-700">Processing: <span class="font-semibold text-blue-600">{{ num_processing }}</span></p>
     <p class="text-lg text-gray-700">Loaded: <span class="font-semibold text-green-600">{{ num_complete }}</span></p>
-
   </div>
+
+    {% endif %}
 </div>

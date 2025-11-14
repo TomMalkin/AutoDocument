@@ -1,11 +1,15 @@
 services:
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: prod
     image: tommalkin/autodocument:latest
 
   worker:
     build: 
       context: .
       dockerfile: worker/Dockerfile
+      target: prod
     image: tommalkin/autodocument-worker:latest
     command: ["dramatiq", "autodoc.tasks", "--processes", "1"]

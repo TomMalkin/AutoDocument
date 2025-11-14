@@ -129,6 +129,15 @@ class WorkflowInstanceRepository(Repository):
         )
         self.session.execute(stmt)
 
+    def add_failure_reasons(self, instance_id: int, reasons: str):
+        """Update the status of an instance."""
+        stmt = (
+            update(WorkflowInstance)
+            .where(WorkflowInstance.Id == instance_id)
+            .values(FailureReasons=reasons)
+        )
+        self.session.execute(stmt)
+
     # def add_split(
     #     self, parent_instance_id: int, start_time: datetime.datetime, step: int
     # ) -> WorkflowInstance:
