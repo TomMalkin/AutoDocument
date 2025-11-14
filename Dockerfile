@@ -1,5 +1,7 @@
+# --- Base stage ---
+
 # Use the official Python image from the Docker Hub
-FROM python:3.12
+FROM python:3.12 AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -51,14 +53,9 @@ COPY alembic.ini .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN mkdir -p /app/database
-# Copy the Flask application code to the working directory
-COPY dashboard /app/dashboard
-COPY autodoc /app/autodoc 
+
 COPY init /app/init
 COPY alembic /app/alembic
-
-# Expose the port on which the Flask app will run
-EXPOSE 4605
 
 # Copy and set permissions for the entrypoint script
 COPY entrypoint.sh /app/entrypoint.sh
@@ -67,5 +64,27 @@ RUN chmod +x /app/entrypoint.sh
 # Set the entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]
 
+# --- Production ---
+
+FROM base AS prod
+
+# Copy the Flask application code to the working directory
+COPY dashboard /app/dashboard
+COPY autodoc /app/autodoc 
+
+# Expose the port on which the Flask app will run
+EXPOSE 4605
+
 # Set the default command to run after the entrypoint script
 CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605"]
+
+# --- Development ---
+
+FROM base AS dev
+
+COPY dev_gunicorn_config.py .
+CMD ["gunicorn", "dashboard:create_app()", "-c", "dev_gunicorn_config.py"]
+
+# Set the default command to run after the entrypoint script
+# CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605", "--reload", "--access-logfile", "/app/logs/logs.log", "--error-logfile", "/app/logs/errors.log"]
+# CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605", "--reload", "--reload-extra-file", "/app/dashboard", "--reload-extra-file", "/app/autodoc", "--timeout", "120", "--access-logfile", "/app/logs/logs.log", "--error-logfile", "/app/logs/errors.log"]

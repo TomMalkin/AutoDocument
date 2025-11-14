@@ -1,4 +1,7 @@
-FROM python:3.12
+
+# --- Base stage ---
+
+FROM python:3.12 AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -39,4 +42,10 @@ COPY /worker/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+
+# --- Production ---
+FROM base AS prod
 COPY autodoc /worker/autodoc 
+
+# --- Development ---
+FROM base AS dev

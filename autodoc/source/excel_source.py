@@ -1,6 +1,9 @@
 """Define the ExcelSource and ExcelTable Sources."""
 
+from typing import Optional
+
 import pandas as pd
+from loguru import logger
 
 from autodoc.data.tables import Source
 from autodoc.storage_service import LinuxStorageService
@@ -39,6 +42,15 @@ class ExcelRecordSourceService(SourceService):
 
         self.data = self.dataframe.to_dict("records")[0]
 
+    def check(self) -> tuple[bool, Optional[str]]:
+        """Check if this source can be loaded. Returns (can be loaded, reason why not)."""
+        if self.file_exists():
+            logger.info(f"File exists, so source can be loaded (path is {self.path})")
+            return True, None
+
+        logger.info(f"File does not exist, so source can not be loaded (path is {self.path})")
+        return False, f"File does not exist: {self.path}"
+
 
 class ExcelTableSourceService(SourceService):
     """
@@ -73,3 +85,12 @@ class ExcelTableSourceService(SourceService):
             header=self.source.HeaderRow - 1,
         )
         self.data = list(self.dataframe.to_dict("records"))
+
+    def check(self) -> tuple[bool, Optional[str]]:
+        """Check if this source can be loaded. Returns (can be loaded, reason why not)."""
+        if self.file_exists():
+            logger.info(f"File exists, so source can be loaded (path is {self.path})")
+            return True, None
+
+        logger.info(f"File does not exist, so source can not be loaded (path is {self.path})")
+        return False, f"File does not exist: {self.path}"

@@ -1,6 +1,7 @@
 """Create a base class for sources."""
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from autodoc.data.tables import Source
 from autodoc.storage_service import get_storage_service
@@ -18,6 +19,8 @@ class SourceService(ABC):
         """Initialise the object wih a Source object."""
         self.source = source
 
+        self.checked = False
+
     def set_storage_service(self):
         """Set the storage service."""
         template = self.source.file_template
@@ -28,6 +31,25 @@ class SourceService(ABC):
 
         if self.storage_service:
             self.path = self.storage_service.get_file()
+
+    def file_exists(self) -> Optional[bool]:
+        """Return if the source file exists."""
+        print(f"Checking this path: {self.path}")
+        if self.path:
+            print(f"Returning {self.path.is_file()}")
+            return self.path.is_file()
+
+        return False
+
+    @abstractmethod
+    def check(self) -> tuple[bool, Optional[str]]:
+        """
+        Check if this source is ready to be loaded.
+
+        For example, if the database is connected, if the source file exists.
+
+        Returns (can be loaded, reason why not)
+        """
 
     @abstractmethod
     def load_data(self, current_data: dict) -> None:

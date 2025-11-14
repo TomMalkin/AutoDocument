@@ -1,6 +1,9 @@
 """Define the CSVRecord and CSVTable Sources."""
 
+from typing import Optional
+
 import pandas as pd
+from loguru import logger
 
 from autodoc.data.tables import Source
 from autodoc.storage_service.linux import LinuxStorageService
@@ -42,6 +45,15 @@ class CSVRecordSourceService(SourceService):
 
         self.data = self.dataframe.to_dict("records")[0]
 
+    def check(self) -> tuple[bool, Optional[str]]:
+        """Check if this source can be loaded. Returns (can be loaded, reason why not)."""
+        if self.file_exists():
+            logger.info(f"File exists, so source can be loaded (path is {self.path})")
+            return True, None
+
+        logger.info(f"File does not exist, so source can not be loaded (path is {self.path})")
+        return False, f"File does not exist: {self.path}"
+
 
 class CSVTableSourceService(SourceService):
     """
@@ -72,3 +84,12 @@ class CSVTableSourceService(SourceService):
         """Load the data to a pandas dataframe and then to records."""
         self.dataframe = pd.read_csv(self.path)
         self.data = list(self.dataframe.to_dict("records"))
+
+    def check(self) -> tuple[bool, Optional[str]]:
+        """Check if this source can be loaded. Returns (can be loaded, reason why not)."""
+        if self.file_exists():
+            logger.info(f"File exists, so source can be loaded (path is {self.path})")
+            return True, None
+
+        logger.info(f"File does not exist, so source can not be loaded (path is {self.path})")
+        return False, f"File does not exist: {self.path}"
