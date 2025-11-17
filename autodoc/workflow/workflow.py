@@ -122,16 +122,57 @@ class Workflow:
             )
             self.manager.commit()
 
-            source_service.load_data(current_data=self.data)
+            logger.info(f"contexts before loading source {source.Id}: {contexts}")
+
+            """
+            when updating contexts, single record enriches all current
+            contexts, while a multi record will copy for each output and then
+            enrich that context. Note, both multi_record AND splitter must be
+            set for context expansion before enrichment. That is because a
+            multi_record may be writing to a single field rather than
+            expanding.
+
+            single record enrichment [{"Id": 1}] -> [{"Id": 1, "name":
+            "Barry"}] [{"Id": 1}, {"Id": 2}] -> [{"Id": 1, "name": "Barry"},
+            {"Id": 1, "name": "Barry"}]
+
+            multi_record + splitter enrichment [{"something": 1}] ->
+            [{"something": 1, "name": "Barry"}, {"something": 1, "name":
+            "Gary"}]
+            """
+
+            next_contexts = []
+
+            logger.info(f"{len(contexts)} contexts to loop through.")
+
+            for context in contexts:
+                logger.info(f"Running context {context}")
+                source_service.load_data(current_data=context)
+
+                logger.info(f"source has loaded data {source_service.data}")
+
+                if source_service.is_multi_record:
+                    if source_service.source.Splitter:
+
+                        for record in source_service.data:
+                            merged = context.copy()
+                            merged.update(record)
+                            next_contexts.append(merged)
+
+                    else:
+                        merged = context.copy()
+                        merged.update({source_service.source.FieldName: source_service.data})
+                        next_contexts.append(merged)
+
+                else:
+                    merged = context.copy()
+                    merged.update(source_service.data)
+                    next_contexts.append(merged)
+
+            contexts = next_contexts
 
             self.manager.source_instances.set_loaded(source_instance_id=source_instance.Id)
             self.manager.commit()
-
-            logger.info(f"contexts before loading: {contexts}")
-
-            contexts = self.expand(contexts, source_service)
-
-            logger.info(f"contexts after loading: {contexts}")
 
         return contexts
 
@@ -160,7 +201,6 @@ class Workflow:
 
         if not check:
             if reasons:
-
                 reasons_text = "|".join(r for r in reasons if r)
 
             else:
