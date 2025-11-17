@@ -10,7 +10,7 @@ from autodoc.storage_service import get_storage_service
 class SourceService(ABC):
     """Base Interface for a Source object."""
 
-    # data: dict | list
+    data: dict | list
     # is_multi_record: bool
     # storage_service: StorageService | None
     # path: Path
