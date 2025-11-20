@@ -2,10 +2,9 @@
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional
 
-from autodoc.data.tables import Outcome
 from autodoc.storage_service import StorageService, get_storage_service
+from autodoc.data.tables import Outcome
 
 
 class OutcomeService(ABC):
@@ -14,13 +13,16 @@ class OutcomeService(ABC):
     is_combination: bool
     rendered_output_location: str
 
-    input_storage_service:StorageService
+    input_storage_service: StorageService
     input_path: Path
 
-    output_storage_service:StorageService
+    output_storage_service: StorageService
     output_path: Path
 
     is_file: bool
+
+    outcome: Outcome
+
 
     # def __init__(self, outcome: Outcome, download_dir: Optional[Path]) -> None:
     #     """

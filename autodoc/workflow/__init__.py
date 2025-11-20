@@ -1,5 +1,3 @@
-"""Expse the Workflow Class."""
+"""Expose the WorkflowRunner."""
 
-from .workflow import Workflow
-
-__all__ = ["Workflow", "EventLoggerInterface"]
+from .workflow import WorkflowRunner as WorkflowRunner

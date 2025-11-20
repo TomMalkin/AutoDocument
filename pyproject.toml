@@ -90,7 +90,6 @@ max-complexity = 10
 
 [tool.ty.rules]
 possibly-unresolved-reference = "error"
-possibly-unbound-attribute = "error"
 
 [dependency-groups]
 dev = [

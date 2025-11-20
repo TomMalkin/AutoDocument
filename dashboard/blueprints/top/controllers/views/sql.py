@@ -31,7 +31,7 @@ def add_record_source_view(workflow_id: int) -> Union[str, Response]:
             workflow_id=workflow_id,
             source_type=source_type,
             sql_text=form.sql_text.data,
-            database_id=form.database.data,
+            database_id=int(form.database.data),
             step=form.step.data or 1,
         )
         manager.commit()
@@ -59,7 +59,7 @@ def add_record_set_source_view(workflow_id: int) -> Union[str, Response]:
             workflow_id=workflow_id,
             source_type=source_type,
             sql_text=form.sql_text.data,
-            database_id=form.database.data,
+            database_id=int(form.database.data),
             field_name=form.field_name.data,
             splitter=splitter,
             step=form.step.data or 1,
@@ -87,7 +87,7 @@ def add_record_set_transpose_source_view(workflow_id: int) -> Union[str, Respons
             workflow_id=workflow_id,
             source_type=source_type,
             sql_text=form.sql_text.data,
-            database_id=form.database.data,
+            database_id=int(form.database.data),
             key_field=form.key_field.data,
             value_field=form.value_field.data,
             step=form.step.data or 1,

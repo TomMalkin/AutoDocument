@@ -11,6 +11,7 @@ class SourceService(ABC):
     """Base Interface for a Source object."""
 
     data: dict | list
+    is_multi_record: bool
     # is_multi_record: bool
     # storage_service: StorageService | None
     # path: Path
