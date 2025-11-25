@@ -11,11 +11,12 @@ class SourceService(ABC):
     """Base Interface for a Source object."""
 
     data: dict | list
+    is_multi_record: bool
     # is_multi_record: bool
     # storage_service: StorageService | None
     # path: Path
 
-    def __init__(self, source: Source, uploaded_filenane=None) -> None:
+    def __init__(self, source: Source, uploaded_filename=None) -> None:
         """Initialise the object wih a Source object."""
         self.source = source
 

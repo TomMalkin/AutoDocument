@@ -1,7 +1,7 @@
 """Define the repositories."""
 
 import datetime
-from typing import Optional
+from typing import Optional, Sequence
 
 from loguru import logger
 from sqlalchemy import or_, select, update
@@ -41,7 +41,7 @@ class SQLFieldsRepository(Repository):
 class FormFieldRepository(Repository):
     """Repository for the FormField Table."""
 
-    def get_all(self, workflow_id) -> list[FormField]:
+    def get_all(self, workflow_id) -> Sequence[FormField]:
         """Get all form fields for a given workflow."""
         stmt = select(FormField).where(FormField.WorkflowId == workflow_id)
         return self.session.scalars(stmt).all()
@@ -72,9 +72,14 @@ class WorkflowRepository(Repository):
 
     def get(self, workflow_id: int) -> Workflow:
         """Get a Workflow from an Id."""
-        return self.session.get(Workflow, workflow_id)
+        workflow = self.session.get(Workflow, workflow_id)
 
-    def get_all(self) -> list[Workflow]:
+        if not workflow:
+            raise ValueError(f"Unknown Workflow Id: {workflow_id}")
+
+        return workflow
+
+    def get_all(self) -> Sequence[Workflow]:
         """Get all workflows."""
         stmt = select(Workflow)
         return self.session.scalars(stmt).all()
@@ -98,9 +103,14 @@ class WorkflowInstanceRepository(Repository):
 
     def get(self, instance_id: int) -> WorkflowInstance:
         """Get a WorkflowInstance."""
-        return self.session.get(WorkflowInstance, instance_id)
+        workflow_instance = self.session.get(WorkflowInstance, instance_id)
 
-    def get_all(self, workflow_id: int) -> list[WorkflowInstance]:
+        if not workflow_instance:
+            raise ValueError(f"Unknown Instance Id: {instance_id}")
+
+        return workflow_instance
+
+    def get_all(self, workflow_id: int) -> Sequence[WorkflowInstance]:
         """Get all instances of a workflow."""
         stmt = select(WorkflowInstance).where(WorkflowInstance.WorkflowId == workflow_id)
         return self.session.scalars(stmt).all()
@@ -123,9 +133,7 @@ class WorkflowInstanceRepository(Repository):
     def update_status(self, instance_id: int, status: str):
         """Update the status of an instance."""
         stmt = (
-            update(WorkflowInstance)
-            .where(WorkflowInstance.Id == instance_id)
-            .values(Status=status)
+            update(WorkflowInstance).where(WorkflowInstance.Id == instance_id).values(Status=status)
         )
         self.session.execute(stmt)
 
@@ -156,7 +164,7 @@ class WorkflowInstanceRepository(Repository):
 class DatabaseMetaSourceRepository(Repository):
     """The repository of actions on the DatabaseMetaSource Table."""
 
-    def get_all(self) -> list[DatabaseMetaSource]:
+    def get_all(self) -> Sequence[DatabaseMetaSource]:
         """Get all user defined databases."""
         stmt = select(DatabaseMetaSource)
         return self.session.scalars(stmt).all()
@@ -182,6 +190,10 @@ class OutcomeTypeRepository(Repository):
         """Get the Outcome Id from a name."""
         stmt = select(OutcomeType).where(OutcomeType.Name == name)
         outcome_type = self.session.scalars(stmt).first()
+
+        if not outcome_type:
+            raise ValueError(f"Unknown Outcome Type: {name}")
+
         return outcome_type
 
     def seed(self):
@@ -213,6 +225,9 @@ class SourceTypeRepository(Repository):
         """Get the source Id from a name."""
         stmt = select(SourceType).where(SourceType.Name == name)
         source_type = self.session.scalars(stmt).first()
+        if not source_type:
+            raise ValueError(f"Unknown Source Type: {name}")
+
         return source_type
 
     def seed(self):
@@ -247,7 +262,10 @@ class StorageTypeRepository(Repository):
     def get_by_name(self, name: str) -> StorageType:
         """Get a StorageType based on it's name."""
         stmt = select(StorageType).where(StorageType.Name == name)
-        return self.session.scalars(stmt).first()
+        storage_type = self.session.scalars(stmt).first()
+        if not storage_type:
+            raise ValueError(f"Unknown Storage Type: {name}")
+        return storage_type
 
     def seed(self):
         """Ensure type tables include up to date types."""
@@ -273,16 +291,16 @@ class StorageTypeRepository(Repository):
 class StorageInstanceRepository(Repository):
     """The repository of actions on the StorageInstance Table."""
 
-    def get(self, storage_instance_id: int) -> StorageInstance:
+    def get(self, storage_instance_id: int) -> Optional[StorageInstance]:
         """Get a StorageInstance from an Id."""
         return self.session.get(StorageInstance, storage_instance_id)
 
-    def get_all_of_type(self, storage_type: str) -> list[StorageInstance]:
+    def get_all_of_type(self, storage_type: str) -> Sequence[StorageInstance]:
         """Get all Storage Instances of a given type."""
         stmt = select(StorageInstance).join(StorageType).where(StorageType.Name == storage_type)
         return self.session.scalars(stmt).all()
 
-    def get_all(self) -> list[StorageInstance]:
+    def get_all(self) -> Sequence[StorageInstance]:
         """Get all Storage Instances that aren't the Download special type."""
         stmt = select(StorageInstance).join(StorageType).where(StorageType.Name != "Download")
         return self.session.scalars(stmt).all()
@@ -302,7 +320,7 @@ class StorageInstanceRepository(Repository):
         url: Optional[str] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
-    ) -> Optional[StorageInstance]:
+    ) -> StorageInstance:
         """Add a new storage instance."""
         storage_instance = StorageInstance(
             StorageTypeId=storage_type.Id,
@@ -351,9 +369,13 @@ class OutcomeRepository(Repository):
 
     def get(self, outcome_id: int) -> Outcome:
         """Get an outcome and it's type from an outcome Id."""
-        return self.session.get(Outcome, outcome_id)
+        outcome =  self.session.get(Outcome, outcome_id)
+        if not outcome:
+            raise ValueError(f"Unknown Outcome Id: {outcome_id}")
 
-    def get_file_uploads(self, workflow_id: int) -> list[Outcome]:
+        return outcome
+
+    def get_file_uploads(self, workflow_id: int) -> Sequence[Outcome]:
         """Get Outcomes that require a template to be uploaded when the Workflow is processed."""
         stmt = (
             select(Outcome)
@@ -371,7 +393,7 @@ class OutcomeRepository(Repository):
         if outcome:
             self.session.delete(outcome)
 
-    def get_all(self, workflow_id: int) -> list[Outcome]:
+    def get_all(self, workflow_id: int) -> Sequence[Outcome]:
         """Get all outcomes for a given workflow."""
         stmt = select(Outcome).where(Outcome.WorkflowId == workflow_id)
         return self.session.scalars(stmt).all()
@@ -410,9 +432,13 @@ class SourceRepository(Repository):
 
     def get(self, source_id: int) -> Source:
         """Get a single Source."""
-        return self.session.get(Source, source_id)
+        source = self.session.get(Source, source_id)
+        if not source:
+            raise ValueError(f"Unknown Source Id: {source_id}")
 
-    def get_file_uploads(self, workflow_id: int) -> list[Source]:
+        return source
+
+    def get_file_uploads(self, workflow_id: int) -> Sequence[Source]:
         """
         Get Sources that require a file upload for a given Workflow.
 
@@ -429,12 +455,16 @@ class SourceRepository(Repository):
         )
         return self.session.scalars(stmt).all()
 
-    def get_all(self, workflow_id: int) -> list[Source]:
+    def get_all(self, workflow_id: int) -> Sequence[Source]:
         """Get all sources for a Workflow."""
-        stmt = select(Source).where(Source.WorkflowId == workflow_id)
+        stmt = (
+            select(Source)
+            .where(Source.WorkflowId == workflow_id)
+            .order_by(Source.Step.asc(), Source.Splitter.asc())
+        )
         return self.session.scalars(stmt).all()
 
-    def get_all_from_step(self, workflow_id: int, step: int) -> list[Source]:
+    def get_all_from_step(self, workflow_id: int, step: int) -> Sequence[Source]:
         """Get all sources for a Workflow for a given step onwards."""
         stmt = (
             select(Source)
@@ -515,14 +545,18 @@ class SourceRepository(Repository):
 class LLMProviderRepository(Repository):
     """Repository for the LLMProvider Table."""
 
-    def get_all(self) -> list[LLMProvider]:
+    def get_all(self) -> Sequence[LLMProvider]:
         """Get all LLM Providers."""
         stmt = select(LLMProvider)
         return self.session.scalars(stmt).all()
 
     def get(self, provider_id) -> LLMProvider:
         """Get a LLM Provider from its Id."""
-        return self.session.get(LLMProvider, provider_id)
+        provider = self.session.get(LLMProvider, provider_id)
+        if not provider:
+            raise ValueError(f"Unknown Provider Id: {provider_id}")
+
+        return provider
 
     def seed(self):
         """Ensure type tables include up to date types."""
@@ -566,14 +600,19 @@ class LLMProviderRepository(Repository):
 class LLMRepository(Repository):
     """Repository for the LLMProvider Table."""
 
-    def get_all(self) -> list[LLM]:
+    def get_all(self) -> Sequence[LLM]:
         """Get all LLMs."""
         stmt = select(LLM)
         return self.session.scalars(stmt).all()
 
     def get(self, llm_id: int) -> LLM:
         """Get a LLM from an Id."""
-        return self.session.get(LLM, llm_id)
+        llm = self.session.get(LLM, llm_id)
+
+        if not llm:
+            raise ValueError(f"Unknown LLM Id: {llm_id}")
+
+        return llm
 
     def delete(self, llm_id: int):
         """Delete a LLM."""
@@ -600,7 +639,7 @@ class LLMRepository(Repository):
 class SourceInstanceRepository(Repository):
     """Repository for the SourceInstance Table."""
 
-    def get_all(self, instance_id: int) -> list[SourceInstance]:
+    def get_all(self, instance_id: int) -> Sequence[SourceInstance]:
         """Get all Source Instances for a given Instance Id."""
         stmt = select(SourceInstance).where(SourceInstance.InstanceId == instance_id)
         return self.session.scalars(stmt).all()
@@ -629,7 +668,7 @@ class SourceInstanceRepository(Repository):
 class OutcomeInstanceRepository(Repository):
     """Repository for the OutcomeInstance Table."""
 
-    def get_all(self, instance_id: int) -> list[OutcomeInstance]:
+    def get_all(self, instance_id: int) -> Sequence[OutcomeInstance]:
         """Get all Outcome Instances for a given Instance Id."""
         stmt = select(OutcomeInstance).where(OutcomeInstance.InstanceId == instance_id)
         return self.session.scalars(stmt).all()

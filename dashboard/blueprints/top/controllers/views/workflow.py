@@ -18,9 +18,9 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from werkzeug.wrappers.response import Response
 
-from autodoc import Workflow
-from autodoc.tasks import process_instance
+# from autodoc.workflow import WorkflowRunner
 from autodoc.config import DOWNLOAD_DIRECTORY
+from autodoc.tasks import process_instance
 
 # from autodoc.outcome.download_container import DownloadContainer
 from dashboard.database import get_db_manager
@@ -39,7 +39,9 @@ def workflow(workflow_id: int) -> str:
 
     instances = manager.workflow_instances.get_all(workflow_id=workflow_id)
 
-    workflow = Workflow(workflow_id=workflow_id, manager=manager)
+    workflow = manager.workflows.get(workflow_id=workflow_id)
+
+    # workflow = Workflow(workflow_id=workflow_id, manager=manager)
 
     return render_template(
         "top/workflow.html",
@@ -117,9 +119,11 @@ def workflow_instance(workflow_id: int) -> Response | str:
 
         if form is None:
             logger.info("No form fields or upload fields identified, skipping form generation")
-            workflow = Workflow(workflow_id=workflow_id, manager=manager)
-            workflow.create_instance()
-            process_instance.send(instance_id=workflow.instance.Id, upload_mapping={}, form_data={})
+
+            instance = manager.workflow_instances.add(workflow_id=workflow_id)
+            manager.commit()
+
+            process_instance.send(instance_id=instance.Id, upload_mapping={}, form_data={})
 
         else:
             logger.info("Form fields and/or upload fields identified, rendering form")
@@ -158,36 +162,20 @@ def workflow_instance(workflow_id: int) -> Response | str:
                     # e.g. "Client Record" -> dashboard/files/client_record.csv
                     name_to_file_mapping[upload_file_field] = uploaded_file_path
 
-            # TEMP: running async task
-            workflow = Workflow(
-                workflow_id=workflow_id,
-                form_data=data,
-                manager=manager,
-                upload_mapping=name_to_file_mapping,
-            )
-
-            workflow.create_instance()
-
-            # process_instance(
-            #     instance_id=workflow.instance.Id,
-            #     upload_mapping=name_to_file_mapping,
-            #     form_data=data,
-            # )
+            instance = manager.workflow_instances.add(workflow_id=workflow_id)
+            manager.commit()
 
             useable_data = {k: v for k, v in data.items() if not isinstance(v, FileStorage)}
             process_instance.send(
-                instance_id=workflow.instance.Id,
+                instance_id=instance.Id,
                 upload_mapping=name_to_file_mapping,
                 form_data=useable_data,
             )
 
-            # workflow.process()
-
         else:
             return render_template_string(str(form.errors))
 
-    # return redirect(url_for("top.base.index"))
-    return redirect(url_for("top.workflow.instance_review", instance_id=workflow.instance.Id))
+    return redirect(url_for("top.workflow.instance_review", instance_id=instance.Id))
 
 
 @bp.route("/instance_review/<instance_id>/", methods=["GET"])
@@ -215,6 +203,7 @@ def download(instance_id: int):
         zip_path = download_dir.parent / zip_filename
         return send_file(zip_path)
 
+
 @bp.route("/component/source_table/<instance_id>", methods=["GET"])
 def source_table(instance_id: int):
     """Table component of source statuses designed to be polled by the instance review page."""
@@ -239,7 +228,7 @@ def source_table(instance_id: int):
             "components/sources_status.html",
             num_processing=num_processing,
             num_complete=num_complete,
-            instance=instance
+            instance=instance,
         )
         response = make_response(text)
         response.status_code = 286
@@ -249,8 +238,9 @@ def source_table(instance_id: int):
         "components/sources_status.html",
         num_processing=num_processing,
         num_complete=num_complete,
-        instance=instance
+        instance=instance,
     )
+
 
 @bp.route("/component/outcome_table/<instance_id>", methods=["GET"])
 def outcome_table(instance_id: int):
@@ -276,7 +266,7 @@ def outcome_table(instance_id: int):
             num_processing=num_processing,
             num_complete=num_complete,
             has_download=instance.workflow.has_download,
-            instance=instance
+            instance=instance,
         )
         response = make_response(text)
         response.status_code = 286
@@ -287,5 +277,5 @@ def outcome_table(instance_id: int):
         num_processing=num_processing,
         num_complete=num_complete,
         has_download=instance.workflow.has_download,
-        instance=instance
+        instance=instance,
     )

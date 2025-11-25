@@ -5,6 +5,8 @@ from sqlalchemy import VARCHAR, bindparam, create_engine, text
 from autodoc.containers import Record, RecordScalar, RecordSet
 from autodoc.data.tables import DatabaseMetaSource
 
+from loguru import logger
+
 
 class MetaDatabase:
     """A User supplied database."""
@@ -12,15 +14,19 @@ class MetaDatabase:
     def __init__(self, database: DatabaseMetaSource):
         """Initialise a metadatabase from details in the MetaDatabaseSource table."""
         self.database = database
+        logger.info(f"Creating engine with {self.database.ConnectionString}")
         self.engine = create_engine(self.database.ConnectionString)
 
     def check_connection(self) -> bool:
         """Check if a connection to the database can be established."""
         connection = None
         try:
+            logger.info("Checking Engine")
             connection = self.engine.connect()
+            logger.info("Engine Check successful")
             return True
-        except Exception:
+        except Exception as e:
+            logger.error(f"Engine Connection Issue: {e}")
             return False
         finally:
             if connection:

@@ -15,9 +15,9 @@
 
             {% include 'components/alerts.html' %}
 
-            <h1 class="text-3xl font-semibold mb-4">Workflow: {{ workflow.name}}</h1>
+            <h1 class="text-3xl font-semibold mb-4">Workflow: {{ workflow.Name}}</h1>
             <a class="inline-block rounded px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-red-400 focus:relative"
-                    href="{{ url_for('top.workflow.workflow_instance', workflow_id=workflow.workflow_id) }}">Run</a>
+                    href="{{ url_for('top.workflow.workflow_instance', workflow_id=workflow.Id) }}">Run</a>
 
             <span class="flex items-center">
                 <span class="h-px flex-1 bg-black"></span>
@@ -29,7 +29,7 @@
 
                 <!--Left hand column with diagram-->
                 <div class=" lg:col-span-3">
-                    {{ workflow_diagram(workflow.workflow_id) }}
+                    {{ workflow_diagram(workflow.Id) }}
                 </div>
 
                 <!--Right hand column with source and outcome adding-->

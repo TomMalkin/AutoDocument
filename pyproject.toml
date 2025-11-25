@@ -16,8 +16,7 @@ dependencies = [
     "click==8.1.7",
     "cryptography==43.0.0",
     "docx-mailmerge==0.5.0",
-    "docxcompose==1.4.0",
-    "docxtpl==0.17.0",
+    "docxtpl>=0.20.2",
     "dramatiq-workflow>=0.3.0",
     "dramatiq[redis,watch]>=1.18.0",
     "dropbox>=12.0.2",
@@ -58,6 +57,9 @@ dependencies = [
     "pyjwt==2.8.0",
     "pymysql==1.1.1",
     "pyodbc==5.1.0",
+    "pytest>=8.4.1",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
     "python-dateutil==2.9.0.post0",
     "python-docx==1.1.2",
     "python-dotenv==1.0.1",
@@ -90,7 +92,6 @@ max-complexity = 10
 
 [tool.ty.rules]
 possibly-unresolved-reference = "error"
-possibly-unbound-attribute = "error"
 
 [dependency-groups]
 dev = [
@@ -100,7 +101,7 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-
+addopts = "-p no:langsmith -p no:pytest_langsmith -p no:langsmith_plugin"
 
 # [tool.mypy]
 # disallow_untyped_defs = true

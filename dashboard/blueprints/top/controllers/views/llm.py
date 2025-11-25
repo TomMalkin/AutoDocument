@@ -35,7 +35,7 @@ def add_llm_source_view(workflow_id: int) -> Union[str, Response]:
 
         llm = None
         if llm_id:
-            llm = manager.llms.get(llm_id=llm_id)
+            llm = manager.llms.get(llm_id=int(llm_id))
 
         manager.sources.add(
             workflow_id=workflow_id,

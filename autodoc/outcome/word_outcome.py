@@ -46,10 +46,9 @@ class WordOutcomeService(OutcomeService):
         else:
             self.set_output_storage_service()
 
-        self.document = DocxTemplate(self.input_storage_service.get_file())
-
     def render(self, data: dict) -> None:
         """Render the given data to the document."""
+        self.document = DocxTemplate(self.input_storage_service.get_file())
         self.document.render(data)
         self.output_storage_service.render(data=data)
 

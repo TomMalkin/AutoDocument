@@ -16,11 +16,12 @@ class LLMSourceService(SourceService):
     """A Response from an LLM."""
 
     is_multi_record = False
+    data: dict
 
     def __init__(self, source: Source, **kwargs) -> None:
         """Initialise the CSVRecordSourceService with the file_path of the file."""
         self.source = source
-        self.data: dict = {}
+        self.data = {}
 
     def load_data(self, current_data: dict | None = None) -> None:
         """Set the response to the llm key."""

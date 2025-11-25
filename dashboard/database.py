@@ -9,6 +9,7 @@ def get_db_manager() -> DatabaseManager:
     """Load and return the database manager from Flask's application context."""
     if "db_manager" not in g:
         DB_PATH = current_app.config.get("DB_PATH")
+        assert isinstance(DB_PATH, str)
         g.db_manager = DatabaseManager(db_file=DB_PATH)
     return g.db_manager
 

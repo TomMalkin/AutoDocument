@@ -7,22 +7,19 @@ from dramatiq.brokers.redis import RedisBroker
 
 from autodoc.config import DB_PATH, REDIS_HOST
 from autodoc.data.manager import DatabaseManager
-from autodoc.workflow import Workflow
+from autodoc.workflow.workflow_factory import WorkflowRunnerFactory
 
 redis_broker = RedisBroker(host=REDIS_HOST, port=6379)
 dramatiq.set_broker(redis_broker)
 
 
 @dramatiq.actor
-def process_instance(instance_id: int, upload_mapping: Optional[dict], form_data=Optional[dict]):
+def process_instance(instance_id: int, form_data: Optional[dict], upload_mapping: Optional[dict]):
     """Process an instance."""
     manager = DatabaseManager(db_file=DB_PATH)
 
-    workflow = Workflow.from_instance_id(
-        instance_id=instance_id,
-        manager=manager,
-        upload_mapping=upload_mapping,
-        form_data=form_data,
+    workflow_runner = WorkflowRunnerFactory.create_runner(
+        instance_id=instance_id, manager=manager, form_data=form_data, upload_mapping=upload_mapping
     )
 
-    workflow.process()
+    workflow_runner.process()
