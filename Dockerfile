@@ -84,7 +84,3 @@ FROM base AS dev
 
 COPY dev_gunicorn_config.py .
 CMD ["gunicorn", "dashboard:create_app()", "-c", "dev_gunicorn_config.py"]
-
-# Set the default command to run after the entrypoint script
-# CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605", "--reload", "--access-logfile", "/app/logs/logs.log", "--error-logfile", "/app/logs/errors.log"]
-# CMD ["gunicorn", "dashboard:create_app()", "--bind", "0.0.0.0:4605", "--reload", "--reload-extra-file", "/app/dashboard", "--reload-extra-file", "/app/autodoc", "--timeout", "120", "--access-logfile", "/app/logs/logs.log", "--error-logfile", "/app/logs/errors.log"]
