@@ -16,7 +16,7 @@ class SourceService(ABC):
     # storage_service: StorageService | None
     # path: Path
 
-    def __init__(self, source: Source, uploaded_filenane=None) -> None:
+    def __init__(self, source: Source, uploaded_filename=None) -> None:
         """Initialise the object wih a Source object."""
         self.source = source
 
