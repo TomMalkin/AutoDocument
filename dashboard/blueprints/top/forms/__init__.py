@@ -8,7 +8,7 @@ from .excel import (
     CreateExcelTableSourceForm as CreateExcelTableSourceForm,
 )
 from .form_field import CreateFormFieldForm as CreateFormFieldForm
-from .html import CreateHTMLOutcomeForm as CreateHTMLOutcomeForm
+from .text import CreateTextOutcomeForm as CreateTextOutcomeForm
 from .meta import CreateMetaDatabase as CreateMetaDatabase
 from .pdf import CreatePDFOutcomeForm as CreatePDFOutcomeForm
 from .sql import CreateRecordSetSourceForm as CreateRecordSetSourceForm

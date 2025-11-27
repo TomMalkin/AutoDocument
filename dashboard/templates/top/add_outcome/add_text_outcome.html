@@ -1,11 +1,11 @@
 
 {% extends "top/add_outcome_layout.html" %}
 
-{% block title %}Add HTML Template{% endblock title %}
+{% block title %}Add Text File Template{% endblock title %}
 
 {% block content %}
 
-<form method="POST" action="{{url_for('top.html.add_html_outcome_view', workflow_id=workflow_id)}}">
+<form method="POST" action="{{url_for('top.text.add_text_outcome_view', workflow_id=workflow_id)}}">
     {{ form.csrf_token }}
 
     <div class="border rounded bg-gray-50 p-4 flex items-center gap-4 mb-4">
@@ -16,7 +16,7 @@
         <div class="flex-col space-y-4">
             <div>
                 <p>
-                Add a HTML Template, useful for emails or reports.
+                Add any Text File, for example CSV or HTML.
                 </p>
             </div>
 

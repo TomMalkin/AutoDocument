@@ -1,7 +1,7 @@
 {% raw %}
 # Outcomes
 
-Outcomes are the final result of Workflow. It can be a Word Document, a PDF, or an HTML document for example. They are defined by a template which contain text fields that will be populated by AutoDocument, for example `{{name}}`. The data loaded by the sources will have a value attributed to "name", which will be inserted into that field in the document. See [Templating](/tempating.md) for more info.
+Outcomes are the final result of Workflow. It can be a Word Document, a PDF, or an Text document for example. They are defined by a template which contain text fields that will be populated by AutoDocument, for example `{{name}}`. The data loaded by the sources will have a value attributed to "name", which will be inserted into that field in the document. See [Templating](/tempating.md) for more info.
 
 Defining an Outcome involves defining the template, and defining the output location. A "File Storage" selection needs to be set for both. See [File Storages](/file_storages.md) for more info. A File Storage selection can be a location to save the generated files, or simply zipped and downloaded straight from the web app.
 

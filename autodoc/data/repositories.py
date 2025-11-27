@@ -199,7 +199,7 @@ class OutcomeTypeRepository(Repository):
     def seed(self):
         """Ensure type tables include up to date types."""
         outcome_types_required = [
-            OutcomeType(Name="HTML", IsFile=1),
+            OutcomeType(Name="Text", IsFile=1),
             OutcomeType(Name="Microsoft Word", IsFile=1),
             OutcomeType(Name="PDF", IsFile=1),
         ]

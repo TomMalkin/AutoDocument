@@ -1,4 +1,4 @@
-"""Define HTML views."""
+"""Define Text views."""
 
 from typing import Union
 
@@ -7,16 +7,16 @@ from werkzeug.wrappers.response import Response
 
 from dashboard.database import get_db_manager
 
-from ...forms import CreateHTMLOutcomeForm
+from ...forms import CreateTextOutcomeForm
 from ...models import get_optional_new_file_template_id
 
-bp = Blueprint("html", __name__)
+bp = Blueprint("text", __name__)
 
 
-@bp.route("/workflow/<workflow_id>/add_html_outcome", methods=["GET", "POST"])
-def add_html_outcome_view(workflow_id: int) -> Union[str, Response]:
-    """Add a HTML outcome document."""
-    form = CreateHTMLOutcomeForm()
+@bp.route("/workflow/<workflow_id>/add_text_outcome", methods=["GET", "POST"])
+def add_text_outcome_view(workflow_id: int) -> Union[str, Response]:
+    """Add a Text File outcome document."""
+    form = CreateTextOutcomeForm()
     manager = get_db_manager()
 
     if form.validate_on_submit():
@@ -40,7 +40,7 @@ def add_html_outcome_view(workflow_id: int) -> Union[str, Response]:
             bucket=form.output_bucket.data,
         )
 
-        outcome_type = manager.outcome_types.get_from_name(name="HTML")
+        outcome_type = manager.outcome_types.get_from_name(name="Text")
         manager.outcomes.add(
             workflow_id=workflow_id,
             outcome_type=outcome_type,
@@ -56,7 +56,7 @@ def add_html_outcome_view(workflow_id: int) -> Union[str, Response]:
     storage_instances = manager.storage_instances.get_all()
 
     return render_template(
-        "top/add_outcome/add_html_outcome.html",
+        "top/add_outcome/add_text_outcome.html",
         form=form,
         workflow_id=workflow_id,
         storage_instances=storage_instances,

@@ -1,19 +1,12 @@
 """Expose the various Outcomes."""
 
-from .html_outcome import HTMLOutcomeService
-from .outcome import OutcomeService
+from .text_outcome import TextOutcomeService
+from .outcome import OutcomeService as OutcomeService
 from .pdf_outcome import PDFOutcomeService
 from .word_outcome import WordOutcomeService
 
 outcome_service_map = {
-    "HTML": HTMLOutcomeService,
+    "Text": TextOutcomeService,
     "Microsoft Word": WordOutcomeService,
     "PDF": PDFOutcomeService,
 }
-
-__all__ = [
-    "HTMLOutcomeService",
-    "WordOutcomeService",
-    "PDFOutcomeService",
-    "OutcomeService",
-]

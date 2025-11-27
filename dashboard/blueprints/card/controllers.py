@@ -124,8 +124,8 @@ def outcome_card(outcome_id: int):
     manager = get_db_manager()
     outcome = manager.outcomes.get(outcome_id=outcome_id)
 
-    if outcome.outcome_type.Name == "HTML":
-        return render_template("components/cards/outcomes/html_card.html", outcome=outcome)
+    if outcome.outcome_type.Name == "Text":
+        return render_template("components/cards/outcomes/text_card.html", outcome=outcome)
 
     if outcome.outcome_type.Name == "Microsoft Word":
         return render_template("components/cards/outcomes/word_card.html", outcome=outcome)

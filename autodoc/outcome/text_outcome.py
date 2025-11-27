@@ -1,4 +1,4 @@
-"""Outcome for creating HTML Files."""
+"""Outcome for creating Text Files."""
 
 from pathlib import Path
 from typing import Optional
@@ -12,8 +12,8 @@ from autodoc.outcome.outcome import OutcomeService
 from autodoc.storage_service import LinuxStorageService
 
 
-class HTMLOutcomeService(OutcomeService):
-    """HTML Document Outcome Service."""
+class TextOutcomeService(OutcomeService):
+    """Text Document Outcome Service."""
 
     is_combination = False
 
@@ -31,7 +31,7 @@ class HTMLOutcomeService(OutcomeService):
         self.outcome = outcome
         self.rendered_text: str
 
-        logger.info(f"Creating HTMLOutcomeService class with {template_uploaded_filename=}")
+        logger.info(f"Creating LinuxStorageService class with {template_uploaded_filename=}")
 
         if template_uploaded_filename:
             self.input_storage_service = LinuxStorageService(
@@ -54,12 +54,12 @@ class HTMLOutcomeService(OutcomeService):
         self.template = Template(self.input_storage_service.get_text())
 
     def render(self, data: dict) -> None:
-        """Render the HTML document using jinja2."""
+        """Render the Text document using jinja2."""
         self.rendered_text = self.template.render(**data)
         if self.output_storage_service:
             self.output_storage_service.render(data=data)
 
     def save(self) -> None:
-        """Save the HTML document using standard write."""
+        """Save the Text document using standard write."""
         if self.output_storage_service:
             self.output_storage_service.save_text(self.rendered_text)
