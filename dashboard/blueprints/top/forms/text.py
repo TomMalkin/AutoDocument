@@ -1,4 +1,4 @@
-"""Define HTML forms."""
+"""Define Text forms."""
 
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
@@ -6,9 +6,9 @@ from wtforms import SubmitField
 from .mixins import DownloadAccessorMixin, FileAccessorMixin, OutputFileAccessorMixin
 
 
-class CreateHTMLOutcomeForm(
+class CreateTextOutcomeForm(
     FlaskForm, FileAccessorMixin, OutputFileAccessorMixin, DownloadAccessorMixin
 ):
-    """Create HTML Outcome."""
+    """Create Text Outcome."""
 
     submit = SubmitField()
