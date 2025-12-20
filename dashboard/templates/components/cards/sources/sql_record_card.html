@@ -16,6 +16,8 @@
     <div class="flex flex-col">
         <div class="flex flex-row gap-2 mb-2">
             <h2 class="text-xl font-bold">SQL Record</h2>
+            <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-400 focus:relative"
+                href="{{ url_for('top.source.edit_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">edit</a>
             <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
                 href="{{ url_for('top.source.delete_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">delete</a>
         </div>

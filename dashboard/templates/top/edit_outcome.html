@@ -1,0 +1,111 @@
+{% extends "top/add_outcome_layout.html" %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+
+<form method="POST" action="{{ url_for('top.outcome.edit_outcome_view', workflow_id=workflow_id, outcome_id=outcome_id) }}" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+
+    <div class="border rounded bg-gray-50 p-4 flex items-center gap-4">
+        <div class="text-green-500">
+            {% include 'svg/important.html' %}
+        </div>
+
+        <div class="flex-col space-y-4">
+            {% for explanation in explanations %}
+            <div> <p>{{ explanation }}</p> </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="border rounded p-2 my-2 bg-gray-50">
+        {# These fields are handled by the components below so ignore in the dynamic list #}
+        {% set accessor_fields = ['name', 'bucket', 'location', 'output_bucket', 'output_location', 'download_name'] %}
+
+        {# Render the dynamically generated fields, excluding the ones handled by the component #}
+        {% for field in form if field.widget.input_type != 'hidden' 
+                              and field.name != 'submit' 
+                              and field.name not in accessor_fields %}
+            <div class="mb-3 flex gap-4">
+                {{ field.label(class='block mt-4 text-sm font-medium text-gray-900') }}
+
+                {% if field.type == "TextAreaField" %}
+                    {{ field(rows=5, class='mt-1.5 p-2 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
+                {% else %}
+                    {{ field(class='mt-1.5 p-2 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if 'input_file_accessor' in components %}
+
+            <div class="border border-gray-300 rounded p-4 mt-4">
+                <label for="option" class="pt-4">{{ file_label or "File:" }}</label>
+                <select id="option" name="option" class=" bg-gray-50 mt-4 block w-full p-2 border border-gray-300 rounded-md"
+                    hx-get="{{ url_for('top.snippet.storage_instance_form_snippet', outcome_id=outcome_id) }}" 
+                    hx-target="#dynamic-fields" 
+                    hx-trigger="load, change"
+                    required>
+                    
+                    <option disabled="disabled" value="">Select...</option>
+
+                    <option value="-1" {% if not outcome.input_file_template or outcome.input_file_template.StorageInstanceId == -1 %}selected{% endif %}>
+                        Uploaded during Workflow
+                    </option>
+                    
+                    {% for storage_instance in storage_instances %}
+                        <option value="{{ storage_instance.Id }}" 
+                                {% if outcome.input_file_template and outcome.input_file_template.StorageInstanceId == storage_instance.Id %}selected{% endif %}>
+                            ({{ storage_instance.storage_type.Name }}) {{ storage_instance.RemotePath or storage_instance.URL}}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+                <div id="dynamic-fields"></div>
+
+            </div>
+            
+        {% endif %}
+
+        {% if 'output_file_accessor' in components %}
+
+            <div class="border border-gray-300 rounded p-4 mt-4">
+                <label for="option" class="pt-4">{{ file_label or "Output File:" }}</label>
+                <select id="outputoption" name="outputoption" class=" bg-gray-50 mt-4 block w-full p-2 border border-gray-300 rounded-md"
+                    hx-get="{{ url_for('top.snippet.storage_instance_form_snippet', outcome_id=outcome_id, storage_type='output') }}" 
+                    hx-target="#dynamic-fields-output" 
+                    hx-trigger="load, change"
+                    required>
+                    
+                    <option disabled="disabled" value="">Select...</option>
+
+                    <option value="-1" {% if not outcome.output_file_template or outcome.output_file_template.StorageInstanceId == -1 %}selected{% endif %}>
+                        Downloaded after Workflow
+                    </option>
+                    
+                    {% for storage_instance in storage_instances %}
+                        <option value="{{ storage_instance.Id }}" 
+                                {% if outcome.output_file_template and outcome.output_file_template.StorageInstanceId == storage_instance.Id %}selected{% endif %}>
+                            ({{ storage_instance.storage_type.Name }}) {{ storage_instance.RemotePath or storage_instance.URL}}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+                <div id="dynamic-fields-output"></div>
+
+            </div>
+
+        {% endif %}
+
+        <div class="mt-1.5">
+            {{ form.submit(class='mt-1.5 rounded border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium
+            text-white hover:bg-transparent hover:text-indigo-600 focus:outline-none focus:ring active:text-indigo-500', value='Save Changes') }}
+        </div>
+    </div>
+
+</form>
+
+{% endblock content %}

@@ -2,7 +2,6 @@
 
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField,
     IntegerField,
     RadioField,
     SelectField,
@@ -13,34 +12,31 @@ from wtforms import (
 from wtforms.validators import InputRequired
 
 
-class CreateRecordSourceForm(FlaskForm):
-    """Create a Record Source."""
+class SQLMixin:
+    """Common SQL Fields."""
 
+    is_file = False
     sql_text = TextAreaField("SQL", validators=[InputRequired()])
-    database = SelectField("Database")
+    database = SelectField("Database", coerce=int)
     step = IntegerField("Step", validators=[InputRequired()], default=1)
     submit = SubmitField()
 
 
-class CreateRecordSetSourceForm(FlaskForm):
+class CreateRecordSourceForm(FlaskForm, SQLMixin):
+    """Create a Record Source."""
+
+
+class CreateRecordSetSourceForm(FlaskForm, SQLMixin):
     """Create a Record Set Source."""
 
-    sql_text = TextAreaField("SQL", validators=[InputRequired()])
-    database = SelectField("Database")
     splitter_choice = RadioField(choices=[("splitter", "splitter"), ("field", "field")])
 
     field_name = StringField("Field Name")
-    step = IntegerField("Step", validators=[InputRequired()], default=1)
-    submit = SubmitField()
 
 
-class CreateRecordSetTransposeSourceForm(FlaskForm):
+class CreateRecordSetTransposeSourceForm(FlaskForm, SQLMixin):
     """Create a Record Set Source."""
 
-    sql_text = TextAreaField("SQL", validators=[InputRequired()])
-    database = SelectField("Database")
-    splitter = BooleanField("Splitter")
+    # splitter = BooleanField("Splitter")
     key_field = StringField("Key Field")
     value_field = StringField("Value Field")
-    step = IntegerField("Step", validators=[InputRequired()], default=1)
-    submit = SubmitField()

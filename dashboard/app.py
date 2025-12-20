@@ -1,27 +1,20 @@
 """Define the app creation factory."""
 
 import os
-import sys
-from pathlib import Path
 
+import click
 from dotenv import load_dotenv
 from flask import Flask
-from loguru import logger
+from flask.cli import with_appcontext
 
 from autodoc.config import DB_PATH, DOWNLOAD_DIRECTORY, UPLOAD_DIRECTORY
 from autodoc.data.initialise import initialise_database
 from dashboard.database import register_db_teardown
 
-import click
-from flask.cli import with_appcontext
-
 from .blueprints import auth_blueprint, card_blueprint, meta_blueprint, top_blueprint
 from .blueprints.auth.controllers import login_manager
 
 load_dotenv()
-
-logger.remove()
-logger.add(sys.stderr, level="INFO")
 
 # UPLOAD_DIR = Path("dashboard/files/")
 # if not UPLOAD_DIR.is_dir():
@@ -29,15 +22,11 @@ logger.add(sys.stderr, level="INFO")
 #     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
-
-
 # if not DOWNLOAD_DIRECTORY.is_dir():
 #     print("creating upload folder: ", DOWNLOAD_DIRECTORY)
 #     DOWNLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin")
-
-logger.add("log.log")
 
 
 @click.command("init-db")
@@ -60,7 +49,6 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
     app.config["DB_PATH"] = DB_PATH
     app.config["ADMIN_PASSWORD"] = ADMIN_PASSWORD
     app.secret_key = "your_secret_key"
-
 
     app.cli.add_command(init_db_command)
 
