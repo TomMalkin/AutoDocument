@@ -23,16 +23,3 @@ def register_db_teardown(app: Flask):
         db_manager = g.pop("db_manager", None)
         if db_manager:
             db_manager.close()
-
-
-def close_db(e=None):
-    """Close the database connection at the end of the application context."""
-    manager = g.pop("manager", None)
-
-    if manager:
-        manager.db.close()
-
-
-def init_app(app):
-    """Add teardown to the app."""
-    app.teardown_appcontext(close_db)

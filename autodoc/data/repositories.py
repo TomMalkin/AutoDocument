@@ -196,6 +196,20 @@ class OutcomeTypeRepository(Repository):
 
         return outcome_type
 
+    def get(self, outcome_type_id: int) -> OutcomeType:
+        """Get a OutcomeType from it's Id."""
+        outcome_type = self.session.get(OutcomeType, outcome_type_id)
+
+        if not outcome_type:
+            raise ValueError(f"Unknown Outcome Type Id: {outcome_type_id}")
+
+        return outcome_type
+
+    def get_all(self) -> Sequence[OutcomeType]:
+        """Get all OutcomeTypes."""
+        stmt = select(OutcomeType)
+        return self.session.scalars(stmt).all()
+
     def seed(self):
         """Ensure type tables include up to date types."""
         outcome_types_required = [
@@ -220,6 +234,20 @@ class OutcomeTypeRepository(Repository):
 
 class SourceTypeRepository(Repository):
     """The repository of actions on the SourceType Table."""
+
+    def get(self, source_type_id: int) -> SourceType:
+        """Get a SourceType from it's Id."""
+        source_type = self.session.get(SourceType, source_type_id)
+
+        if not source_type:
+            raise ValueError(f"Unknown Source Type Id: {source_type_id}")
+
+        return source_type
+
+    def get_all(self) -> Sequence[SourceType]:
+        """Get all SourceTypes."""
+        stmt = select(SourceType)
+        return self.session.scalars(stmt).all()
 
     def get_from_name(self, name: str) -> SourceType:
         """Get the source Id from a name."""
@@ -369,7 +397,7 @@ class OutcomeRepository(Repository):
 
     def get(self, outcome_id: int) -> Outcome:
         """Get an outcome and it's type from an outcome Id."""
-        outcome =  self.session.get(Outcome, outcome_id)
+        outcome = self.session.get(Outcome, outcome_id)
         if not outcome:
             raise ValueError(f"Unknown Outcome Id: {outcome_id}")
 
@@ -426,6 +454,33 @@ class OutcomeRepository(Repository):
         self.session.flush()
         return outcome
 
+    def update(
+        self,
+        outcome_id: int,
+        name: Optional[str],
+        input_file_template_id: Optional[int],
+        output_file_template_id: Optional[int],
+        download_name: Optional[str],
+        filter_field: Optional[str] = None,
+        filter_value: Optional[str] = None,
+        file_upload: bool = False,
+    ) -> Outcome:
+        """Update an existing Outcome."""
+        outcome = self.get(outcome_id=outcome_id)
+
+        if outcome:
+            outcome.Name = name
+            outcome.InputFileTemplateId = input_file_template_id
+            outcome.OutputFileTemplateId = output_file_template_id
+            outcome.DownloadName = download_name
+            outcome.FilterField = filter_field
+            outcome.FilterValue = filter_value
+            outcome.FileUpload = file_upload
+
+            self.session.flush()
+
+        return outcome
+
 
 class SourceRepository(Repository):
     """Repository for the Source Table."""
@@ -437,6 +492,13 @@ class SourceRepository(Repository):
             raise ValueError(f"Unknown Source Id: {source_id}")
 
         return source
+
+    def get_by_name(self, name: str) -> Optional[Source]:
+        """Get a source by its unique name."""
+        if not name:
+            return None
+        stmt = select(Source).where(Source.Name == name)
+        return self.session.scalars(stmt).first()
 
     def get_file_uploads(self, workflow_id: int) -> Sequence[Source]:
         """
@@ -539,6 +601,49 @@ class SourceRepository(Repository):
         )
         self.session.add(source)
         self.session.flush()
+        return source
+
+    def update(
+        self,
+        source_id: int,
+        step: int,
+        file_template_id: Optional[int] = None,
+        name: Optional[str] = None,
+        database_id: Optional[int] = None,
+        sql_text: Optional[str] = None,
+        splitter: Optional[bool] = False,
+        field_name: Optional[str] = None,
+        key_field: Optional[str] = None,
+        value_field: Optional[str] = None,
+        orientation: Optional[str] = None,
+        sheet_name: Optional[str] = None,
+        header_row: Optional[int] = None,
+        llm: Optional[LLM] = None,
+        llm_prompt_template: Optional[str] = None,
+        llm_system_prompt: Optional[str] = None,
+    ) -> Source:
+        """Update the given source."""
+        source = self.get(source_id=source_id)
+
+        if source:
+            source.Step = step
+            source.FileTemplateId = file_template_id
+            source.Name = name
+            source.DatabaseId = database_id
+            source.SQLText = sql_text
+            source.Splitter = splitter
+            source.FieldName = field_name
+            source.KeyField = key_field
+            source.ValueField = value_field
+            source.Orientation = orientation
+            source.SheetName = sheet_name
+            source.HeaderRow = header_row
+            source.LLM = llm
+            source.LLMPromptTemplate = llm_prompt_template
+            source.LLMSystemPrompt = llm_system_prompt
+
+            self.session.flush()
+
         return source
 
 

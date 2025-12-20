@@ -35,9 +35,179 @@
                 <!--Right hand column with source and outcome adding-->
                 <div class=" lg:col-span-1 flex flex-col gap-4">
                     <h2>Add Sources</h2>
-                    {% include "components/add_source_table.html" %}
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+
+                            <tbody class="divide-y divide-gray-200">
+
+                                <tr>
+                                    <td class="hover:bg-gray-50">
+                                        <a class="text-sm font-medium text-gray-700 focus:relative"
+                                            href="{{ url_for('top.form_field.add_form_field_view', workflow_id=workflow.Id)}}">
+                                            <div class="w-full h-full px-8 py-2">
+                                                Form Field 
+                                            </div>
+                                        </a>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+
+                                        <div class="flex space-x-1">
+
+                                            <div class="content-center">
+                                                <p class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative">
+                                                    Database
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex-col rounded-md border bg-white shadow-sm">
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['SQL Record']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Single Record
+                                                        </div>
+                                                    </a>
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['SQL RecordSet']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Multiple Records
+                                                        </div>
+                                                    </a>
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['SQL RecordSet Transpose']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Transposed Record
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+
+                                        <div class="flex space-x-1">
+
+                                            <div class="content-center">
+                                                <p class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative">
+                                                    CSV
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex-col rounded-md border bg-white shadow-sm">
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['CSVRecord']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Single Record
+                                                        </div>
+                                                    </a>
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['CSVTable']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Multiple Records
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+
+                                        <div class="flex space-x-1">
+
+                                            <div class="content-center">
+                                                <p class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative">
+                                                    Excel
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex-col rounded-md border bg-white shadow-sm">
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['ExcelRecord']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Single Record
+                                                        </div>
+                                                    </a>
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['ExcelTable']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            Multiple Records
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="hover:bg-gray-50 whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+
+                                        <div class="flex space-x-1">
+
+                                            <div class="content-center">
+                                                <p class="px-4 py-2 text-sm font-medium text-gray-700 focus:relative">
+                                                    AI
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <div class="flex-col rounded-md border bg-white shadow-sm">
+                                                    <a href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['LLM']) }}">
+                                                        <div class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative">
+                                                            LLM Response
+                                                        </div>
+                                                    </a>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <h2>Add Outcomes</h2>
-                    {% include "components/add_outcome_table.html" %}
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+
+                            <tbody class="divide-y divide-gray-200">
+
+
+                                <tr>
+                                    <td class="hover:bg-gray-50">
+                                        <a class="text-sm font-medium text-gray-900 focus:relative"
+                                            href="{{ url_for('top.outcome.add_outcome_view', workflow_id=workflow.Id, outcome_type_id=outcome_type_mapping['Microsoft Word'])}}">
+                                            <div class="w-full h-full px-8 py-2">
+                                                Microsoft Word Template
+                                            </div>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="hover:bg-gray-50">
+                                        <a class="text-sm font-medium text-gray-900 focus:relative"
+                                            href="{{ url_for('top.outcome.add_outcome_view', workflow_id=workflow.Id, outcome_type_id=outcome_type_mapping['PDF'])}}">
+                                            <div class="w-full h-full px-8 py-2">
+                                                PDF Template
+                                            </div>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="hover:bg-gray-50">
+                                        <a class="text-sm font-medium text-gray-900 focus:relative"
+                                            href="{{ url_for('top.outcome.add_outcome_view', workflow_id=workflow.Id, outcome_type_id=outcome_type_mapping['Text'])}}">
+                                            <div class="w-full h-full px-8 py-2">
+                                                Text File Template
+                                            </div>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

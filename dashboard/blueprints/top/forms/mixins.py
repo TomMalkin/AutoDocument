@@ -9,6 +9,7 @@ class FileAccessorMixin:
     bucket = StringField("Bucket")
     location = StringField("Location")
     name = StringField("Name")
+    is_file = True
 
 
 class OutputFileAccessorMixin:

@@ -17,3 +17,20 @@ from .sql import CreateRecordSourceForm as CreateRecordSourceForm
 from .word import CreateWordOutcomeForm as CreateWordOutcomeForm
 from .workflow import CreateWorkflowForm as CreateWorkflowForm
 from .llm import CreateLLMSourceForm as CreateLLMSourceForm
+
+ADD_SOURCE_FORMS = {
+    "SQL Record": CreateRecordSourceForm,
+    "SQL RecordSet": CreateRecordSetSourceForm,
+    "SQL RecordSet Transpose": CreateRecordSetTransposeSourceForm,
+    "CSVRecord": CreateCSVRecordSourceForm,
+    "CSVTable": CreateCSVTableSourceForm,
+    "ExcelRecord": CreateExcelRecordSourceForm,
+    "ExcelTable": CreateExcelTableSourceForm,
+    "LLM": CreateLLMSourceForm,
+}
+
+ADD_OUTCOME_FORMS = {
+    "Text": CreateTextOutcomeForm,
+    "Microsoft Word": CreateWordOutcomeForm,
+    "PDF": CreatePDFOutcomeForm,
+}

@@ -2,7 +2,7 @@
 
 from typing import Union, cast
 
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for, request
 from loguru import logger
 from werkzeug.wrappers.response import Response
 
@@ -31,8 +31,9 @@ def add_form_field_view(workflow_id: int) -> Union[str, Response]:
         )
         manager.commit()
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
-    else:
-        logger.info(form.errors)
+
+    elif request.method == "POST":
+        logger.error(form.errors)
 
     return render_template(
         "top/add_source/add_form_field_source.html", form=form, workflow_id=workflow_id

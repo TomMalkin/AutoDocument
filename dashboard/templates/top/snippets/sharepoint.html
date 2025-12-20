@@ -1,4 +1,4 @@
 <div class="mb-4">
-    <label for="location" class="block text-gray-700">Filename:</label>
-    <input type="text" id="location" name="location" class="block w-full mt-1 p-2 border border-gray-300 rounded-md" required>
+    <label for="{{ 'output_location' if storage_type == 'output' else 'location' }}" class="block text-gray-700">Filename:</label>
+    <input type="text" id="{{ 'output_location' if storage_type == 'output' else 'location' }}" name="{{ 'output_location' if storage_type == 'output' else 'location' }}" class="block w-full mt-1 p-2 border border-gray-300 rounded-md" value="{{ location or '' }}" required>
 </div>

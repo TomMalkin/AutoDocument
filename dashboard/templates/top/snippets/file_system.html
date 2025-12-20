@@ -4,8 +4,8 @@
     <div class="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200">{{ root_path }}</div>
 
     <div class="flex-grow">
-        <input type="text" id="location" name="location"
-            class="w-full border h-full border-gray-300 rounded-r-md px-4" required>
+        <input type="text" id="{{ 'output_location' if storage_type == 'output' else 'location' }}" name="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+            class="w-full border h-full border-gray-300 rounded-r-md px-4" value="{{ location or '' }}" required>
     </div>
 
 </span>

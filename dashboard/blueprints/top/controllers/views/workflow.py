@@ -41,13 +41,23 @@ def workflow(workflow_id: int) -> str:
 
     workflow = manager.workflows.get(workflow_id=workflow_id)
 
-    # workflow = Workflow(workflow_id=workflow_id, manager=manager)
+    outcome_types = manager.outcome_types.get_all()
+    outcome_type_mapping = {}
+    for outcome_type in outcome_types:
+        outcome_type_mapping[outcome_type.Name] = outcome_type.Id
+
+    source_types = manager.source_types.get_all()
+    source_type_mapping = {}
+    for source_type in source_types:
+        source_type_mapping[source_type.Name] = source_type.Id
 
     return render_template(
         "top/workflow.html",
         workflow=workflow,
         instances=instances,
         form_fields=form_fields,
+        outcome_type_mapping=outcome_type_mapping,
+        source_type_mapping=source_type_mapping,
     )
 
 
