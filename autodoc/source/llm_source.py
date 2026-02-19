@@ -60,7 +60,7 @@ class LLMSourceService(SourceService):
             return False, "No model name provided."
         if not llm.provider or not llm.provider.LangChainName:
             return False, "No provider defined."
-        if not llm.APIKey:
+        if not llm.APIKey and llm.provider.CommonName != "Ollama":
             return False, "No API key provided."
 
         try:
