@@ -6,6 +6,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 
+from autodoc.config import OUTPUT_FILE_PERMISSION
+
 from loguru import logger
 
 
@@ -39,6 +41,11 @@ class StorageService(ABC):
             password: password or secret key
         """
         self.temp_file_name: str
+
+    @staticmethod
+    def update_permissions(path: Path):
+        """Update the permissions of a file to be more permissive."""
+        os.chmod(path, OUTPUT_FILE_PERMISSION)
 
     @abstractmethod
     def get_file(self) -> Path:

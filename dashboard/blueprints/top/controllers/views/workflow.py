@@ -150,7 +150,11 @@ def workflow_instance(workflow_id: int) -> Response | str:
         logger.info("POST request identified")
 
         if form.validate_on_submit():
-            data = {k: v for k, v in form.data.items() if k not in ["submit", "csrf_token"]}
+            data = {
+                k.removeprefix("autodoc_"): v
+                for k, v in form.data.items()
+                if k not in ["submit", "csrf_token"]
+            }
 
             name_to_file_mapping = {}  # will be like {"Client Record": "client_record.csv"}
             if form.upload_file_fields:
@@ -170,12 +174,16 @@ def workflow_instance(workflow_id: int) -> Response | str:
                     logger.info(f"saving to {uploaded_file_path}")
 
                     # e.g. "Client Record" -> dashboard/files/client_record.csv
-                    name_to_file_mapping[upload_file_field] = uploaded_file_path
+                    name_to_file_mapping[upload_file_field.removeprefix("autodoc_")] = uploaded_file_path
 
             instance = manager.workflow_instances.add(workflow_id=workflow_id)
             manager.commit()
 
-            useable_data = {k: v for k, v in data.items() if not isinstance(v, FileStorage)}
+            useable_data = {
+                k.removeprefix("autodoc_"): v
+                for k, v in data.items()
+                if not isinstance(v, FileStorage)
+            }
             process_instance.send(
                 instance_id=instance.Id,
                 upload_mapping=name_to_file_mapping,

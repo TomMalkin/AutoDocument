@@ -2,7 +2,7 @@
 
 from typing import Union, cast
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, url_for, request
 from loguru import logger
 from werkzeug.wrappers.response import Response
 
@@ -27,7 +27,7 @@ def add_form_field_view(workflow_id: int) -> Union[str, Response]:
             workflow_id=workflow_id,
             name=cast(str, form.name.data),
             label=cast(str, form.label.data),
-            field_type=cast(str, form.field_type.data),
+            field_type=cast(str, form.field_type.data)
         )
         manager.commit()
         return redirect(url_for("top.workflow.workflow", workflow_id=workflow_id))
@@ -35,8 +35,9 @@ def add_form_field_view(workflow_id: int) -> Union[str, Response]:
     elif request.method == "POST":
         logger.error(form.errors)
 
-    return render_template("top/add_form_field_source.html", form=form, workflow_id=workflow_id)
-
+    return render_template(
+        "top/add_form_field_source.html", form=form, workflow_id=workflow_id
+    )
 
 @bp.route("/delete_form_field/<workflow_id>/<form_field_id>/", methods=["GET", "POST"])
 def delete_form_field_view(workflow_id: int, form_field_id: int) -> Union[str, Response]:

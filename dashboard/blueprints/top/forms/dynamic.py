@@ -69,7 +69,7 @@ def get_form(
     form_fields = manager.form_fields.get_all(workflow_id=workflow_id)
 
     for field in form_fields:
-        name = field.FieldName
+        name = "autodoc_" + field.FieldName
         label = field.FieldLabel or field.FieldName
         field_obj = field_map[field.FieldType]
 
@@ -86,7 +86,7 @@ def get_form(
     sources_requiring_file_uploads = manager.sources.get_file_uploads(workflow_id=workflow_id)
 
     for source in sources_requiring_file_uploads:
-        name = source.Name
+        name = "autodoc_" + source.Name
         label = f"({source.source_type.Name}) {source.Name}"
 
         allowed_file_extensions = file_extension_mapping.get(source.source_type.Name, [])
@@ -99,7 +99,7 @@ def get_form(
     outcomes_requiring_file_upload = manager.outcomes.get_file_uploads(workflow_id=workflow_id)
 
     for outcome in outcomes_requiring_file_upload:
-        name = outcome.Name
+        name = "autodoc_" + outcome.Name
         label = f"({outcome.outcome_type.Name}) {outcome.Name}"
         setattr(Form, name, FileField(label))
         upload_file_fields.append(name)
