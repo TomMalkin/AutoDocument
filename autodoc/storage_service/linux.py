@@ -68,3 +68,5 @@ class LinuxStorageService(StorageService):
 
         shutil.copy(self.temp_file_name, self.path)
         logger.info(f"Saved {self.temp_file_name} to {self.path}")
+
+        self.update_permissions(path=self.path)

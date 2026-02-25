@@ -59,3 +59,5 @@ class WindowsStorageService(StorageService):
             return
 
         shutil.copy(self.temp_file_name, self.path)
+
+        self.update_permissions(path=self.path)
