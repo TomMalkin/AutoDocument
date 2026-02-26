@@ -13,7 +13,7 @@ redis_broker = RedisBroker(host=REDIS_HOST, port=6379)
 dramatiq.set_broker(redis_broker)
 
 
-@dramatiq.actor
+@dramatiq.actor(max_retries=1)
 def process_instance(instance_id: int, form_data: Optional[dict], upload_mapping: Optional[dict]):
     """Process an instance."""
     manager = DatabaseManager(db_file=DB_PATH)
