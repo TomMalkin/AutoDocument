@@ -9,6 +9,7 @@ from loguru import logger
 from autodoc.data.tables import Outcome
 from autodoc.outcome.outcome import OutcomeService
 from autodoc.storage_service import LinuxStorageService
+from .docx_service import DocxTemplateService
 
 
 class WordOutcomeService(OutcomeService):
@@ -49,7 +50,8 @@ class WordOutcomeService(OutcomeService):
     def render(self, data: dict) -> None:
         """Render the given data to the document."""
         self.document = DocxTemplate(self.input_storage_service.get_file())
-        self.document.render(data)
+        document_service = DocxTemplateService(document=self.document)
+        document_service.render(data)
         self.output_storage_service.render(data=data)
 
     def save(self) -> None:
