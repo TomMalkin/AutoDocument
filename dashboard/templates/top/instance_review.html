@@ -1,51 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
-{% include "components/head.html" %}
-{% from 'macros/workflow_diagram.html' import workflow_diagram %}
-
-<body class="bg-gray-100">
-    <div class="flex">
-        <!-- Sidebar -->
-        {% include "components/side-menu.html" %}
-
-
-        <!-- Main content -->
-        <div class="col-span-6 flex-1 p-6 space-y-6">
-            <h1 class="text-3xl font-semibold mb-4">Instance - (ID: {{workflow_instance.Id}})</h1>
-            <h1 class="text-3xl font-semibold mb-4">Workflow - {{workflow_instance.workflow.Name}}</h1>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-                <div class="flex flex-col col-span-1 gap-4">
-                    <div>
-                         <div
-                          hx-get="{{url_for('top.workflow.source_table', instance_id=workflow_instance.Id)}}"
-                          hx-trigger="load, every 1s"
-                          hx-swap="innerHTML"
-                        ></div>
+    {% include "components/head.html" %}
+    {% from 'macros/workflow_diagram.html' import workflow_diagram %}
+    <body class="bg-slate-100">
+        <div class="flex gap-2">
+            <!-- Sidebar -->
+            {% include "components/side-menu.html" %}
+            <!-- Main content -->
+            <div class="p-6 space-y-6">
+                <div class="flex flex-col gap-2">
+                    <div class="flex gap-2 items-center">
+                        <a href="{{ url_for('top.workflow.workflow', workflow_id=workflow_instance.workflow.Id) }}"
+                           class="border p-2 rounded-lg bg-sky-800 hover:bg-sky-700 text-slate-50">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke-width="3.5"
+                                 stroke="currentColor"
+                                 class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                            </svg>
+                        </a>
+                        <h1 class="text-3xl font-semibold text-slate-700">WORKFLOW</h1>
+                        <h1 class="text-3xl font-semibold text-slate-900 bg-slate-300 rounded-lg p-1">
+                            {{ workflow_instance.workflow.Name }}
+                        </h1>
                     </div>
-
-                    <div>
-                         <div
-                          hx-get="{{url_for('top.workflow.outcome_table', instance_id=workflow_instance.Id)}}"
-                          hx-trigger="load, every 1s"
-                          hx-swap="innerHTML"
-                        ></div>
+                    <div class="flex gap-2 items-center">
+                        <h1 class="text-3xl font-semibold text-slate-700">INSTANCE</h1>
+                        <h1 class="text-3xl font-semibold text-slate-900 bg-slate-300 rounded-lg p-1">ID: {{ workflow_instance.Id }}</h1>
                     </div>
                 </div>
-                <div class="flex flex-col">
-
-                <div class="col-span-1">
-                    <h1 class="inline-flex font-bold text-2xl pb-4">Current Workflow</h1>
-                    {{ workflow_diagram(workflow_instance.WorkflowId) }}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="flex flex-col col-span-1 gap-4">
+                        <div class="flex flex-row items-center mb-4">
+                            <div class="text-xl font-bold text-slate-800 mr-4">SOURCES</div>
+                            <div class="flex-grow border-t-2 border-slate-300"></div>
+                        </div>
+                        <div>
+                            <div hx-get="{{ url_for('top.workflow.source_table', instance_id=workflow_instance.Id) }}"
+                                 hx-trigger="load, every 1s"
+                                 hx-swap="innerHTML"></div>
+                        </div>
+                        <div class="flex flex-row items-center mb-4">
+                            <div class="text-xl font-bold text-slate-800 mr-4">OUTCOMES</div>
+                            <div class="flex-grow border-t-2 border-slate-300"></div>
+                        </div>
+                        <div>
+                            <div hx-get="{{ url_for('top.workflow.outcome_table', instance_id=workflow_instance.Id) }}"
+                                 hx-trigger="load, every 1s"
+                                 hx-swap="innerHTML"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="col-span-1">
+                            <h1 class="inline-flex font-bold text-2xl pb-4">Current Workflow</h1>
+                            {{ workflow_diagram(workflow_instance.WorkflowId) }}
+                        </div>
+                    </div>
                 </div>
-
             </div>
-
-
         </div>
-    </div>
-</body>
-
+    </body>
 </html>

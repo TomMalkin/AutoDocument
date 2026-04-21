@@ -1,8 +1,27 @@
-<div class="my-4">
-    <label for="bucket" class="block text-gray-700">Bucket:</label>
-    <input type="text" id="{{ 'output_bucket' if storage_type == 'output' else 'bucket' }}" name="{{ 'output_bucket' if storage_type == 'output' else 'bucket' }}" class="block w-full mt-1 p-2 border border-gray-300 rounded-md" value="{{ bucket or '' }}" required>
-</div>
-<div class="mb-4">
-    <label for="{{ 'output_location' if storage_type == 'output' else 'location' }}" class="block text-gray-700">Filename:</label>
-    <input type="text" id="{{ 'output_location' if storage_type == 'output' else 'location' }}" name="{{ 'output_location' if storage_type == 'output' else 'location' }}" class="block w-full mt-1 p-2 border border-gray-300 rounded-md" value="{{ location or '' }}" required>
-</div>
+<label for="bucket" class="flex items-center gap-2 text-slate-900">
+  {% include 'svg/icons/bucket.html' %} Bucket:</label
+>
+
+<input
+  type="text"
+  id="{{ 'output_bucket' if storage_type == 'output' else 'bucket' }}"
+  name="{{ 'output_bucket' if storage_type == 'output' else 'bucket' }}"
+  class="w-full p-2 border border-slate-300 rounded-lg bg-white"
+  value="{{ bucket or '' }}"
+  required
+/>
+
+<label
+  for="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+  class="text-slate-900 flex items-center gap-2"
+>
+  {% include 'svg/icons/folder.html' %} Filename:</label
+>
+<input
+  type="text"
+  id="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+  name="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+  class="block w-full mt-1 p-2 border border-slate-300 rounded-lg bg-white"
+  value="{{ location or '' }}"
+  required
+/>

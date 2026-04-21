@@ -26,12 +26,12 @@ class CreateMetaFileSystem(FlaskForm):
     """Form to create a Unix based file system link."""
 
     local_path = StringField(
-        "Container Path",
+        "Path in Container",
         validators=[DataRequired()],
         render_kw={"placeholder": "/path/in/container"},
     )
     remote_path = StringField(
-        "Linux Path",
+        "Path Familiar to Users",
         validators=[DataRequired()],
         render_kw={"placeholder": "/path/familiar/to/users"},
     )
@@ -42,10 +42,10 @@ class CreateMetaWindowsFileSystem(FlaskForm):
     """Form to create a file system link to a windows share."""
 
     local_path = StringField(
-        "Local Path", validators=[DataRequired()], render_kw={"placeholder": "/path/in/container"}
+        "Path in Container", validators=[DataRequired()], render_kw={"placeholder": "/path/in/container"}
     )
     remote_path = StringField(
-        "Windows Path",
+        "Path Familiar to Users",
         validators=[DataRequired()],
         render_kw={"placeholder": r"Letter:\Familiar\Path"},
     )
@@ -87,7 +87,7 @@ class CreateLLM(FlaskForm):
     system_prompt = TextAreaField(
         "System Prompt Default",
         validators=[DataRequired()],
-        render_kw={"placeholder": "E.g., You are a helpful AI assistant."}
+        render_kw={"placeholder": "E.g., You are a helpful assistant."}
     )
 
     submit = SubmitField()

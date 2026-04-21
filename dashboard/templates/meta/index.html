@@ -1,38 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
-{% include "components/head.html" %}
-
-<body class="bg-gray-100">
-    <div class="flex flex-row">
-        <!-- Sidebar -->
-        {% include "components/side-menu.html" %}
-
-        <!-- Content -->
-        <div class="p-6 flex-grow font-bold gap-2">
-
-                <h1 class="text-3xl font-semibold mb-4">Administrator Dashboard</h1>
-
-                <div class="flex flex-col gap-2 w-1/5">
-                    <a href="{{url_for('meta.db.manage')}}" class="border border-indigo-600 bg-indigo-300 rounded py-6 px-3 hover:bg-indigo-100">
-                        <p>Manage Databases</p>
+    {% include "components/head.html" %}
+    <body class="bg-slate-100">
+        <div class="flex gap-6">
+            <!-- Sidebar -->
+            {% include "components/side-menu.html" %}
+            <!-- Content -->
+            <div class="flex flex-col gap-6 w-1/2">
+                <div class="flex flex-row items-center mb-4 mt-6">
+                    <div class="text-xl font-bold text-slate-800 mr-4">ADMIN DASHBOARD</div>
+                    <div class="flex-grow border-t-2 border-slate-300"></div>
+                </div>
+                <div class="flex flex-col text-slate-700 text-xl bg-white border rounded-lg border-slate-300 divide-y divide-slate-300">
+                    <a href="{{ url_for("meta.db.manage") }}"
+                       class="p-4 hover:bg-slate-300 flex gap-2 items-center">
+                        {% include "svg/icons/database.html" %}
+                        Databases
                     </a>
-                    <a href="{{ url_for('meta.fs.manage') }}" class="border border-indigo-600 bg-indigo-300 rounded py-6 px-3 hover:bg-indigo-100">
-                        <p>Manage File Systems</p>
+                    <div class="p-1 pl-4 hover:bg-slate-300 flex gap-2 items-center">
+                        {% include "svg/icons/folder.html" %}
+                        File Systems
+                        <div class="flex border rounded-lg bg-white border-slate-300 divide-x divide-slate-300 overflow-hidden">
+                            <a href="{{ url_for("meta.fs.manage_linux") }}"
+                               class="p-2 hover:bg-sky-300 flex gap-2 items-center">
+                                {% include "svg/icons/linux.html" %}
+                                Linux
+                            </a>
+                            <a href="{{ url_for("meta.fs.manage_windows") }}"
+                               class="p-2 hover:bg-sky-300 flex gap-2 items-center">
+                                {% include "svg/icons/windows.html" %}
+                                Windows
+                            </a>
+                        </div>
+                    </div>
+                    <a href="{{ url_for("meta.sp.manage") }}"
+                       class="p-4 hover:bg-slate-300 flex gap-2 items-center">
+                        {% include "svg/icons/sharepoint.html" %}
+                        Sharepoint Libraries
                     </a>
-                    <a href="{{ url_for('meta.sp.manage') }}" class="border border-indigo-600 bg-indigo-300 rounded py-6 px-3 hover:bg-indigo-100">
-                        <p>Manage SharePoint Libraries</p>
-                    </a>
-                    <a href="{{ url_for('meta.s3.manage') }}" class="border border-indigo-600 bg-indigo-300 rounded py-6 px-3 hover:bg-indigo-100">
-                        <p>Manage S3</p>
-                    </a>
-                    <a href="{{ url_for('meta.llm.manage') }}" class="border border-indigo-600 bg-indigo-300 rounded py-6 px-3 hover:bg-indigo-100">
-                        <p>Manage LLMs</p>
+                    <a href="{{ url_for("meta.s3.manage") }}"
+                       class="p-4 hover:bg-slate-300 flex gap-2 items-center">
+                        {% include "svg/icons/bucket.html" %}
+                        S3 Storages</a><a href="{{ url_for("meta.llm.manage") }}"
+   class="p-4 hover:bg-slate-300 flex gap-2 items-center">
+                        {% include "svg/icons/cpu.html" %}
+                        Language Models
                     </a>
                 </div>
-        </div>
-
-    </div>
-</body>
-
-</html>
+            </div>
+        </body>
+    </html>

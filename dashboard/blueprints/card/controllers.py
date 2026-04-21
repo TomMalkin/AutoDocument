@@ -52,9 +52,7 @@ def source_card(source_id: int):
         )
 
     if source_type.Name == "LLM":
-        return render_template(
-            "components/cards/sources/llm_card.html", source=source
-        )
+        return render_template("components/cards/sources/llm_card.html", source=source)
 
     raise
 
@@ -107,6 +105,7 @@ def sql_text(source_id: int):
     manager = get_db_manager()
     source = manager.sources.get(source_id=source_id)
     return render_template("components/cards/sql_text.html", source=source)
+
 
 @card_blueprint.route("/prompt_template/<int:source_id>")
 def prompt_template(source_id: int):
@@ -227,3 +226,32 @@ def outcome_storage_card(input_type: str):
     if input_type == "input":
         return redirect(url_for("card.outcome_input_storage_card", outcome_id=outcome_id))
     return redirect(url_for("card.outcome_output_storage_card", outcome_id=outcome_id))
+
+
+@card_blueprint.route("/form_field_preview", methods=["POST"])
+def form_field_preview():
+    """Show a form field preview as the user is creating is in add form field source."""
+    name = request.form.get("name", "")
+    label = request.form.get("label", "")
+    field_type = request.form.get("field_type", "String")
+
+    return render_template(
+        "components/cards/form_field_preview.html",
+        name=name,
+        label=label,
+        field_type=field_type,
+    )
+
+
+@card_blueprint.route("/unique_name_preview", methods=["GET"])
+def unique_name_preview():
+    """Get the unique name currently in the input."""
+    name = request.args.get("name", "")
+    return name
+
+@card_blueprint.route("/bouncer/<field>", methods=["GET", "POST"])
+def bouncer(field: str):
+    """Get the value in the field."""
+    value = request.args.get(field, "")
+    return value
+

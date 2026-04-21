@@ -16,21 +16,30 @@ from .forms import (
 bp = Blueprint("fs", "fs")
 
 
-@bp.route("/manage")
+@bp.route("/manage_linux")
 @login_required
-def manage():
+def manage_linux():
+    """Manage Windows and Posix file systems."""
+    manager = get_db_manager()
+    linux_filesystems = manager.storage_instances.get_all_of_type(storage_type="Linux Share")
+    linux_filesystem_form = CreateMetaFileSystem()
+    return render_template(
+        "meta/file_system_linux.html",
+        linux_filesystems=linux_filesystems,
+        linux_form=linux_filesystem_form,
+    )
+
+@bp.route("/manage_windows")
+@login_required
+def manage_windows():
     """Manage Windows and Posix file systems."""
     manager = get_db_manager()
     windows_filesystems = manager.storage_instances.get_all_of_type(storage_type="Windows Share")
     windows_filesystem_form = CreateMetaWindowsFileSystem()
-    linux_filesystems = manager.storage_instances.get_all_of_type(storage_type="Linux Share")
-    linux_filesystem_form = CreateMetaFileSystem()
     return render_template(
-        "meta/file_system.html",
+        "meta/file_system_windows.html",
         windows_filesystems=windows_filesystems,
         windows_form=windows_filesystem_form,
-        linux_filesystems=linux_filesystems,
-        linux_form=linux_filesystem_form,
     )
 
 
@@ -41,9 +50,14 @@ def add_linux() -> Union[str, Response]:
     manager = get_db_manager()
     form = CreateMetaFileSystem()
 
+    print("validating form")
     if form.validate_on_submit():
+        print("form validated")
         local_path = cast(str, form.local_path.data).rstrip("/") + "/"
         remote_path = cast(str, form.remote_path.data).rstrip("/") + "/"
+
+        print(f"{local_path=}")
+        print(f"{remote_path=}")
 
         storage_type = manager.storage_types.get_by_name(name="Linux Share")
         manager.storage_instances.add(
@@ -53,7 +67,9 @@ def add_linux() -> Union[str, Response]:
         )
         manager.commit()
 
-    return redirect(url_for("meta.fs.manage"))
+    print(f"form didn't validate: {form.errors}")
+
+    return redirect(url_for("meta.fs.manage_linux"))
 
 
 @bp.route("/add_windows", methods=["POST"])
@@ -73,14 +89,18 @@ def add_windows() -> Union[str, Response]:
         )
         manager.commit()
 
-    return redirect(url_for("meta.fs.manage"))
+    return redirect(url_for("meta.fs.manage_windows"))
 
 
 @bp.route("/delete/<int:storage_instance_id>")
 @login_required
-def delete(storage_instance_id: int):
+def delete(storage_instance_id: int, fs_type: str = "linux"):
     """Endpoint to remove a filesystem."""
     manager = get_db_manager()
     manager.storage_instances.delete(storage_instance_id=storage_instance_id)
     manager.commit()
-    return redirect(url_for("meta.fs.manage"))
+    if fs_type=="linux":
+        return redirect(url_for("meta.fs.manage_linux"))
+    else:
+        return redirect(url_for("meta.fs.manage_windows"))
+

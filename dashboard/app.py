@@ -3,18 +3,18 @@
 import os
 
 import click
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from flask import Flask
 from flask.cli import with_appcontext
 
-from autodoc.config import DB_PATH, DOWNLOAD_DIRECTORY, UPLOAD_DIRECTORY
+from autodoc.config import DB_PATH, DOWNLOAD_DIRECTORY, UPLOAD_DIRECTORY, USE_WORKERS
 from autodoc.data.initialise import initialise_database
 from dashboard.database import register_db_teardown
 
 from .blueprints import auth_blueprint, card_blueprint, meta_blueprint, top_blueprint
 from .blueprints.auth.controllers import login_manager
 
-load_dotenv()
+# load_dotenv()
 
 # UPLOAD_DIR = Path("dashboard/files/")
 # if not UPLOAD_DIR.is_dir():
@@ -48,6 +48,7 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
     app.config["UPLOAD_DIRECTORY"] = UPLOAD_DIRECTORY
     app.config["DB_PATH"] = DB_PATH
     app.config["ADMIN_PASSWORD"] = ADMIN_PASSWORD
+    app.config["USE_WORKERS"] = USE_WORKERS
     app.secret_key = "your_secret_key"
 
     app.cli.add_command(init_db_command)

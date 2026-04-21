@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% include "components/head.html" %}
+    <body class="bg-gray-100">
+        <div class="flex flex-row gap-6">
+            <!-- Sidebar -->
+            {% include "components/side-menu.html" %}
+            <!-- Content -->
+            <div class="flex flex-col pt-6 bg-slate-100 w-full gap-6">
+                <div class="flex flex-row gap-2 items-center">
+                    <h1 class="text-3xl font-semibold mb-4 text-slate-700">Managing</h1>
+                    <h1 class="text-3xl font-semibold mb-4 text-slate-900 bg-slate-300 rounded-lg p-1">
+                        {% block title %}
+                        {% endblock title %}
+                    </h1>
+                </div>
+                {% block explanation %}
+                    <div class="border border-slate-300 rounded-lg bg-slate-200 w-1/2">
+                        <details class="group">
+                            <summary class="flex flex-row items-center rounded-lg bg-slate-200 cursor-pointer list-none">
+                                <p class="text-slate-700 font-bold p-2">How to use</p>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke-width="3"
+                                     stroke="currentColor"
+                                     class="size-4 transition-transform duration-200 ease-in-out group-open:rotate-90">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </summary>
+                            <div class="bg-slate-200 p-1 rounded-lg">
+                                <div class="flex-col space-y-4 p-2 bg-white rounded-lg">
+                                    {% block explanation_text %}
+                                    {% endblock explanation_text %}
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                {% endblock explanation %}
+                <div class="flex gap-6">
+                    <div class="flex-1">
+                        {% block data %}
+                        {% endblock data %}
+                    </div>
+                    <div class="flex-1 pr-4">
+                        {% block form %}
+                        {% endblock form %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

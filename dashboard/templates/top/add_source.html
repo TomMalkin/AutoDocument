@@ -1,97 +1,126 @@
 {% extends "top/add_source_layout.html" %}
-
-{% block title %} {{title}} {% endblock title %}
-
+{% block title %}
+    {{ title }}
+{% endblock title %}
 {% block content %}
-
-<form method="POST" action="{{ url_for('top.source.add_source_view', workflow_id=workflow_id, source_type_id=source_type_id) }}" enctype="multipart/form-data">
-    {{ form.csrf_token }}
-
-    <div class="border rounded bg-gray-50 p-4 flex items-center gap-4">
-        <div class="text-green-500">
-            {% include 'svg/important.html' %}
+    <form method="POST"
+          action="{{ url_for('top.source.add_source_view', workflow_id=workflow_id, source_type_id=source_type_id) }}"
+          enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="border border-slate-300 rounded-lg bg-slate-200">
+            <details class="group">
+                <summary class="flex flex-row items-center rounded-lg bg-slate-200 cursor-pointer list-none">
+                    <p class="text-slate-700 font-bold p-2">How to use</p>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="3"
+                         stroke="currentColor"
+                         class="size-4 transition-transform duration-200 ease-in-out group-open:rotate-90">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                </summary>
+                <div class="bg-slate-200 p-1">
+                    <div class="flex-col space-y-4 p-2 bg-white rounded-lg">
+                        {% for explanation in explanations %}
+                            <div>
+                                <p>{{ explanation }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </details>
         </div>
-
-        <div class="flex-col space-y-4">
-            {% for explanation in explanations %}
-            <div> <p>{{ explanation }}</p> </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="border rounded p-2 my-2 bg-gray-50">
-        {# These fields are handled by the components below so ignore in the dynamic list #}
-        {% set accessor_fields = ['name', 'bucket', 'location'] %}
-        {% set multirecord_fields = ['splitter_choice', 'field_name'] %}
-
-        {# Render the dynamically generated fields, excluding the ones handled by the component #}
-        {% for field in form if field.widget.input_type != 'hidden' 
-                              and field.name != 'submit' 
-                              and field.name not in accessor_fields
-                              and field.name not in multirecord_fields %}
-            <div class="mb-3 flex gap-4">
-                {{ field.label(class='block mt-4 text-sm font-medium text-gray-900') }}
-
-                {% if field.type == "TextAreaField" %}
-                    {{ field(rows=5, class='mt-1.5 p-2 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
-                {% else %}
-                    {{ field(class='mt-1.5 p-2 w-full rounded-lg bg-white border-gray-300 text-gray-700 sm:text-sm') }}
-                {% endif %}
+        <div class="border border-slate-300 rounded-lg p-2 my-2 bg-slate-200">
+            {# These fields are handled by the components below so ignore in the dynamic list #}
+            {% set accessor_fields = ["name", "bucket", "location"] %}
+            {% set multirecord_fields = ["splitter_choice", "field_name"] %}
+            {# Render the dynamically generated fields, excluding the ones handled by the component #}
+            <div class="mb-3 gap-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-4 items-center ">
+                {% for field in form if field.widget.input_type != 'hidden'
+                    and field.name != 'submit'
+                    and field.name not in accessor_fields
+                    and field.name not in multirecord_fields %}
+                    {{ field.label(class='text-slate-900') }}
+                    {% if field.type == "TextAreaField" %}
+                        {{ field(rows=5, class='p-2 w-full rounded-lg bg-white border-slate-300 text-slate-700') }}
+                    {% else %}
+                        {{ field(class='p-2 w-96 rounded-lg bg-white border-slate-300 text-slate-700') }}
+                    {% endif %}
+                    {% if field.label.text == 'Key Field' %}
+                        <div class="col-span-1 mb-6"></div>
+                        <div class="italic text-sm mb-6">The name of the column that can be referenced in templates.</div>
+                    {% endif %}
+                    {% if field.label.text == 'Value Field' %}
+                        <div class="col-span-1"></div>
+                        <div class="italic text-sm">The values that will be inserted to the template.</div>
+                    {% endif %}
+                {% endfor %}
             </div>
-        {% endfor %}
-
-        {% if 'file_accessor' in components %}
-            <div class="border border-gray-300 rounded p-4 mt-4">
-                <label for="option" class="pt-4">{{ file_label or "File:" }}</label>
-                <select id="option" name="option" class=" bg-gray-50 mt-4 block w-full p-2 border border-gray-300 rounded-md"
-                    hx-get="{{ url_for('top.snippet.input_storage_instance_form_snippet') }}" hx-target="#dynamic-fields" required>
-                    <option selected="true" disabled="disabled" value="">Select...</option>
-
-                    <option value="-1">Uploaded during Workflow</option>
-                    {% for storage_instance in storage_instances %}
-
-                    <option value="{{ storage_instance.Id }}">({{ storage_instance.storage_type.Name }}) {{
-                        storage_instance.RemotePath or storage_instance.URL}}</option>
-                    {% endfor %}
-
-                </select>
-
-                <div id="dynamic-fields"></div>
-
+            {% if 'file_accessor' in components %}
+                <div class="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-2 border border-slate-300 rounded-lg p-2 text-slate-900 bg-slate-100">
+                    <label for="option" class="">{{ file_label or "File:" }}</label>
+                    <select id="option"
+                            name="option"
+                            class=" bg-white w-full p-2 border border-slate-300 rounded-lg"
+                            hx-get="{{ url_for("top.snippet.input_storage_instance_form_snippet") }}"
+                            hx-target="#dynamic-fields"
+                            required>
+                        <option selected="true" disabled="disabled" value="">Select...</option>
+                        <option value="-1">Uploaded during Workflow</option>
+                        {% for storage_instance in storage_instances %}
+                            <option value="{{ storage_instance.Id }}">
+                                ({{ storage_instance.storage_type.Name }}) {{
+                                storage_instance.RemotePath or storage_instance.URL}}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div id="dynamic-fields" class="contents"></div>
+                </div>
+            {% endif %}
+            {% if 'splitter' in components %}
+                <fieldset class="grid grid-cols-2 gap-6 text-slate-700">
+                    <!--Splitter-->
+                    <label class="col-span-1 p-6 border rounded-lg border-slate-300 mt-6 has-[:checked]:bg-slate-300 has-[:checked]:font-semibold"
+                           for="splitter">
+                        <div class="flex gap-2">
+                            <input type="radio"
+                                   name="splitter_choice"
+                                   id="splitter"
+                                   value="splitter"
+                                   checked>
+                            {% include "svg/icons/iterator.html" %}
+                            Iterator
+                        </div>
+                        <p class="italic mt-6 font-normal">Each record will be split into a new Workflow</p>
+                    </label>
+                    <!--Field-->
+                    <label class="col-span-1 p-6 border rounded-lg mt-6 has-[:checked]:bg-slate-300 border-slate-300 has-[:checked]:font-semibold"
+                           for="field">
+                        <div class="flex flex-row gap-2">
+                            <input type="radio"
+                                   name="splitter_choice"
+                                   id="field"
+                                   class="peer/field"
+                                   value="field">
+                            {% include "svg/icons/multifield.html" %}
+                            Field
+                        </div>
+                        <p class="italic mt-6 font-normal">All records will be set to a field name as a list</p>
+                        <label for="field_name"
+                               class="peer-checked/field:text-slate-700 block mt-5 text-slate-700 font-normal">
+                            Field Name
+                            <input class="mt-1.5 p-2 w-full rounded-lg bg-white border-slate-300 text-slate-700 sm:text-sm"
+                                   id="field_name"
+                                   name="field_name"
+                                   type="text">
+                        </label>
+                    </label>
+                </fieldset>
+            {% endif %}
+            <div class="mt-1.5">
+                {{ form.submit(class='mt-1.5 rounded-lg border bg-sky-800 hover:bg-sky-700 px-12 py-3 font-semibold text-slate-100 focus:outline-none focus:ring cursor-pointer') }}
             </div>
-        {% endif %}
-
-        {% if 'splitter' in components %}
-            <fieldset class="grid grid-cols-2 gap-6">
-
-                <!--Splitter-->
-                <label class="col-span-1 p-6 border rounded mt-6 has-[:checked]:bg-blue-100" for="splitter">
-                    <input type="radio" name="splitter_choice" id="splitter" value="splitter" checked>
-                    Splitter
-                    <p class="italic mt-6">Each record will be split into a new Workflow</p>
-                </label>
-
-                <!--Field-->
-                <label class="col-span-1 p-6 border rounded mt-6 has-[:checked]:bg-blue-100" for="field">
-                    <input type="radio" name="splitter_choice" id="field" class="peer/field" value="field">
-                    Field
-                    <p class="italic mt-6">All records will be set to a field name as a list</p>
-                    <label for="field_name" class="peer-checked/field:text-black block mt-5 text-gray-500">
-                        Field Name
-                    <input class="mt-1.5 p-2 w-full rounded-lg bg-gray-50 border-gray-300 text-gray-700 sm:text-sm" id="field_name"
-                        name="field_name" type="text">
-            </label>
-                </label>
-
-            </fieldset>
-        {% endif %}
-
-        <div class="mt-1.5">
-            {{ form.submit(class='mt-1.5 rounded border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium
-            text-white hover:bg-transparent hover:text-indigo-600 focus:outline-none focus:ring active:text-indigo-500') }}
         </div>
-    </div>
-
-</form>
-
+    </form>
 {% endblock content %}

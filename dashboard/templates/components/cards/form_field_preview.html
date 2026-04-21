@@ -1,0 +1,39 @@
+<div class="flex flex-row items-center mb-4">
+  <div class="text-xl font-bold text-slate-800 mr-4">PREVIEW</div>
+  <div class="flex-grow border-t-2 border-slate-300"></div>
+</div>
+
+<div
+  class="flex flex-col gap-2 p-2 border rounded-lg border-slate-300 bg-slate-200"
+>
+  <div class="flex gap-4 items-center">
+    <label class="text-slate-900">{{ label }}</label>
+
+    {% if field_type == "Integer" %}
+    <input
+      type="number"
+      name="{{ name }}"
+      class="p-2 border rounded-lg w-96 bg-white border-slate-300"
+      placeholder="Enter {{ label }}"
+    />
+    {% elif field_type == "String" %}
+    <input
+      type="text"
+      name="{{ name }}"
+      class="p-2 border rounded-lg w-96 bg-white border-slate-300"
+      placeholder="Enter {{ label }}"
+    />
+    {% endif %}
+  </div>
+
+  <div class="flex flex-row items-center">
+    <div class="flex-grow border-t-2 border-slate-300"></div>
+  </div>
+
+  <div class="italic">
+    This field will write to
+    <span class="font-semibold text-slate-900 bg-slate-300 rounded-lg p-1"
+      >{{ name }}</span
+    >
+  </div>
+</div>
