@@ -1,3 +1,4 @@
+
 # AutoDocument
 
 Effortlessly Automate, Template and Scale your document processes.
@@ -12,5 +13,5 @@ See the Installation instructions in the
 
 
 # Example Workflow
+<img width="1142" height="1236" alt="Screenshot 2026-04-21 165024" src="https://github.com/user-attachments/assets/644d051a-216a-48d4-a9db-e5139d77e4cc" />
 
-![Image](https://github.com/user-attachments/assets/054c714f-e3c6-41e2-9b29-08b3b5852d0b)
