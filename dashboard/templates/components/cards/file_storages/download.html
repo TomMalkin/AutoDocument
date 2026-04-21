@@ -1,4 +1,20 @@
-<div class="border rounded-lg p-1 flex-col bg-yellow-100">
-    <h3 class="text-xl font-bold">Downloaded when workflow is run</h3>
-    <h3>Saved to '{{ name }}'</h3>
+<div
+  class="border rounded flex bg-slate-200 border-none flex-row items-center gap-2 p-1"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    class="size-6"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+    />
+  </svg>
+
+  <p>Downloaded at runtime as <span class="font-bold">{{ name }}</span></p>
 </div>

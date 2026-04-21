@@ -51,6 +51,8 @@ def workflow(workflow_id: int) -> str:
     for source_type in source_types:
         source_type_mapping[source_type.Name] = source_type.Id
 
+    use_workers = current_app.config["USE_WORKERS"]
+
     return render_template(
         "top/workflow.html",
         workflow=workflow,
@@ -58,6 +60,7 @@ def workflow(workflow_id: int) -> str:
         form_fields=form_fields,
         outcome_type_mapping=outcome_type_mapping,
         source_type_mapping=source_type_mapping,
+        use_workers=use_workers,
     )
 
 
@@ -133,7 +136,10 @@ def workflow_instance(workflow_id: int) -> Response | str:
             instance = manager.workflow_instances.add(workflow_id=workflow_id)
             manager.commit()
 
-            process_instance.send(instance_id=instance.Id, upload_mapping={}, form_data={})
+            if current_app.config["USE_WORKERS"]:
+                process_instance.send(instance_id=instance.Id, upload_mapping={}, form_data={})
+            else:
+                process_instance(instance_id=instance.Id, upload_mapping={}, form_data={})
 
         else:
             logger.info("Form fields and/or upload fields identified, rendering form")
@@ -174,7 +180,9 @@ def workflow_instance(workflow_id: int) -> Response | str:
                     logger.info(f"saving to {uploaded_file_path}")
 
                     # e.g. "Client Record" -> dashboard/files/client_record.csv
-                    name_to_file_mapping[upload_file_field.removeprefix("autodoc_")] = uploaded_file_path
+                    name_to_file_mapping[upload_file_field.removeprefix("autodoc_")] = (
+                        uploaded_file_path
+                    )
 
             instance = manager.workflow_instances.add(workflow_id=workflow_id)
             manager.commit()
@@ -184,11 +192,18 @@ def workflow_instance(workflow_id: int) -> Response | str:
                 for k, v in data.items()
                 if not isinstance(v, FileStorage)
             }
-            process_instance.send(
-                instance_id=instance.Id,
-                upload_mapping=name_to_file_mapping,
-                form_data=useable_data,
-            )
+            if current_app.config["USE_WORKERS"]:
+                process_instance.send(
+                    instance_id=instance.Id,
+                    upload_mapping=name_to_file_mapping,
+                    form_data=useable_data,
+                )
+            else:
+                process_instance(
+                    instance_id=instance.Id,
+                    upload_mapping=name_to_file_mapping,
+                    form_data=useable_data,
+                )
 
         else:
             return render_template_string(str(form.errors))

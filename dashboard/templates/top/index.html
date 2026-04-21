@@ -1,108 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-
-{% include "components/head.html" %}
-{% import 'macros/alert.html' as alert_macro %}
-
-<body class="bg-gray-100">
-    <div class="flex">
-        <!-- Sidebar -->
-        {% include "components/side-menu.html" %}
-
-        <!-- Main content -->
-        <div class="col-span-9 flex-1 p-6 space-y-6">
-            {% include 'components/alerts.html' %}
-
-            <h1 class="text-3xl font-semibold mb-4">AutoDocument</h1>
-            <span class="flex items-center">
-                <span class="h-px flex-1 bg-black"></span>
-            </span>
-
-
-            <div class="flex flex-row gap-4">
-
+    {% include "components/head.html" %}
+    {% import 'macros/alert.html' as alert_macro %}
+    <body class="bg-slate-100">
+        {# all content #}
+        <div class="flex flex-row">
+            <!-- Sidebar -->
+            {% include "components/side-menu.html" %}
+            <!-- Main content -->
+            <div class="flex-1 p-6 space-y-6 pt-6">
+                {% include 'components/alerts.html' %}
                 {% if workflows %}
-                <div class="flex-1">
-                    <div class="mx-auto max-w-lg text-center">
-                        <h1 class="text-2xl font-bold sm:text-3xl pb-1">Workflows</h1>
-                    </div>
-                    <div class="overflow-x-auto rounded-lg border border-gray-200">
-                        <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-                            <tbody class="divide-y divide-gray-200">
-
-                                {% for workflow in workflows %}
-                                <tr>
-                                    <td class="whitespace-nowrap font-bold px-4 py-2 text-gray-900">
-                                        {{ workflow['Name'] }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-4 py-2 text-gray-700 text-right">
-                                        <span class="inline-flex -space-x-px overflow-hidden rounded-md border bg-white shadow-sm">
-                                            <a class="inline-block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative"
-                                                href="{{ url_for('top.workflow.workflow_instance', workflow_id=workflow['Id']) }}">run</a>
-                                            <a class="inline-block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:relative"
-                                                href="{{ url_for('top.workflow.workflow', workflow_id=workflow['Id']) }}">edit</a>
-                                            <a class="inline-block px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                                                href="{{ url_for('top.workflow.delete_workflow', workflow_id=workflow['Id']) }}">delete</a>
-                                        </span>
-                                    </td>
-
-                                </tr>
-                                {% endfor %}
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {% else %}
-
-                <div class="border rounded-lg flex-1 flex flex-row p-2 bg-gray-200">
-                    <div>
-                        <svg class="w-12 h-12 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            {% include 'svg/important.html' %}
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold">Get Started: Add a Workflow</h1>
-                        <p>A Workflow connects one or more data Sources to one or more Outcomes.</p>
-                    </div>
-                </div>
-
-                {% endif %}
-
-                <div class="flex-1">
-                    <div>
-                        <div class="mx-auto max-w-lg text-center">
-                            <h1 class="text-2xl font-bold sm:text-3xl">Create Workflow</h1>
+                    <div class="flex flex-col">
+                        <div class="flex flex-row items-center mb-4 mt-6">
+                            <div class="text-xl font-bold text-slate-800 mr-4">WORKFLOWS</div>
+                            <div class="flex-grow border-t-2 border-slate-300"></div>
+                        </div>
+                        <div class="flex-1 flex-col border rounded-lg bg-white border-slate-300 text-slate-700 divide-y divide-slate-300">
+                            {% for workflow in workflows %}
+                                <div class="flex items-center hover:bg-slate-300">
+                                    <a class="flex-1 px-4 py-2"
+                                       href="{{ url_for('top.workflow.workflow', workflow_id=workflow['Id']) }}">
+                                        {{ workflow.Name }}
+                                    </a>
+                                    <div class="ml-auto px-4 py-2">
+                                        <div class="flex flex-row border border-slate-300 rounded-lg divide-x divide-slate-300 overflow-hidden">
+                                            <a class="flex flex-row items-center p-1 pr-2 bg-white hover:bg-sky-200 text-sky-800"
+                                               href="{{ url_for('top.workflow.workflow_instance', workflow_id=workflow['Id']) }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     fill="none"
+                                                     viewBox="0 0 24 24"
+                                                     stroke-width="2"
+                                                     stroke="currentColor"
+                                                     class="size-6 mr-2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                                                </svg>
+                                                Run
+                                            </a>
+                                            <a class="flex flex-row items-center p-1 pr-2 bg-white hover:bg-red-200 text-red-600"
+                                               href="{{ url_for('top.workflow.delete_workflow', workflow_id=workflow['Id']) }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     fill="none"
+                                                     viewBox="0 0 24 24"
+                                                     stroke-width="1.5"
+                                                     stroke="currentColor"
+                                                     class="size-6 mr-2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                                Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    <div>
-                        <form method="post" action="{{ url_for('top.workflow.create_workflow_view') }}"
-                            class="mx-auto mb-0 mt-8 max-w-md space-y-4">
-                            {{ form.csrf_token }}
-                            <div class="flex items-center justify-between">
-                                <label for="Name" class="sr-only">name</label>
-
-                                <div class="flex-grow relative">
-                                    <input type="text" id="Name" name="name"
-                                        class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                                        placeholder="name" />
-                                </div>
-
-                                <button type="submit"
-                                    class="inline-block rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white ml-4">
-                                    create
-                                </button>
-                            </div>
-                        </form>
+                {% else %}
+                    <div class="border rounded-lg flex-1 flex flex-row p-2 bg-gray-200">
+                        <div>
+                            <svg class="w-12 h-12 text-green-500"
+                                 aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 width="24"
+                                 height="24"
+                                 fill="none"
+                                 viewBox="0 0 24 24">
+                                {% include 'svg/important.html' %}
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold">Get Started: Add a Workflow</h1>
+                            <p>A Workflow connects one or more data Sources to one or more Outcomes.</p>
+                        </div>
                     </div>
-                </div>
-
-
+                {% endif %}
             </div>
-
+            {# create workflow #}
+            <div class="flex-1 pt-6 pr-6">
+                <div class="flex flex-row items-center mb-4 mt-6">
+                    <div class="text-xl font-bold text-slate-800 mr-4">CREATE WORKFLOW</div>
+                    <div class="flex-grow border-t-2 border-slate-300"></div>
+                </div>
+                <div class="flex flex-row items-center gap-2 p-4 border bg-slate-200 rounded-lg border-slate-300">
+                    <form method="post"
+                          action="{{ url_for("top.workflow.create_workflow_view") }}"
+                          class="flex-1">
+                        {{ form.csrf_token }}
+                        <div class="flex items-center">
+                            <label for="Name" class="sr-only">name</label>
+                            <div class="flex-grow relative">
+                                <input type="text"
+                                       id="Name"
+                                       name="name"
+                                       class="w-full rounded-lg border-slate-300 p-4 bg-white shadow-sm text-slate-700 text-xl"
+                                       placeholder="name" />
+                            </div>
+                            <a href="#"
+                               class="inline-flex items-center gap-2 rounded-lg bg-sky-800 hover:bg-sky-700 px-5 py-3 text-xl font-bold text-slate-100 ml-4">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke-width="2.5"
+                                     stroke="currentColor"
+                                     class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                <span>Create</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-</body>
-
+    </body>
 </html>

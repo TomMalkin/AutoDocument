@@ -1,4 +1,20 @@
-<div class="my-4">
-    <label for="bucket" class="block text-gray-700">Unique Name (e.g. Client Record):</label>
-    <input type="text" id="name" name="name" class="block w-full mt-1 p-2 border border-gray-300 rounded-md" value="{{ name or '' }}" required>
+<label for="name" class="text-slate-900"
+  >Unique Name (e.g. Client Record):</label
+>
+<input
+  type="text"
+  id="name"
+  name="name"
+  class="block w-full p-2 border border-slate-300 rounded-lg bg-white"
+  value="{{ name or '' }}"
+  hx-get="{{ url_for('card.unique_name_preview') }}"
+  hx-trigger="keyup changed delay:300ms, load"
+  hx-target="#name-preview"
+  hx-swap="innerHTML"
+  required
+/>
+<div class="col-span-1"></div>
+<div class="italic text-sm">
+  e.g. The user will be prompted for a
+  <span class="font-bold" id="name-preview">Client Record</span> file.
 </div>

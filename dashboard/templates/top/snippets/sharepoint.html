@@ -1,4 +1,14 @@
-<div class="mb-4">
-    <label for="{{ 'output_location' if storage_type == 'output' else 'location' }}" class="block text-gray-700">Filename:</label>
-    <input type="text" id="{{ 'output_location' if storage_type == 'output' else 'location' }}" name="{{ 'output_location' if storage_type == 'output' else 'location' }}" class="block w-full mt-1 p-2 border border-gray-300 rounded-md" value="{{ location or '' }}" required>
-</div>
+<label
+  for="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+  class="flex gap-2 items-center text-slate-900"
+>
+  {% include 'svg/icons/sharepoint.html' %} File Name:</label
+>
+<input
+  type="text"
+  id="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+  name="{{ 'output_location' if storage_type == 'output' else 'location' }}"
+  class="w-full p-2 border border-slate-300 rounded-lg bg-white"
+  value="{{ location or '' }}"
+  required
+/>

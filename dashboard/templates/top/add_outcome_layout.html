@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
-{% include "components/head.html" %}
-{% from 'macros/workflow_diagram.html' import workflow_diagram %}
-
-<body class="bg-gray-100">
-    <div class="flex">
-        <!-- Sidebar -->
-        {% include "components/side-menu.html" %}
-
-
-        <!-- Main content -->
-        <div class="col-span-6 flex-1 p-6 space-y-6">
-            <h1 class="text-3xl font-semibold mb-4">{% block title %}{% endblock %}</h1>
-            <span class="flex items-center">
-                <span class="h-px flex-1 bg-black"></span>
-            </span>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="col-span-1">
-                    {% block content %}
-                    {% endblock content %}
+    {% include "components/head.html" %}
+    {% from 'macros/workflow_diagram.html' import workflow_diagram %}
+    <body class="bg-slate-50">
+        <div class="flex">
+            <!-- Sidebar -->
+            {% include "components/side-menu.html" %}
+            <!-- Main content -->
+            <div class="col-span-6 flex-1 p-6 space-y-6">
+                <div class="flex gap-2 items-center">
+                    <a href="{{ url_for('top.workflow.workflow', workflow_id=workflow_id) }}"
+                       class="border p-2 rounded-lg bg-sky-800 hover:bg-sky-700 text-slate-50">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="3.5"
+                             stroke="currentColor"
+                             class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                    </a>
+                    <h1 class="text-3xl font-semibold text-slate-700">
+                        {% block title %}{% endblock %}
+                    </h1>
                 </div>
-
-                <div class="col-span-1 pl-6">
-                    <p class="text-xl font-bold mb-2">Current Workflow</p>
-                    {{ workflow_diagram(workflow_id) }}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="col-span-1">
+                        {% block content %}
+                        {% endblock content %}
+                    </div>
+                    <div class="col-span-1">
+                        <h1 class="inline-flex font-bold text-2xl pb-4">Current Workflow</h1>
+                        {{ workflow_diagram(workflow_id) }}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</body>
-
+    </body>
 </html>

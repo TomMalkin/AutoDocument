@@ -128,6 +128,20 @@ def add_source_view(workflow_id: int, source_type_id: int) -> Union[str, Respons
 
     explanations = EXPLANATION_MAP.get(source_type.Name) or []
 
+    # Temporary Fix for formatting
+    title_mapper = {
+        "CSVRecord": "CSV - Single Record",
+        "CSVTable": "CSV",
+        "ExcelRecord": "Excel - Single Record",
+        "ExcelTable": "Excel",
+        "LLM": "AI Response",
+        "SQL Record": "Database Query - Single Record",
+        "SQL RecordSet": "Database Query",
+        "SQL RecordSet Transpose": "Database Query - Transposed",
+    }
+
+    _title = title_mapper.get(source_type.Name, source_type.Name)
+
     return render_template(
         "top/add_source.html",
         form=form,
@@ -136,7 +150,7 @@ def add_source_view(workflow_id: int, source_type_id: int) -> Union[str, Respons
         components=components,
         explanations=explanations,
         source_type_id=source_type_id,
-        title=f"Add Source: {source_type.Name}"
+        title=f"Add Source: {_title}"
     )
 
 

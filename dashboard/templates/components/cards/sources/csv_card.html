@@ -1,39 +1,48 @@
-<div class="border rounded-lg flex flex-row p-1 m-1 gap-2 bg-green-500">
-
-    <div>
-        <svg class="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            {% include 'svg/csv.html' %}
-        </svg>
-
-        <svg class="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            {% include 'svg/record.html' %}
-        </svg>
-
-
+{% extends "components/cards/sources/source_card_template.html" %}
+{% block svg %}
+    <svg class="w-12 h-12 text-green-800"
+         aria-hidden="true"
+         xmlns="http://www.w3.org/2000/svg"
+         width="24"
+         height="24"
+         fill="currentColor"
+         viewBox="0 0 24 24">
+        {% include 'svg/csv.html' %}
+    </svg>
+{% endblock svg %}
+{% block title %}
+    {% if source["Name"] %}
+        <h2 class="text-xl font-bold">CSV - Single Record: {{ source["Name"] }}</h2>
+    {% else %}
+        <h2 class="text-xl font-bold">CSV - Single Record</h2>
+    {% endif %}
+{% endblock title %}
+{% block multi %}
+{% endblock multi %}
+{% block details_info %}
+    <div class="p-2 bg-slate-200 border-t border-slate-200 flex">
+        {% if source.Orientation == "horizontal" %}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor"
+                 class="size-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+            </svg>
+            {{ source.Orientation }} record (headings go across the first row)
+        {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor"
+                 class="size-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
+            </svg>
+            {{ source.Orientation }} record (headings go down the first column)
+        {% endif %}
     </div>
-
-    <div class="flex flex-col">
-
-        <div class="flex flex-row gap-2 mb-2">
-            <h2 class="text-xl font-bold">CSV Record</h2>
-            <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-400 focus:relative"
-                href="{{ url_for('top.source.edit_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">edit</a>
-            <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.source.delete_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">delete</a>
-        </div>
-
-        <p><span class="font-bold">Orientation:</span> {{ source.Orientation }}</p>
-
-        <div class="flex flex-row gap-2">
-
-            <p class="font-bold">Loaded From:</p>
-            <div class="mt-2 p-1 rounded-lg bg-gray-100" hx-trigger="load"
-                hx-get="{{ url_for('card.source_storage_card', source_id=source.Id) }}" hx-swap="outerHTML">
-            </div>
-
-        </div>
-
-    </div>
-</div>
+{% endblock details_info %}
+{% block other %}
+{% endblock other %}

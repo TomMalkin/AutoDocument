@@ -1,33 +1,41 @@
-<div class="border rounded-lg flex flex-row p-2 m-1 gap-2 bg-blue-400">
-
-    <div class="w-12">
-        <svg class="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            {% include 'svg/database.html' %}
-        </svg>
-
-        <svg class="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            {% include 'svg/record.html' %}
-        </svg>
-
-    </div>
-
-    <div class="flex flex-col">
-        <div class="flex flex-row gap-2 mb-2">
-            <h2 class="text-xl font-bold">SQL Record</h2>
-            <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-400 focus:relative"
-                href="{{ url_for('top.source.edit_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">edit</a>
-            <a class="rounded px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.source.delete_source_view', workflow_id=source.WorkflowId, source_id=source.Id) }}">delete</a>
+{% extends "components/cards/sources/source_card_template.html" %}
+{% block title %}
+    <h2 class="text-xl font-bold">Database Query - Single Record</h2>
+{% endblock title %}
+{% block svg %}
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 24 24"
+         fill="currentColor"
+         class="size-6 text-sky-700 w-12 h-12">
+        {% include 'svg/database.html' %}
+    </svg>
+{% endblock svg %}
+{% block card_contents %}
+    <!-- Key Details -->
+    <div class="flex gap-2">
+        <span class="font-bold">Loaded From:</span>
+        <div class="border-none rounded-lg bg-slate-200 p-1 flex gap-2 items-center">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="1.5"
+                 stroke="currentColor"
+                 class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+            </svg>
+            {{ source.database.Name }}
         </div>
-        <p><span class="font-bold">Database:</span> {{ source.database.Name }}</p>
-        <p class="font-bold">Query:</p>
-
-        <div class="mt-2 p-1 rounded-lg bg-gray-100 cursor-pointer" hx-trigger="click"
-            hx-get="{{ url_for('card.sql_text', source_id=source.Id) }}" hx-swap="innerHTML">
-            <p>(click to show)</p>
-        </div>
-
     </div>
-</div>
+{% endblock card_contents %}
+{% block details_info %}
+    <div class="bg-slate-200 p-2">
+        <div class="text-slate-700 font-bold mb-2">Query:</div>
+        <div class="p-1 rounded-lg bg-slate-50">
+            <p class="whitespace-pre-line hover:">{{ source.SQLText }}</p>
+        </div>
+    </div>
+{% endblock details_info %}
+{% block multi %}
+{% endblock multi %}
+{% block other %}
+{% endblock other %}

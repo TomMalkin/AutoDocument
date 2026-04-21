@@ -18,7 +18,7 @@ def manage():
     manager = get_db_manager()
     llms = manager.llms.get_all()
 
-    llm_form = CreateLLM()
+    llm_form = CreateLLM(system_prompt="You are a helpful assistant.")
     providers = manager.llm_providers.get_all()
     provider_options = [(p.Id, p.CommonName) for p in providers]
     llm_form.provider.choices = provider_options

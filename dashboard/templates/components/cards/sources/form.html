@@ -1,25 +1,88 @@
-<div class="flex flex-row items-center bg-gray-300 rounded-lg p-1 pl-2 my-6">
-
-    <h1 class="text-3xl font-bold">Form</h1>
-
-    <div class="flex flex-col flex-grow">
-
+<div class="flex flex-col gap-2 border border-slate-200 bg-white rounded-lg">
+    <div class="grid grid-cols-[max-content_max-content_max-content_max-content_1fr] gap-x-4 gap-y-2 rounded-lg bg-white p-2 items-center">
         {% for form_field in form_fields %}
-        <div class="border rounded-lg flex flex-row p-2 m-1 bg-orange-300 items-center gap-2">
-
-            <p class="font-bold">{{ form_field['FieldLabel'] }}: </p>
-            <div class="border rounded p-1 mx-1 border-black bg-yellow-50">{{ form_field['FieldType'] }}</div>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>
-            <p>{{ form_field['FieldName'] }} </p>
-            <div class="inline-block min-h-[1em] w-0.5 self-stretch bg-gray-800"></div>
-            <a class="rounded inline-block px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-400 focus:relative"
-                href="{{ url_for('top.form_field.delete_form_field_view', form_field_id=form_field['Id'], workflow_id=workflow_id) }}">delete</a>
-        </div>
+            <div>
+                <span class="font-bold">{{ form_field['FieldLabel'] }}</span>
+            </div>
+            <div class="border-none rounded bg-slate-200 border-slate-200 px-1 items-center">
+                {% if form_field['FieldType'] == "String" %}
+                    Text
+                {% else %}
+                    Number
+                {% endif %}
+            </div>
+            <div class="">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor"
+                     class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                </svg>
+            </div>
+            <div class="border-none rounded bg-slate-200 items-center p-1 font-bold flex flex-row gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor"
+                     class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                </svg>
+                {{ form_field['FieldName'] }}
+            </div>
+            <div class="justify-self-end">
+                <a class="rounded flex gap-2 p-2 text-sm text-red-600 bg-white hover:bg-red-50 focus:relative items-center"
+                   href="{{ url_for('top.form_field.delete_form_field_view', form_field_id=form_field['Id'], workflow_id=workflow_id) }}">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.5"
+                         stroke="currentColor"
+                         class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                </a>
+            </div>
         {% endfor %}
-
     </div>
-
+    <details class="group">
+        <summary class="flex flex-row items-center bg-slate-200 cursor-pointer list-none">
+            <p class="text-slate-700 font-bold p-2">Preview</p>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="3"
+                 stroke="currentColor"
+                 class="size-4 transition-transform duration-200 ease-in-out group-open:rotate-90">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+        </summary>
+        <div class="p-2 bg-slate-200">
+            <form class="space-y-4 bg-white rounded-lg">
+                <div class="items-center grid grid-cols-[max-content_max-content] py-2 pl-2 gap-2">
+                    {% for form_field in form_fields %}
+                        <!-- <div class="flex items-center gap-3 m-2"> -->
+                        <label for="{{ form_field['FieldName'] }}"
+                               class="block text-sm font-bold text-slate-900">{{ form_field['FieldLabel'] }}</label>
+                        {% if form_field['FieldType'] == "String" %}
+                            <input type="text"
+                                   id="{{ form_field['FieldName'] }}"
+                                   name="{{ form_field['FieldName'] }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-900 focus:ring-indigo-500 p-1"
+                                   placeholder="Enter {{ form_field['FieldLabel'] }}">
+                        {% elif form_field['FieldType'] == "Integer" %}
+                            <input type="number"
+                                   id="{{ form_field['FieldName'] }}"
+                                   name="{{ form_field['FieldName'] }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-1"
+                                   placeholder="Enter {{ form_field['FieldLabel'] }}">
+                        {% endif %}
+                        <!-- </div> -->
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+    </details>
 </div>
