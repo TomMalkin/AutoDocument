@@ -37,247 +37,88 @@
       </tr>
 
       <!-- Database -->
+
       <tr>
-        <td>
-          <div class="flex flex-row gap-2 items-center p-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"
-              />
-            </svg>
+        <td class="hover:bg-slate-300">
+          <a
+            class="text-slate-700 focus:relative"
+            href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['Database']) }}"
+          >
+            <div class="flex flex-row gap-2 items-center p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"
+                />
+              </svg>
 
-            <div class="">Database Query</div>
-            <div
-              class="border flex-col rounded-lg bg-white shadow-sm border-slate-300 ml-auto w-50"
-            >
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['SQL Record']) }}"
-              >
-                <div
-                  class="px-4 py-2 hover:bg-slate-300 focus:relative flex flex-row gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 12h14"
-                    />
-                  </svg>
-                  Single Record
-                </div>
-              </a>
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['SQL RecordSet']) }}"
-              >
-                <div
-                  class="px-4 py-2 hover:bg-slate-300 focus:relative flex flex-row gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                    />
-                  </svg>
-                  Multiple Records
-                </div>
-              </a>
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['SQL RecordSet Transpose']) }}"
-              >
-                <div
-                  class="px-4 py-2 hover:bg-slate-300 focus:relative flex flex-row gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25"
-                    />
-                  </svg>
-
-                  Transpose Record
-                </div>
-              </a>
+              <div class="w-full h-full py-2">Database Query</div>
             </div>
-          </div>
+          </a>
         </td>
       </tr>
 
       <!-- CSV -->
       <tr>
-        <td>
-          <div class="flex flex-row gap-2 items-center p-2">
-            <svg
-              class="w-6 h-6 text-green-700"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {% include 'svg/csv.html' %}
-            </svg>
-
-            <div class="">CSV</div>
-            <div
-              class="border flex-col rounded-lg bg-white shadow-sm border-slate-300 ml-auto w-50"
-            >
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['CSVRecord']) }}"
+        <td class="hover:bg-slate-300">
+          <a
+            class="text-slate-700 focus:relative"
+            href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['CSV']) }}"
+          >
+            <div class="flex flex-row gap-2 items-center p-2">
+              <svg
+                class="w-6 h-6 text-green-700"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="currentColor"
+                viewBox="0 0 24 24"
               >
-                <div
-                  class="px-4 py-2 hover:bg-slate-300 focus:relative flex gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 12h14"
-                    />
-                  </svg>
+                {% include 'svg/csv.html' %}
+              </svg>
 
-                  Single Record
-                </div>
-              </a>
-
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['CSVTable']) }}"
-              >
-                <div
-                  class="flex flex-row gap-2 px-4 py-2 hover:bg-slate-300 focus:relative"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                    />
-                  </svg>
-
-                  Multiple Records
-                </div>
-              </a>
+              <div class="w-full h-full py-2">CSV</div>
             </div>
-          </div>
+          </a>
         </td>
       </tr>
+
       <tr>
-        <td>
-          <div class="flex flex-row gap-2 items-center p-2">
-            <svg
-              class="w-6 h-6 text-slate-700"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {% include 'svg/mexcel.html' %}
-            </svg>
-
-            <div class="">Excel</div>
-            <div
-              class="border flex-col rounded-lg bg-white shadow-sm border-slate-300 ml-auto w-50"
-            >
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['ExcelRecord']) }}"
+        <td class="hover:bg-slate-300">
+          <a
+            class="text-slate-700 focus:relative"
+            href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['Excel']) }}"
+          >
+            <div class="flex flex-row gap-2 items-center p-2">
+              <svg
+                class="w-6 h-6 text-green-700"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="currentColor"
+                viewBox="0 0 24 24"
               >
-                <div
-                  class="px-4 py-2 hover:bg-slate-300 focus:relative flex gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 12h14"
-                    />
-                  </svg>
+                {% include 'svg/mexcel.html' %}
+              </svg>
 
-                  Single Record
-                </div>
-              </a>
-              <a
-                href="{{ url_for('top.source.add_source_view', workflow_id=workflow.Id, source_type_id=source_type_mapping['ExcelTable']) }}"
-              >
-                <div
-                  class="px-4 py-2 hover:bg-slate-300 focus:relative flex gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                    />
-                  </svg>
-
-                  Multiple Records
-                </div>
-              </a>
+              <div class="w-full h-full py-2">Excel</div>
             </div>
-          </div>
+          </a>
         </td>
       </tr>
+
+      
+      
 
       <tr>
         <td class="hover:bg-slate-300">

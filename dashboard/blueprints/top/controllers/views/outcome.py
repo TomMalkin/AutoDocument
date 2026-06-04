@@ -115,7 +115,7 @@ def edit_outcome_view(workflow_id: int, outcome_id: int) -> Union[str, Response]
     if request.method == "POST":
         form = create_outcome_form(manager=manager, outcome_type=outcome_type)
     else:
-        initial_data = {
+        initial_data: dict[str, str | int | None] = {
             "name": outcome.Name,
             "download_name": outcome.DownloadName,
             # Add other fields if they become editable

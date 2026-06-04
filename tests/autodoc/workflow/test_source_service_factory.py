@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from autodoc.data.tables import Source, SourceType
-from autodoc.source.csv_source import CSVRecordSourceService
+from autodoc.source.csv_source import CSVSourceService
 from autodoc.workflow.source_service_factory import SourceServiceFactory
 
 
@@ -15,7 +15,7 @@ def test_create_with_known_source():
     mock_source = MagicMock(spec=Source)
 
     mock_source.source_type = MagicMock(spec=SourceType)
-    mock_source.source_type.Name = "CSVRecord"
+    mock_source.source_type.Name = "CSV"
 
     source_service_factory = SourceServiceFactory()
 
@@ -23,7 +23,7 @@ def test_create_with_known_source():
     source_service = source_service_factory.create(source=mock_source, uploaded_filename=None)
 
     # 3. ASSERT
-    assert isinstance(source_service, CSVRecordSourceService)
+    assert isinstance(source_service, CSVSourceService)
 
 
 def test_create_with_unknown_source():

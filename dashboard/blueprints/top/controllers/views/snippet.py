@@ -193,8 +193,10 @@ def download_preparing():
 def get_system_prompt():
     """Get the default system prompt for a given LLM Id."""
     llm_id = request.values.get("llm")
+    if not llm_id:
+        return "Error"
     manager = get_db_manager()
-    llm = manager.llms.get(llm_id=llm_id)
+    llm = manager.llms.get(llm_id=int(llm_id))
     return llm.SystemPrompt if llm else "Error"
 
 
@@ -202,7 +204,6 @@ def get_system_prompt():
 def input_storage_instance_form_snippet():
     """Return a form snippet based on the type of storage instance."""
     storage_instance_id_str = request.args.get("option")
-    source_id_str = request.args.get("source_id")
 
     if not storage_instance_id_str:
         return render_template_string("")

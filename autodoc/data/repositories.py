@@ -84,6 +84,11 @@ class WorkflowRepository(Repository):
         stmt = select(Workflow)
         return self.session.scalars(stmt).all()
 
+    def get_by_name(self, name: str) -> Optional[Workflow]:
+        """Get a Workflow by its name."""
+        stmt = select(Workflow).where(Workflow.Name == name)
+        return self.session.scalars(stmt).first()
+
     def add(self, name: str) -> Workflow:
         """Add a Workflow to the table and return."""
         workflow = Workflow(Name=name)
@@ -261,15 +266,9 @@ class SourceTypeRepository(Repository):
     def seed(self):
         """Ensure type tables include up to date types."""
         source_types_required = [
-            SourceType(Name="YAML", IsSlow=0, IsFile=1, IsMulti=0),
-            SourceType(Name="RecordScalar", IsSlow=0, IsFile=0, IsMulti=0),
-            SourceType(Name="SQL Record", IsSlow=0, IsFile=0, IsMulti=0),
-            SourceType(Name="SQL RecordSet", IsSlow=0, IsFile=0, IsMulti=1),
-            SourceType(Name="SQL RecordSet Transpose", IsSlow=0, IsFile=1, IsMulti=0),
-            SourceType(Name="CSVRecord", IsSlow=0, IsFile=1, IsMulti=0),
-            SourceType(Name="CSVTable", IsSlow=0, IsFile=1, IsMulti=1),
-            SourceType(Name="ExcelRecord", IsSlow=0, IsFile=1, IsMulti=0),
-            SourceType(Name="ExcelTable", IsSlow=0, IsFile=1, IsMulti=1),
+            SourceType(Name="Database", IsSlow=0, IsFile=0, IsMulti=0),
+            SourceType(Name="CSV", IsSlow=0, IsFile=1, IsMulti=0),
+            SourceType(Name="Excel", IsSlow=0, IsFile=1, IsMulti=0),
             SourceType(Name="LLM", IsSlow=0, IsFile=0, IsMulti=0),
         ]
         source_types_to_add = []
@@ -286,6 +285,11 @@ class SourceTypeRepository(Repository):
 
 class StorageTypeRepository(Repository):
     """The repository of actions on the StorageType Table."""
+
+    def get_all(self) -> Sequence[SourceType]:
+        """Get all SourceTypes."""
+        stmt = select(SourceType)
+        return self.session.scalars(stmt).all()
 
     def get_by_name(self, name: str) -> StorageType:
         """Get a StorageType based on it's name."""
@@ -469,13 +473,13 @@ class OutcomeRepository(Repository):
         outcome = self.get(outcome_id=outcome_id)
 
         if outcome:
-            outcome.Name = name
-            outcome.InputFileTemplateId = input_file_template_id
-            outcome.OutputFileTemplateId = output_file_template_id
-            outcome.DownloadName = download_name
-            outcome.FilterField = filter_field
-            outcome.FilterValue = filter_value
-            outcome.FileUpload = file_upload
+            outcome.Name = name or outcome.Name
+            outcome.InputFileTemplateId = input_file_template_id or outcome.InputFileTemplateId
+            outcome.OutputFileTemplateId = output_file_template_id or outcome.OutputFileTemplateId
+            outcome.DownloadName = download_name or outcome.DownloadName
+            outcome.FilterField = filter_field or outcome.FilterField
+            outcome.FilterValue = filter_value or outcome.FilterValue
+            outcome.FileUpload = file_upload or outcome.FileUpload
 
             self.session.flush()
 
@@ -626,21 +630,21 @@ class SourceRepository(Repository):
         source = self.get(source_id=source_id)
 
         if source:
-            source.Step = step
-            source.FileTemplateId = file_template_id
-            source.Name = name
-            source.DatabaseId = database_id
-            source.SQLText = sql_text
-            source.Splitter = splitter
-            source.FieldName = field_name
-            source.KeyField = key_field
-            source.ValueField = value_field
-            source.Orientation = orientation
-            source.SheetName = sheet_name
-            source.HeaderRow = header_row
-            source.LLM = llm
-            source.LLMPromptTemplate = llm_prompt_template
-            source.LLMSystemPrompt = llm_system_prompt
+            source.Step = step or source.Step
+            source.FileTemplateId = file_template_id or source.FileTemplateId
+            source.Name = name or source.Name
+            source.DatabaseId = database_id or source.DatabaseId
+            source.SQLText = sql_text or source.SQLText
+            source.Splitter = splitter or source.Splitter
+            source.FieldName = field_name or source.FieldName
+            source.KeyField = key_field or source.KeyField
+            source.ValueField = value_field or source.ValueField
+            source.Orientation = orientation or source.Orientation
+            source.SheetName = sheet_name or source.SheetName
+            source.HeaderRow = header_row or source.HeaderRow
+            source.LLM = llm or source.LLM
+            source.LLMPromptTemplate = llm_prompt_template or source.LLMPromptTemplate
+            source.LLMSystemPrompt = llm_system_prompt or source.LLMSystemPrompt
 
             self.session.flush()
 

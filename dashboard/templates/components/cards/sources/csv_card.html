@@ -12,37 +12,12 @@
 {% endblock svg %}
 {% block title %}
     {% if source["Name"] %}
-        <h2 class="text-xl font-bold">CSV - Single Record: {{ source["Name"] }}</h2>
+        <h2 class="text-xl font-bold">CSV - {{ source["Name"] }}</h2>
     {% else %}
-        <h2 class="text-xl font-bold">CSV - Single Record</h2>
+        <h2 class="text-xl font-bold">CSV</h2>
     {% endif %}
 {% endblock title %}
-{% block multi %}
-{% endblock multi %}
-{% block details_info %}
-    <div class="p-2 bg-slate-200 border-t border-slate-200 flex">
-        {% if source.Orientation == "horizontal" %}
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 fill="none"
-                 viewBox="0 0 24 24"
-                 stroke-width="1.5"
-                 stroke="currentColor"
-                 class="size-6 mr-2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-            </svg>
-            {{ source.Orientation }} record (headings go across the first row)
-        {% else %}
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 fill="none"
-                 viewBox="0 0 24 24"
-                 stroke-width="1.5"
-                 stroke="currentColor"
-                 class="size-6 mr-2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
-            </svg>
-            {{ source.Orientation }} record (headings go down the first column)
-        {% endif %}
-    </div>
-{% endblock details_info %}
-{% block other %}
-{% endblock other %}
+
+{% block extra_details %}{% endblock extra_details %}
+{% block other %}{% endblock other %}
+

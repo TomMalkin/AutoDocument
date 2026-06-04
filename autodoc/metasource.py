@@ -2,7 +2,7 @@
 
 from sqlalchemy import VARCHAR, bindparam, create_engine, text
 
-from autodoc.containers import Record, RecordScalar, RecordSet
+from autodoc.containers import Record, RecordSet
 from autodoc.data.tables import DatabaseMetaSource
 
 from loguru import logger
@@ -41,11 +41,6 @@ class MetaDatabase:
         """Create a recordset."""
         headings, data = self.get_data(sql, params)
         return Record(headings, data)
-
-    def record_scalar(self, sql: str, params: dict | None = None) -> RecordScalar:
-        """Create a recordset."""
-        headings, data = self.get_data(sql, params)
-        return RecordScalar(headings, data)
 
     def execute_sql(self, sql, params=None):
         """Execute :sql: on this connection with named :params:."""

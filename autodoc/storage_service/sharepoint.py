@@ -27,14 +27,8 @@ class SharePointSiteStorageService(StorageService):
         self.library = root
         self.relative_file_path = relative
 
-        logger.info(
-            "Initializing SharePointSiteFileAccess with root: {}, relative: {}, url: {}, username: {}, password: {}".format(
-                root, relative, url, username, password
-            )
-        )
-
         user_credentials = UserCredential(user_name=username, password=password)
-        self.ctx = ClientContext(url).with_credentials(user_credentials)  # type: ignore
+        self.ctx = ClientContext(url).with_credentials(user_credentials)
 
         logger.info("request context created")
 
@@ -56,11 +50,7 @@ class SharePointSiteStorageService(StorageService):
         logger.info(f"{relative_file_url=}")
 
         with open(temp_file_name, "wb") as local_file:
-            (
-                self.ctx.web.get_file_by_server_relative_path(relative_file_url)
-                .download(local_file)
-                .execute_query()
-            )
+            (self.ctx.web.get_file_by_server_relative_path(relative_file_url).download(local_file).execute_query())
             logger.info(f"file has been downloaded into: {temp_file_name}")
 
         return Path(temp_file_name)
@@ -73,11 +63,7 @@ class SharePointSiteStorageService(StorageService):
 
             relative_file_url = str(Path(self.library) / self.relative_file_path)
             with open(temp_file_name, "wb") as local_file:
-                (
-                    self.ctx.web.get_file_by_server_relative_path(relative_file_url)
-                    .download(local_file)
-                    .execute_query()
-                )
+                (self.ctx.web.get_file_by_server_relative_path(relative_file_url).download(local_file).execute_query())
                 logger.info(f"file has been downloaded into: {temp_file_name}")
 
             with open(temp_file_name, "r") as f:
@@ -93,12 +79,7 @@ class SharePointSiteStorageService(StorageService):
 
         parent_path = str(full_path.parent)
         logger.info(f"Ensuring the {parent_path=}")
-        _ = (
-            self.ctx.web.ensure_folder_path(parent_path)
-            .get()
-            .select(["ServerRelativePath"])
-            .execute_query()
-        )
+        _ = self.ctx.web.ensure_folder_path(parent_path).get().select(["ServerRelativePath"]).execute_query()
         return parent_path
 
     def save_text(self, text) -> None:

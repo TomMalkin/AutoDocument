@@ -54,10 +54,8 @@ def get_form(
         "Integer": IntegerField,
     }
     file_extension_mapping = {
-        "CSVRecord": ["csv"],
-        "CSVTable": ["csv"],
-        "ExcelRecord": ["xlsx", "xls"],
-        "ExcelTable": ["xlsx", "xls"],
+        "CSV": ["csv"],
+        "Excel": ["xlsx", "xls"],
     }
 
     class Form(WorkflowForm):

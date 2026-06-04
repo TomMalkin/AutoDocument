@@ -130,14 +130,19 @@ def add_source_view(workflow_id: int, source_type_id: int) -> Union[str, Respons
 
     # Temporary Fix for formatting
     title_mapper = {
-        "CSVRecord": "CSV - Single Record",
-        "CSVTable": "CSV",
-        "ExcelRecord": "Excel - Single Record",
-        "ExcelTable": "Excel",
+        # "CSVRecord": "CSV - Single Record",
+        # "CSVTable": "CSV",
+        # "ExcelRecord": "Excel - Single Record",
+        # "ExcelTable": "Excel",
+        # "LLM": "AI Response",
+        # "SQL Record": "Database Query - Single Record",
+        # "SQL RecordSet": "Database Query",
+        # "SQL RecordSet Transpose": "Database Query - Transposed",
+
+        "CSV": "CSV",
+        "Excel": "Excel",
         "LLM": "AI Response",
-        "SQL Record": "Database Query - Single Record",
-        "SQL RecordSet": "Database Query",
-        "SQL RecordSet Transpose": "Database Query - Transposed",
+        "Database": "Database Query",
     }
 
     _title = title_mapper.get(source_type.Name, source_type.Name)
