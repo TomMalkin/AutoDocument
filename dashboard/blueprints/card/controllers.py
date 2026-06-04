@@ -28,28 +28,14 @@ def source_card(source_id: int):
     source = manager.sources.get(source_id=source_id)
     source_type = source.source_type
 
-    if source_type.Name == "CSVRecord":
+    if source_type.Name == "CSV":
         return render_template("components/cards/sources/csv_card.html", source=source)
 
-    if source_type.Name == "CSVTable":
-        return render_template("components/cards/sources/csv_table_card.html", source=source)
-
-    if source_type.Name == "ExcelRecord":
+    if source_type.Name == "Excel":
         return render_template("components/cards/sources/excel_card.html", source=source)
 
-    if source_type.Name == "ExcelTable":
-        return render_template("components/cards/sources/excel_table_card.html", source=source)
-
-    if source_type.Name == "SQL Record" and source.database:
-        return render_template("components/cards/sources/sql_record_card.html", source=source)
-
-    if source_type.Name == "SQL RecordSet" and source.database:
-        return render_template("components/cards/sources/sql_recordset_card.html", source=source)
-
-    if source_type.Name == "SQL RecordSet Transpose" and source.database:
-        return render_template(
-            "components/cards/sources/sql_recordset_transpose_card.html", source=source
-        )
+    if source_type.Name == "Database" and source.database:
+        return render_template("components/cards/sources/database_card.html", source=source)
 
     if source_type.Name == "LLM":
         return render_template("components/cards/sources/llm_card.html", source=source)
@@ -61,7 +47,6 @@ def source_card(source_id: int):
 def source_storage_card(source_id: int):
     """Return a storage card for file based sources."""
     manager = get_db_manager()
-    # source_id = int(request.args.get("source_id"))
     source = manager.sources.get(source_id=source_id)
 
     if not source.file_template or source.file_template.StorageInstanceId == -1:
@@ -75,17 +60,13 @@ def source_storage_card(source_id: int):
         url = storage_instance.URL
         bucket = file_template.Bucket
         location = file_template.Location
-        return render_template(
-            "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
-        )
+        return render_template("components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location)
 
     if storage_type.Name == "SharePoint":
         site = storage_instance.URL
         library = storage_instance.RemotePath
         path = file_template.Location
-        return render_template(
-            "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
-        )
+        return render_template("components/cards/file_storages/sharepoint.html", site=site, library=library, path=path)
 
     if storage_type.Name == "Linux Share":
         path = storage_instance.RemotePath + file_template.Location
@@ -101,7 +82,6 @@ def source_storage_card(source_id: int):
 @card_blueprint.route("/sql_text/<int:source_id>")
 def sql_text(source_id: int):
     """Return the SQL text of a given source id."""
-    # source_id = request.args.get("source_id")
     manager = get_db_manager()
     source = manager.sources.get(source_id=source_id)
     return render_template("components/cards/sql_text.html", source=source)
@@ -110,7 +90,6 @@ def sql_text(source_id: int):
 @card_blueprint.route("/prompt_template/<int:source_id>")
 def prompt_template(source_id: int):
     """Return the prompt template of a given source id."""
-    # source_id = request.args.get("source_id")
     manager = get_db_manager()
     source = manager.sources.get(source_id=source_id)
     return render_template("components/cards/prompt_text.html", source=source)
@@ -153,17 +132,13 @@ def outcome_input_storage_card(outcome_id: int):
         url = storage_instance.URL
         bucket = file_template.Bucket
         location = file_template.Location
-        return render_template(
-            "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
-        )
+        return render_template("components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location)
 
     if storage_type.Name == "SharePoint":
         site = storage_instance.URL
         library = storage_instance.RemotePath
         path = file_template.Location
-        return render_template(
-            "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
-        )
+        return render_template("components/cards/file_storages/sharepoint.html", site=site, library=library, path=path)
 
     if storage_type.Name == "Linux Share":
         path = storage_instance.RemotePath + file_template.Location
@@ -183,9 +158,7 @@ def outcome_output_storage_card(outcome_id: int):
     outcome = manager.outcomes.get(outcome_id=outcome_id)
 
     if not outcome.output_file_template or outcome.output_file_template.StorageInstanceId == -1:
-        return render_template(
-            "components/cards/file_storages/download.html", name=outcome.DownloadName
-        )
+        return render_template("components/cards/file_storages/download.html", name=outcome.DownloadName)
 
     file_template = outcome.output_file_template
     storage_instance = file_template.storage_instance
@@ -195,17 +168,13 @@ def outcome_output_storage_card(outcome_id: int):
         url = storage_instance.URL
         bucket = file_template.Bucket
         location = file_template.Location
-        return render_template(
-            "components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location
-        )
+        return render_template("components/cards/file_storages/s3.html", url=url, bucket=bucket, location=location)
 
     if storage_type.Name == "SharePoint":
         site = storage_instance.URL
         library = storage_instance.RemotePath
         path = file_template.Location
-        return render_template(
-            "components/cards/file_storages/sharepoint.html", site=site, library=library, path=path
-        )
+        return render_template("components/cards/file_storages/sharepoint.html", site=site, library=library, path=path)
 
     if storage_type.Name == "Linux Share":
         path = storage_instance.RemotePath + file_template.Location
@@ -249,9 +218,9 @@ def unique_name_preview():
     name = request.args.get("name", "")
     return name
 
+
 @card_blueprint.route("/bouncer/<field>", methods=["GET", "POST"])
 def bouncer(field: str):
     """Get the value in the field."""
     value = request.args.get(field, "")
     return value
-

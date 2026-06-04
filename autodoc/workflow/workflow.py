@@ -51,8 +51,8 @@ class WorkflowRunner:
         self.outcome_processor = outcome_processor
         self.archiver = archiver
 
-        self.sources: list[Source] = self.manager.sources.get_all(workflow_id=self.workflow_id)
-        self.outcomes: list[Outcome] = self.manager.outcomes.get_all(workflow_id=self.workflow_id)
+        self.sources: list[Source] = list(self.manager.sources.get_all(workflow_id=self.workflow_id))
+        self.outcomes: list[Outcome] = list(self.manager.outcomes.get_all(workflow_id=self.workflow_id))
 
         self.download_dir_base: Path = DOWNLOAD_DIRECTORY
         self.download_dir = self.download_dir_base / str(self.instance.Id)

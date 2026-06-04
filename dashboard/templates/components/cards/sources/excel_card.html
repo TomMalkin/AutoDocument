@@ -4,9 +4,9 @@
 {% endblock svg %}
 {% block title %}
     {% if source["Name"] %}
-        <h2 class="text-xl font-bold">Excel - Single Record - {{ source["Name"] }}</h2>
+        <h2 class="text-xl font-bold">Excel - {{ source["Name"] }}</h2>
     {% else %}
-        <h2 class="text-xl font-bold">Excel - Single Record</h2>
+        <h2 class="text-xl font-bold">Excel</h2>
     {% endif %}
 {% endblock title %}
 {% block details_info %}
@@ -39,4 +39,3 @@
 {% endblock details_info %}
 {% block other %}
 {% endblock other %}
-{% block multi %}{% endblock multi %}

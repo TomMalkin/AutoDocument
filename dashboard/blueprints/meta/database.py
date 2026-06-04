@@ -4,12 +4,11 @@ from typing import cast
 
 from flask import Blueprint, redirect, render_template, url_for
 from flask_login import login_required
+from loguru import logger
 
 from dashboard.database import get_db_manager
 
 from .forms import CreateMetaDatabase
-
-from loguru import logger
 
 bp = Blueprint("db", "db")
 
@@ -65,6 +64,8 @@ def add():
     if form.validate_on_submit():
         name = cast(str, form.name.data)
         database = form.database.data
+        if database is None:
+            return redirect(url_for("meta.db.manage"))
         connection_string = form.connection_string.data
         full_connection_string = f"{mapping[database]}://{connection_string}"
         logger.info(f"Adding database {database} with connection {full_connection_string}")

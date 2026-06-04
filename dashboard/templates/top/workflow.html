@@ -12,11 +12,11 @@
                 {% include 'components/alerts.html' %}
                 <div class="flex justify-between items-center">
                     <div class="flex flex-row gap-2 items-center">
-                    <h1 class="text-3xl font-semibold mb-4 text-slate-700">WORKFLOW</h1>
-                    <h1 class="text-3xl font-semibold mb-4 text-slate-900 bg-slate-200 rounded-lg p-1">{{ workflow.Name }}</h1>
-                    {% if not use_workers %}
-                    <div class="bg-red-200 p-2 rounded-lg">CURRENTLY RUNNING IN SINGLE MODE FOR TESTING</div>
-                    {% endif %}
+                        <h1 class="text-3xl font-semibold mb-4 text-slate-700">WORKFLOW</h1>
+                        <h1 class="text-3xl font-semibold mb-4 text-slate-900 bg-slate-200 rounded-lg p-1">{{ workflow.Name }}</h1>
+                        {% if not use_workers %}
+                            <div class="bg-red-200 p-1 rounded-lg mb-4 font-semibold text-3xl">CURRENTLY RUNNING IN SINGLE MODE FOR TESTING</div>
+                        {% endif %}
                     </div>
                     <a class="inline-flex rounded px-4 py-2 text-xl font-semibold text-slate-100 bg-sky-800 hover:bg-sky-700 focus:relative items-center"
                        href="{{ url_for('top.workflow.workflow_instance', workflow_id=workflow.Id) }}">

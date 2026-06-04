@@ -3,7 +3,7 @@
 from autodoc.data.tables import FileTemplate
 
 from .base import StorageService
-from .dropbox import DropboxStorageService
+# from .dropbox import DropboxStorageService
 from .linux import LinuxStorageService
 from .s3 import S3StorageService
 from .sharepoint import SharePointSiteStorageService
@@ -14,7 +14,7 @@ storage_service_class_map = {
     "Linux Share": LinuxStorageService,
     "S3": S3StorageService,
     "SharePoint": SharePointSiteStorageService,
-    "Dropbox": DropboxStorageService,
+    # "Dropbox": DropboxStorageService,
 }
 
 
