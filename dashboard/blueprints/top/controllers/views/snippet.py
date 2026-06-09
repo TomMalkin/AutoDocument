@@ -204,6 +204,8 @@ def get_system_prompt():
 def input_storage_instance_form_snippet():
     """Return a form snippet based on the type of storage instance."""
     storage_instance_id_str = request.args.get("option")
+    source_id_str = request.args.get("source_id")
+
 
     if not storage_instance_id_str:
         return render_template_string("")
@@ -214,25 +216,35 @@ def input_storage_instance_form_snippet():
 
     manager = get_db_manager()
 
+    existing_location = None
+    existing_bucket = None
+
+    if source_id_str:
+        source_id = int(source_id_str)
+        source = manager.sources.get(source_id=source_id)
+        if source and source.file_template and source.file_template.StorageInstanceId == storage_instance_id:
+            existing_location = source.file_template.Location
+            existing_bucket = source.file_template.Bucket
+
     if storage_instance_id == -1:
-        snippet_file = "upload.html"
-        root_path = None
+        return render_template("top/snippets/upload.html")
 
-    else:
-        storage_instance = manager.storage_instances.get(storage_instance_id=storage_instance_id)
 
-        if storage_instance:
-            snippet_file_map = {
-                "Linux Share": "file_system.html",
-                "Windows Share": "file_system.html",
-                "S3": "s3.html",
-                "SharePoint": "sharepoint.html",
-            }
-            snippet_file = snippet_file_map.get(storage_instance.storage_type.Name)
-            root_path = storage_instance.RemotePath
 
-        else:
-            raise
+    storage_instance = manager.storage_instances.get(storage_instance_id=storage_instance_id)
+
+    if not storage_instance:
+        raise ValueError(f"Storage instance {storage_instance_id} not found.")
+
+
+    snippet_file_map = {
+        "Linux Share": "file_system.html",
+        "Windows Share": "file_system.html",
+        "S3": "s3.html",
+        "SharePoint": "sharepoint.html",
+    }
+    snippet_file = snippet_file_map.get(storage_instance.storage_type.Name)
+    root_path = storage_instance.RemotePath
 
     snippet_path = f"top/snippets/{snippet_file}"
-    return render_template(snippet_path, root_path=root_path)
+    return render_template(snippet_path, root_path=root_path, location=existing_location, bucket=existing_bucket)

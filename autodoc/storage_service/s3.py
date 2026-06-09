@@ -21,6 +21,9 @@ class S3StorageService(StorageService):
 
         self.temp_file_name: str = ""
 
+        if not url.startswith(("http://", "https://")):
+            url = f"https://{url}"
+
         self.client = boto3.client(
             "s3",
             endpoint_url=url,
@@ -30,6 +33,11 @@ class S3StorageService(StorageService):
         )
 
         self.filename = ""
+
+    @property
+    def path(self) -> Path:
+        """For consistency."""
+        return Path(self.filename)
 
     def get_file(self) -> Path:
         """Get a file, return a path that can be used in an open() function."""

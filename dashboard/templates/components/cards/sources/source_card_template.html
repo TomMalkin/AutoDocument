@@ -71,7 +71,7 @@
     <!-- Extra Details -->
     <div>
         {% block multi %}
-            {% if source.Splitter %}
+            {% if source.IsSplitter %}
                 <div class="p-2 bg-slate-200 border-t border-slate-200">
                     <div class="text-slate-700 flex">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +89,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if not source.Splitter %}
+            {% if not source.IsSplitter %}
                 <div class="p-2 bg-slate-200 border-t border-slate-200">
                     <div class="text-slate-700 flex">
                         <svg xmlns="http://www.w3.org/2000/svg"

@@ -2,31 +2,30 @@
 
 from typing import Optional
 
-from sqlalchemy import ForeignKey, Numeric, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, Numeric, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from .base import Base
 
-
-class SQLFields(Base):
-    """
-    List replaceable fields found in SQL text sources.
-
-    For example, if a statement is uploaded with:
-
-    Select Client.Name
-    from Client
-    where Client.Id = :client_id
-
-    Then 'client_id' is extracted and saved in this table.
-    """
-
-    __tablename__ = "SQLFields"
-    Id: Mapped[int] = mapped_column(primary_key=True)
-    SourceId: Mapped[int] = mapped_column(ForeignKey("Source.Id"))
-    FieldName: Mapped[str] = mapped_column(Text)
-
-    source: Mapped["Source"] = relationship(back_populates="fields")
+# class SQLFields(Base):
+#     """
+#     List replaceable fields found in SQL text sources.
+#
+#     For example, if a statement is uploaded with:
+#
+#     Select Client.Name
+#     from Client
+#     where Client.Id = :client_id
+#
+#     Then 'client_id' is extracted and saved in this table.
+#     """
+#
+#     __tablename__ = "SQLFields"
+#     Id: Mapped[int] = mapped_column(primary_key=True)
+#     SourceId: Mapped[int] = mapped_column(ForeignKey("Source.Id"))
+#     FieldName: Mapped[str] = mapped_column(Text)
+#
+#     source: Mapped["DatabaseSource"] = relationship("DatabaseSource", back_populates="fields")
 
 
 class FormField(Base):
@@ -57,18 +56,10 @@ class Workflow(Base):
     Id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     Name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
 
-    instances: Mapped[list["WorkflowInstance"]] = relationship(
-        back_populates="workflow", cascade="all, delete-orphan"
-    )
-    sources: Mapped[list["Source"]] = relationship(
-        back_populates="workflow", cascade="all, delete-orphan"
-    )
-    outcomes: Mapped[list["Outcome"]] = relationship(
-        back_populates="workflow", cascade="all, delete-orphan"
-    )
-    form_fields: Mapped[list["FormField"]] = relationship(
-        back_populates="workflow", cascade="all, delete-orphan"
-    )
+    instances: Mapped[list["WorkflowInstance"]] = relationship(back_populates="workflow", cascade="all, delete-orphan")
+    sources: Mapped[list["Source"]] = relationship(back_populates="workflow", cascade="all, delete-orphan")
+    outcomes: Mapped[list["Outcome"]] = relationship(back_populates="workflow", cascade="all, delete-orphan")
+    form_fields: Mapped[list["FormField"]] = relationship(back_populates="workflow", cascade="all, delete-orphan")
 
     @property
     def has_download(self) -> bool:
@@ -105,9 +96,7 @@ class WorkflowInstance(Base):
     def is_complete(self) -> bool:
         """Return if this instance is complete."""
         """NOT NEEDED, DELETE"""
-        return all(
-            [outcome_instance.Status == "Complete" for outcome_instance in self.outcome_instances]
-        )
+        return all([outcome_instance.Status == "Complete" for outcome_instance in self.outcome_instances])
 
 
 # class WorkflowInstanceEvent(Base):
@@ -135,7 +124,7 @@ class DatabaseMetaSource(Base):
     Name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     ConnectionString: Mapped[str] = mapped_column(Text, nullable=False)
 
-    sources: Mapped[list["Source"]] = relationship(back_populates="database")
+    sources: Mapped[list["DatabaseSource"]] = relationship(back_populates="database")
 
 
 class OutcomeType(Base):
@@ -207,7 +196,7 @@ class FileTemplate(Base):
         back_populates="output_file_template", foreign_keys="Outcome.OutputFileTemplateId"
     )
 
-    source: Mapped["Source"] = relationship(back_populates="file_template")
+    source: Mapped[Optional["Source"]] = relationship("Source", back_populates="file_template")
 
     @property
     def is_download(self) -> bool:
@@ -246,9 +235,7 @@ class Outcome(Base):
         back_populates="output_file_template", foreign_keys=OutputFileTemplateId
     )
 
-    instances: Mapped[list["OutcomeInstance"]] = relationship(
-        back_populates="outcome", cascade="all, delete-orphan"
-    )
+    instances: Mapped[list["OutcomeInstance"]] = relationship(back_populates="outcome", cascade="all, delete-orphan")
 
     @property
     def is_download(self) -> bool:
@@ -256,50 +243,155 @@ class Outcome(Base):
         return not self.output_file_template or self.output_file_template.StorageInstanceId == -1
 
 
+# class Source(Base):
+#     """Represents a data source for a workflow."""
+#
+#     __tablename__ = "Source"
+#     Id: Mapped[int] = mapped_column(primary_key=True)
+#     WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"))
+#     TypeId: Mapped[int] = mapped_column(ForeignKey("SourceType.Id"))
+#     FileTemplateId: Mapped[int] = mapped_column(ForeignKey("FileTemplate.Id"), nullable=True)
+#     # ZIndex: Mapped[int]
+#     DatabaseId: Mapped[int] = mapped_column(ForeignKey(DatabaseMetaSource.Id), nullable=True)
+#     SQLText: Mapped[str] = mapped_column(Text, nullable=True)
+#     Splitter: Mapped[int] = mapped_column(default=0)
+#     FieldName: Mapped[str] = mapped_column(Text, nullable=True)
+#     Step: Mapped[int] = mapped_column(default=1, nullable=False)
+#     KeyField: Mapped[str] = mapped_column(Text, nullable=True)
+#     ValueField: Mapped[str] = mapped_column(Text, nullable=True)
+#     Orientation: Mapped[str] = mapped_column(Text, nullable=True)
+#     Name: Mapped[str] = mapped_column(Text, nullable=True)
+#     SheetName: Mapped[str] = mapped_column(Text, nullable=True)
+#     HeaderRow: Mapped[int] = mapped_column(nullable=True)
+#
+#     LLMId: Mapped[int] = mapped_column(ForeignKey("LLM.Id"), nullable=True)
+#     llm: Mapped["LLM"] = relationship("LLM", back_populates="sources")
+#
+#     LLMPromptTemplate: Mapped[str] = mapped_column(Text, nullable=True)
+#     LLMSystemPrompt: Mapped[str] = mapped_column(Text, nullable=True)
+#
+#     workflow: Mapped["Workflow"] = relationship("Workflow", back_populates="sources")
+#     source_type: Mapped["SourceType"] = relationship("SourceType", back_populates="sources")
+#     database: Mapped["DatabaseMetaSource"] = relationship("DatabaseMetaSource", back_populates="sources")
+#     file_template: Mapped["FileTemplate"] = relationship("FileTemplate", back_populates="source")
+#     fields: Mapped[list["SQLFields"]] = relationship(back_populates="source")
+#
+#     instances: Mapped[list["SourceInstance"]] = relationship(back_populates="source", cascade="all, delete-orphan")
+#
+#     @property
+#     def system_prompt(self):
+#         """Get the system prompt which may have been overridden by the source."""
+#         return self.LLMSystemPrompt or self.llm.SystemPrompt
+
+
+# ------------------------
+# Polymorphic Source setup
+# ------------------------
+
+
+class MultiRecordMixin:
+    """Validator Mixin for multi record sub sources that require a field name if IsSplitter = False."""
+
+    IsSplitter: Mapped[bool] = mapped_column(nullable=False)
+    FieldName: Mapped[str] = mapped_column(Text, nullable=True)
+
+    @validates("FieldName")
+    def validate_field_name(self, _, value):
+        """Validate that FieldName is not empty when IsSplitter is False."""
+        if not self.IsSplitter and not value:
+            raise ValueError("FieldName is required when IsSplitter is False")
+        return value
+
+    # @validates("IsSplitter")
+    # def validate_is_splitter(self, _, value):
+    #     """Validate that IsSplitter isn't set to False when FieldName is empty."""
+    #     if not value and not self.FieldName:
+    #         raise ValueError("FieldName is required when IsSplitter is False")
+    #     return value
+
+
 class Source(Base):
-    """Represents a data source for a workflow."""
+    """Base Source."""
 
     __tablename__ = "Source"
+
     Id: Mapped[int] = mapped_column(primary_key=True)
     WorkflowId: Mapped[int] = mapped_column(ForeignKey("Workflow.Id"))
     TypeId: Mapped[int] = mapped_column(ForeignKey("SourceType.Id"))
-    FileTemplateId: Mapped[int] = mapped_column(ForeignKey("FileTemplate.Id"), nullable=True)
-    # ZIndex: Mapped[int]
-    DatabaseId: Mapped[int] = mapped_column(ForeignKey(DatabaseMetaSource.Id), nullable=True)
-    SQLText: Mapped[str] = mapped_column(Text, nullable=True)
-    Splitter: Mapped[int] = mapped_column(default=0)
-    FieldName: Mapped[str] = mapped_column(Text, nullable=True)
-    Step: Mapped[int] = mapped_column(default=1, nullable=False)
-    KeyField: Mapped[str] = mapped_column(Text, nullable=True)
-    ValueField: Mapped[str] = mapped_column(Text, nullable=True)
-    Orientation: Mapped[str] = mapped_column(Text, nullable=True)
     Name: Mapped[str] = mapped_column(Text, nullable=True)
+    Step: Mapped[int] = mapped_column(default=1, nullable=False)
+
+    # Optional File Template Relationship if the Source type needs it
+    FileTemplateId: Mapped[int] = mapped_column(ForeignKey("FileTemplate.Id"), nullable=True)
+    file_template: Mapped[Optional["FileTemplate"]] = relationship("FileTemplate", back_populates="source")
+
+    # polymorphic discrimination
+    discriminator: Mapped[str] = mapped_column(String(50))  # options are excel, csv, database, llm
+    __mapper_args__ = {"polymorphic_on": "discriminator", "polymorphic_identity": "base"}
+
+    # relationships
+    workflow: Mapped["Workflow"] = relationship("Workflow", back_populates="sources")
+    source_type: Mapped["SourceType"] = relationship("SourceType", back_populates="sources")
+    instances: Mapped[list["SourceInstance"]] = relationship(back_populates="source", cascade="all, delete-orphan")
+
+
+class CSVSource(Source, MultiRecordMixin):
+    """CSV Source."""
+
+    __tablename__ = "SourceCSV"
+
+    Id: Mapped[int] = mapped_column(ForeignKey("Source.Id"), primary_key=True)
+
+    __mapper_args__ = {"polymorphic_identity": "csv"}
+
+
+class ExcelSource(Source, MultiRecordMixin):
+    """Excel Source."""
+
+    __tablename__ = "SourceExcel"
+
+    Id: Mapped[int] = mapped_column(ForeignKey("Source.Id"), primary_key=True)
     SheetName: Mapped[str] = mapped_column(Text, nullable=True)
     HeaderRow: Mapped[int] = mapped_column(nullable=True)
 
-    LLMId: Mapped[int] = mapped_column(ForeignKey("LLM.Id"), nullable=True)
-    llm: Mapped["LLM"] = relationship("LLM", back_populates="sources")
+    __mapper_args__ = {"polymorphic_identity": "excel"}
 
+
+class DatabaseSource(Source, MultiRecordMixin):
+    """Database Source."""
+
+    __tablename__ = "SourceDatabase"
+
+    Id: Mapped[int] = mapped_column(ForeignKey("Source.Id"), primary_key=True)
+    DatabaseId: Mapped[int] = mapped_column(ForeignKey("DatabaseMetaSource.Id"))
+    SQLText: Mapped[str] = mapped_column(Text, nullable=True)
+
+    __mapper_args__ = {"polymorphic_identity": "database"}
+
+    database: Mapped["DatabaseMetaSource"] = relationship("DatabaseMetaSource", back_populates="sources")
+
+    # fields: Mapped[list["SQLFields"]] = relationship(back_populates="source")
+
+
+class LLMSource(Source):
+    """LLM Source."""
+
+    __tablename__ = "SourceLLM"
+    Id: Mapped[int] = mapped_column(ForeignKey("Source.Id"), primary_key=True)
+
+    LLMId: Mapped[int] = mapped_column(ForeignKey("LLM.Id"))
     LLMPromptTemplate: Mapped[str] = mapped_column(Text, nullable=True)
     LLMSystemPrompt: Mapped[str] = mapped_column(Text, nullable=True)
 
-    workflow: Mapped["Workflow"] = relationship("Workflow", back_populates="sources")
-    source_type: Mapped["SourceType"] = relationship("SourceType", back_populates="sources")
-    database: Mapped["DatabaseMetaSource"] = relationship(
-        "DatabaseMetaSource", back_populates="sources"
-    )
-    file_template: Mapped["FileTemplate"] = relationship(
-        "FileTemplate", back_populates="source"
-    )
-    fields: Mapped[list["SQLFields"]] = relationship(back_populates="source")
+    FieldName: Mapped[str] = mapped_column(Text, nullable=False, default="llm_output")
 
-    instances: Mapped[list["SourceInstance"]] = relationship(
-        back_populates="source", cascade="all, delete-orphan"
-    )
+    __mapper_args__ = {"polymorphic_identity": "llm"}
+
+    llm: Mapped["LLM"] = relationship("LLM", back_populates="sources")
 
     @property
     def system_prompt(self):
-        """Get the system prompt which may have been overridden by the source."""
+        """Get the system prompt which defaults to the llm settings if this source isn't overwritten."""
         return self.LLMSystemPrompt or self.llm.SystemPrompt
 
 
@@ -333,7 +425,7 @@ class LLM(Base):
     # this is the default system prompt unless another is specified at the source level
     SystemPrompt: Mapped[str] = mapped_column(Text, nullable=True)
 
-    sources: Mapped[list["Source"]] = relationship(back_populates="llm")
+    sources: Mapped[list["LLMSource"]] = relationship(back_populates="llm")
 
 
 class SourceInstance(Base):
@@ -346,9 +438,7 @@ class SourceInstance(Base):
     source: Mapped["Source"] = relationship("Source", back_populates="instances")
 
     InstanceId: Mapped[int] = mapped_column(ForeignKey(WorkflowInstance.Id), nullable=False)
-    workflow_instance: Mapped["WorkflowInstance"] = relationship(
-        "WorkflowInstance", back_populates="source_instances"
-    )
+    workflow_instance: Mapped["WorkflowInstance"] = relationship("WorkflowInstance", back_populates="source_instances")
 
     Status: Mapped[str] = mapped_column(Text, nullable=False, default="Ongoing")
 
@@ -363,9 +453,7 @@ class OutcomeInstance(Base):
     outcome: Mapped["Outcome"] = relationship("Outcome", back_populates="instances")
 
     InstanceId: Mapped[int] = mapped_column(ForeignKey(WorkflowInstance.Id), nullable=False)
-    workflow_instance: Mapped["WorkflowInstance"] = relationship(
-        "WorkflowInstance", back_populates="outcome_instances"
-    )
+    workflow_instance: Mapped["WorkflowInstance"] = relationship("WorkflowInstance", back_populates="outcome_instances")
 
     Status: Mapped[str] = mapped_column(Text, nullable=False, default="Ongoing")
     RenderedName: Mapped[str] = mapped_column(Text, nullable=False, default="Ongoing")

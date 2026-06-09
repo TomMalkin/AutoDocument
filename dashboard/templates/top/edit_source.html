@@ -31,9 +31,6 @@
                 </div>
             </details>
         </div>
-
-
-
         <div class="border border-slate-300 rounded-lg p-2 my-2 bg-slate-200">
             {# These fields are handled by the components below so ignore in the dynamic list #}
             {% set accessor_fields = ["name", "bucket", "location"] %}
@@ -49,14 +46,6 @@
                         {{ field(rows=5, class='p-2 w-full rounded-lg bg-white border-slate-300 text-slate-700') }}
                     {% else %}
                         {{ field(class='p-2 w-96 rounded-lg bg-white border-slate-300 text-slate-700') }}
-                    {% endif %}
-                    {% if field.label.text == 'Key Field' %}
-                        <div class="col-span-1 mb-6"></div>
-                        <div class="italic text-sm mb-6">The name of the column that can be referenced in templates.</div>
-                    {% endif %}
-                    {% if field.label.text == 'Value Field' %}
-                        <div class="col-span-1"></div>
-                        <div class="italic text-sm">The values that will be inserted to the template.</div>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -76,9 +65,9 @@
                             Uploaded during Workflow
                         </option>
                         {% for storage_instance in storage_instances %}
-                            <option value="{{ storage_instance.Id }}">
-                                ({{ storage_instance.storage_type.Name }}) {{
-                                storage_instance.RemotePath or storage_instance.URL}}
+                            <option value="{{ storage_instance.Id }}"
+                                    {% if source.file_template and source.file_template.StorageInstanceId == storage_instance.Id %}selected{% endif %}>
+                                ({{ storage_instance.storage_type.Name }}) {{ storage_instance.RemotePath or storage_instance.URL }}
                             </option>
                         {% endfor %}
                     </select>
@@ -95,7 +84,7 @@
                                    name="splitter_choice"
                                    id="splitter"
                                    value="splitter"
-                                   checked>
+                                   {% if form.splitter_choice.data == 'splitter' %}checked{% endif %}>
                             {% include "svg/icons/iterator.html" %}
                             Iterator
                         </div>
@@ -109,7 +98,8 @@
                                    name="splitter_choice"
                                    id="field"
                                    class="peer/field"
-                                   value="field">
+                                   value="field"
+                                   {% if form.splitter_choice.data == 'field' %}checked{% endif %}>
                             {% include "svg/icons/multifield.html" %}
                             Field
                         </div>
@@ -120,7 +110,8 @@
                             <input class="mt-1.5 p-2 w-full rounded-lg bg-white border-slate-300 text-slate-700 sm:text-sm"
                                    id="field_name"
                                    name="field_name"
-                                   type="text">
+                                   type="text"
+                                   value="{{ form.field_name.data or '' }}">
                         </label>
                     </label>
                 </fieldset>
@@ -129,24 +120,5 @@
                 {{ form.submit(class='mt-1.5 rounded-lg border bg-sky-800 hover:bg-sky-700 px-12 py-3 font-semibold text-slate-100 focus:outline-none focus:ring cursor-pointer') }}
             </div>
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
     </form>
 {% endblock content %}

@@ -49,8 +49,8 @@ class OutcomeService(ABC):
         template = self.outcome.output_file_template
         self.output_storage_service = get_storage_service(file_template=template)
 
-        if self.output_storage_service:
-            self.template_path = self.output_storage_service.get_file()
+        # if self.output_storage_service:
+        #     self.template_path = self.output_storage_service.get_file()
 
     @abstractmethod
     def render(self, data: dict) -> None:
