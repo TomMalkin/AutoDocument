@@ -71,7 +71,7 @@ class SourceLoader:
                 source_service.load_data(current_data=context)
 
                 if source_service.is_multi_record:
-                    if source_service.source.Splitter:
+                    if source_service.source.IsSplitter:
                         for record in source_service.data:
                             merged = context.copy()
                             merged.update(record)

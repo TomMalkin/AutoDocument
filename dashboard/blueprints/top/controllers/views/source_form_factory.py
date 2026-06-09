@@ -2,19 +2,13 @@
 
 from typing import Optional
 
-from flask import Blueprint
-
 from autodoc.data.tables import SourceType
 from dashboard.database import DatabaseManager
 
 from ...forms import ADD_SOURCE_FORMS
 
-bp = Blueprint("source", __name__)
 
-
-def create_source_form(
-    manager: DatabaseManager, source_type: SourceType, initial_data: Optional[dict] = None
-):
+def create_source_form(manager: DatabaseManager, source_type: SourceType, initial_data: Optional[dict] = None):
     """Create a Form for adding or editting a Source."""
     form_type = ADD_SOURCE_FORMS.get(source_type.Name)
 
@@ -33,7 +27,6 @@ def create_source_form(
     if hasattr(form, "llm"):
         llms = manager.llms.get_all()
         llm_choices = [(llm.Id, f"{llm.provider.CommonName}: {llm.ModelName}") for llm in llms]
-
         form.llm.choices = llm_choices
 
     return form

@@ -37,22 +37,23 @@ def upgrade() -> None:
     conn = op.get_bind()
 
     new_types = [
-        ("Database", 0),
-        ("CSV", 1),
-        ("Excel", 1),
+        ("Database", 0, 1),
+        ("CSV", 1, 1),
+        ("Excel", 1, 1),
+        ("LLM", 0, 0),
     ]
 
     # 1) Ensure new types exist
-    for name, is_file in new_types:
+    for name, is_file, is_multi in new_types:
         conn.execute(
             sa.text("""
                 INSERT INTO SourceType (Name, IsSlow, IsFile, IsMulti)
-                SELECT :name, 0, :is_file, 1
+                SELECT :name, 0, :is_file, :is_multi
                 WHERE NOT EXISTS (
                     SELECT 1 FROM SourceType WHERE Name = :name
                 )
             """),
-            {"name": name, "is_file": is_file},
+            {"name": name, "is_file": is_file, "is_multi": is_multi},
         )
 
     # 2) update current sources to the new type Ids

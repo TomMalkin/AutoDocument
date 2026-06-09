@@ -41,6 +41,8 @@ def create_app(template_folder="templates", static_folder="static") -> Flask:
     template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
     static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
+    # print(f"Running with DB_PATH={DB_PATH}")
+
     app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
     app.config["SECRET_KEY"] = "any secret string"
     # app.config["UPLOAD_DIR"] = UPLOAD_DIR

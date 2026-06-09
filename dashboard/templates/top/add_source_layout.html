@@ -8,6 +8,18 @@
             {% include "components/side-menu.html" %}
             <!-- Main content -->
             <div class="col-span-6 flex-1 p-6 space-y-6">
+                <!-- Flashed Messages Section -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="space-y-4">
+                            {% for category, message in messages %}
+                                <div class="p-4 rounded-lg {{ 'bg-green-100 text-green-800 border-l-4 border-green-500' if category == 'success' else 'bg-red-100 text-red-800 border-l-4 border-red-500' }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
                 <div class="flex gap-2 items-center">
                     <a href="{{ url_for('top.workflow.workflow', workflow_id=workflow_id) }}"
                        class="border p-2 rounded-lg bg-sky-800 hover:bg-sky-700 text-slate-50">
@@ -21,7 +33,8 @@
                         </svg>
                     </a>
                     <h1 class="text-3xl font-semibold text-slate-700">
-                        {% block title %}{% endblock %}
+                        {% block title %}
+                        {% endblock %}
                     </h1>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">

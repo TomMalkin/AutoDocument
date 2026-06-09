@@ -12,7 +12,6 @@ from .repositories import (
     OutcomeTypeRepository,
     SourceRepository,
     SourceTypeRepository,
-    SQLFieldsRepository,
     StorageInstanceRepository,
     StorageTypeRepository,
     WorkflowInstanceRepository,
@@ -30,7 +29,7 @@ class DatabaseManager:
     def __init__(self, db_file: str):
         """Create a Database Manager with a given db_file."""
         self.engine = create_engine(f"sqlite:///{db_file}")
-        Base.metadata.create_all(self.engine)
+        # Base.metadata.create_all(self.engine)
         self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         self._session: Session | None = None
 
@@ -50,10 +49,10 @@ class DatabaseManager:
         """Provide access to the ProductRepository for the current session."""
         return SourceRepository(self._get_current_session())
 
-    @property
-    def sql_fields(self) -> SQLFieldsRepository:
-        """Provide access to the SQLFieldsRepository for the current session."""
-        return SQLFieldsRepository(self._get_current_session())
+    # @property
+    # def sql_fields(self) -> SQLFieldsRepository:
+    #     """Provide access to the SQLFieldsRepository for the current session."""
+    #     return SQLFieldsRepository(self._get_current_session())
 
     @property
     def form_fields(self) -> FormFieldRepository:

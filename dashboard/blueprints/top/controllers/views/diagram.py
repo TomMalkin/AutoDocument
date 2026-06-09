@@ -14,7 +14,7 @@ def workflow_diagram():
     manager = get_db_manager()
 
     if not workflow_id:
-        return "TODO"
+        raise ValueError(f"Unknown workflow_id {workflow_id}, cannot construct workflow diagram.")
 
     workflow_id = int(workflow_id)
 

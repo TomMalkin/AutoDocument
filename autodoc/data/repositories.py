@@ -9,10 +9,14 @@ from sqlalchemy.orm import Session
 
 from .tables import (
     LLM,
+    CSVSource,
     DatabaseMetaSource,
+    DatabaseSource,
+    ExcelSource,
     FileTemplate,
     FormField,
     LLMProvider,
+    LLMSource,
     Outcome,
     OutcomeInstance,
     OutcomeType,
@@ -32,10 +36,6 @@ class Repository:
     def __init__(self, session: Session):
         """Create a new repository instance based on a session."""
         self.session = session
-
-
-class SQLFieldsRepository(Repository):
-    """Repository for the SQLFields Table."""
 
 
 class FormFieldRepository(Repository):
@@ -59,9 +59,7 @@ class FormFieldRepository(Repository):
 
     def add(self, workflow_id: int, name: str, label: str, field_type: str) -> FormField:
         """Add a form field to a Workflow."""
-        form_field = FormField(
-            WorkflowId=workflow_id, FieldType=field_type, FieldName=name, FieldLabel=label
-        )
+        form_field = FormField(WorkflowId=workflow_id, FieldType=field_type, FieldName=name, FieldLabel=label)
         self.session.add(form_field)
         self.session.flush()
         return form_field
@@ -137,18 +135,12 @@ class WorkflowInstanceRepository(Repository):
 
     def update_status(self, instance_id: int, status: str):
         """Update the status of an instance."""
-        stmt = (
-            update(WorkflowInstance).where(WorkflowInstance.Id == instance_id).values(Status=status)
-        )
+        stmt = update(WorkflowInstance).where(WorkflowInstance.Id == instance_id).values(Status=status)
         self.session.execute(stmt)
 
     def add_failure_reasons(self, instance_id: int, reasons: str):
         """Update the status of an instance."""
-        stmt = (
-            update(WorkflowInstance)
-            .where(WorkflowInstance.Id == instance_id)
-            .values(FailureReasons=reasons)
-        )
+        stmt = update(WorkflowInstance).where(WorkflowInstance.Id == instance_id).values(FailureReasons=reasons)
         self.session.execute(stmt)
 
     # def add_split(
@@ -384,13 +376,9 @@ class FileTemplateRepository(Repository):
 
         return self.add(storage_instance_id=storage_instance_id, location=location, bucket=bucket)
 
-    def add(
-        self, storage_instance_id: int, location: Optional[str], bucket: Optional[str]
-    ) -> FileTemplate:
+    def add(self, storage_instance_id: int, location: Optional[str], bucket: Optional[str]) -> FileTemplate:
         """Add a new fila access isntance."""
-        file_template = FileTemplate(
-            StorageInstanceId=storage_instance_id, Location=location, Bucket=bucket
-        )
+        file_template = FileTemplate(StorageInstanceId=storage_instance_id, Location=location, Bucket=bucket)
         self.session.add(file_template)
         self.session.flush()
         return file_template
@@ -504,6 +492,13 @@ class SourceRepository(Repository):
         stmt = select(Source).where(Source.Name == name)
         return self.session.scalars(stmt).first()
 
+    def get_by_name_in_workflow(self, name: str, workflow_id: int) -> Optional[Source]:
+        """Get a source by its unique name."""
+        if not name:
+            return None
+        stmt = select(Source).where(Source.Name == name, Source.WorkflowId == workflow_id)
+        return self.session.scalars(stmt).first()
+
     def get_file_uploads(self, workflow_id: int) -> Sequence[Source]:
         """
         Get Sources that require a file upload for a given Workflow.
@@ -523,11 +518,7 @@ class SourceRepository(Repository):
 
     def get_all(self, workflow_id: int) -> Sequence[Source]:
         """Get all sources for a Workflow."""
-        stmt = (
-            select(Source)
-            .where(Source.WorkflowId == workflow_id)
-            .order_by(Source.Step.asc(), Source.Splitter.asc())
-        )
+        stmt = select(Source).where(Source.WorkflowId == workflow_id).order_by(Source.Step.asc())
         return self.session.scalars(stmt).all()
 
     def get_all_from_step(self, workflow_id: int, step: int) -> Sequence[Source]:
@@ -536,25 +527,20 @@ class SourceRepository(Repository):
             select(Source)
             .where(Source.WorkflowId == workflow_id)
             .where(Source.Step >= step)
-            .order_by(Source.Step.asc(), Source.Splitter.asc())
+            .order_by(Source.Step.asc(), Source.IsSplitter.asc())
         )
         return self.session.scalars(stmt).all()
 
     def get_form_source(self, workflow_id: int) -> Optional[Source]:
         """Get the form source for a given Workflow."""
-        stmt = (
-            select(Source)
-            .join(SourceType)
-            .where(Source.WorkflowId == workflow_id)
-            .where(SourceType.Name == "Form")
-        )
+        stmt = select(Source).join(SourceType).where(Source.WorkflowId == workflow_id).where(SourceType.Name == "Form")
         return self.session.scalars(stmt).first()
 
-    def name_exists(self, name) -> bool:
+    def name_exists(self, name: str, workflow_id: int) -> bool:
         """Return if a given name already exists for this Workflow."""
         if not name:
             return False
-        stmt = select(Source).where(Source.Name == name)
+        stmt = select(Source).where(Source.Name == name, Source.WorkflowId == workflow_id)
         return bool(self.session.scalars(stmt).first())
 
     def delete(self, source_id: int):
@@ -563,40 +549,98 @@ class SourceRepository(Repository):
         if source:
             self.session.delete(source)
 
-    def add(
+    def add_csv(
         self,
         workflow_id: int,
         source_type: SourceType,
         step: int,
+        is_splitter: bool,
         file_template_id: Optional[int] = None,
-        name: Optional[str] = None,
-        database_id: Optional[int] = None,
-        sql_text: Optional[str] = None,
-        splitter: Optional[bool] = None,
         field_name: Optional[str] = None,
-        key_field: Optional[str] = None,
-        value_field: Optional[str] = None,
-        orientation: Optional[str] = None,
-        sheet_name: Optional[str] = None,
-        header_row: Optional[int] = None,
-        llm: Optional[LLM] = None,
-        llm_prompt_template: Optional[str] = None,
-        llm_system_prompt: Optional[str] = None,
-    ) -> Source:
-        """Add a new source of any type."""
-        source = Source(
+        name: Optional[str] = None,
+    ) -> CSVSource:
+        """Add a CSVSource."""
+        source = CSVSource(
             WorkflowId=workflow_id,
             TypeId=source_type.Id,
             FileTemplateId=file_template_id,
-            DatabaseId=database_id,
-            SQLText=sql_text,
-            Splitter=splitter,
-            FieldName=field_name,
-            KeyField=key_field,
-            ValueField=value_field,
-            Orientation=orientation,
+            Step=step,
+            Name=name,
+            IsSplitter=is_splitter,
+            FieldName=field_name if not is_splitter else None,
+        )
+        self.session.add(source)
+        self.session.flush()
+        return source
+
+    def add_excel(
+        self,
+        workflow_id: int,
+        source_type: SourceType,
+        step: int,
+        is_splitter: bool,
+        file_template_id: Optional[int] = None,
+        field_name: Optional[str] = None,
+        sheet_name: Optional[str] = None,
+        header_row: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> ExcelSource:
+        """Add an ExcelSource."""
+        source = ExcelSource(
+            WorkflowId=workflow_id,
+            TypeId=source_type.Id,
+            FileTemplateId=file_template_id,
+            Step=step,
+            Name=name,
+            IsSplitter=is_splitter,
+            FieldName=field_name if not is_splitter else None,
             SheetName=sheet_name,
             HeaderRow=header_row,
+        )
+        self.session.add(source)
+        self.session.flush()
+        return source
+
+    def add_database(
+        self,
+        workflow_id: int,
+        source_type: SourceType,
+        step: int,
+        is_splitter: bool,
+        database_id: int,
+        sql_text: Optional[str] = None,
+        field_name: Optional[str] = None,
+        name: Optional[str] = None,
+    ) -> DatabaseSource:
+        """Add a Database Source."""
+        source = DatabaseSource(
+            WorkflowId=workflow_id,
+            TypeId=source_type.Id,
+            Step=step,
+            Name=name,
+            IsSplitter=is_splitter,
+            DatabaseId=database_id,
+            SQLText=sql_text,
+            FieldName=field_name if not is_splitter else None,
+        )
+        self.session.add(source)
+        self.session.flush()
+        return source
+
+    def add_llm(
+        self,
+        workflow_id: int,
+        source_type: SourceType,
+        step: int,
+        llm: LLM,
+        llm_prompt_template: Optional[str] = None,
+        llm_system_prompt: Optional[str] = None,
+        name: Optional[str] = None,
+    ) -> LLMSource:
+        """Add an LLMSource."""
+        source = LLMSource(
+            WorkflowId=workflow_id,
+            TypeId=source_type.Id,
             Step=step,
             Name=name,
             llm=llm,
@@ -607,47 +651,175 @@ class SourceRepository(Repository):
         self.session.flush()
         return source
 
-    def update(
+    # def add(
+    #     self,
+    #     workflow_id: int,
+    #     source_type: SourceType,
+    #     step: int,
+    #     file_template_id: Optional[int] = None,
+    #     name: Optional[str] = None,
+    #     database_id: Optional[int] = None,
+    #     sql_text: Optional[str] = None,
+    #     splitter: Optional[bool] = None,
+    #     field_name: Optional[str] = None,
+    #     key_field: Optional[str] = None,
+    #     value_field: Optional[str] = None,
+    #     orientation: Optional[str] = None,
+    #     sheet_name: Optional[str] = None,
+    #     header_row: Optional[int] = None,
+    #     llm: Optional[LLM] = None,
+    #     llm_prompt_template: Optional[str] = None,
+    #     llm_system_prompt: Optional[str] = None,
+    # ) -> Source:
+    #     """Add a new source of any type."""
+    #     source = Source(
+    #         WorkflowId=workflow_id,
+    #         TypeId=source_type.Id,
+    #         FileTemplateId=file_template_id,
+    #         DatabaseId=database_id,
+    #         SQLText=sql_text,
+    #         Splitter=splitter,
+    #         FieldName=field_name,
+    #         KeyField=key_field,
+    #         ValueField=value_field,
+    #         Orientation=orientation,
+    #         SheetName=sheet_name,
+    #         HeaderRow=header_row,
+    #         Step=step,
+    #         Name=name,
+    #         llm=llm,
+    #         LLMPromptTemplate=llm_prompt_template,
+    #         LLMSystemPrompt=llm_system_prompt,
+    #     )
+    #     self.session.add(source)
+    #     self.session.flush()
+    #     return source
+
+    # def update(
+    #     self,
+    #     source_id: int,
+    #     step: int,
+    #     file_template_id: Optional[int] = None,
+    #     name: Optional[str] = None,
+    #     database_id: Optional[int] = None,
+    #     sql_text: Optional[str] = None,
+    #     splitter: Optional[bool] = False,
+    #     field_name: Optional[str] = None,
+    #     key_field: Optional[str] = None,
+    #     value_field: Optional[str] = None,
+    #     orientation: Optional[str] = None,
+    #     sheet_name: Optional[str] = None,
+    #     header_row: Optional[int] = None,
+    #     llm: Optional[LLM] = None,
+    #     llm_prompt_template: Optional[str] = None,
+    #     llm_system_prompt: Optional[str] = None,
+    # ) -> Source:
+    #     """Update the given source."""
+    #     source = self.get(source_id=source_id)
+    #
+    #     if source:
+    #         source.Step = step or source.Step
+    #         source.FileTemplateId = file_template_id or source.FileTemplateId
+    #         source.Name = name or source.Name
+    #         source.DatabaseId = database_id or source.DatabaseId
+    #         source.SQLText = sql_text or source.SQLText
+    #         source.Splitter = splitter or source.Splitter
+    #         source.FieldName = field_name or source.FieldName
+    #         source.KeyField = key_field or source.KeyField
+    #         source.ValueField = value_field or source.ValueField
+    #         source.Orientation = orientation or source.Orientation
+    #         source.SheetName = sheet_name or source.SheetName
+    #         source.HeaderRow = header_row or source.HeaderRow
+    #         source.LLM = llm or source.LLM
+    #         source.LLMPromptTemplate = llm_prompt_template or source.LLMPromptTemplate
+    #         source.LLMSystemPrompt = llm_system_prompt or source.LLMSystemPrompt
+    #
+    #         self.session.flush()
+    #
+    #     return source
+
+    def update_csv(
         self,
         source_id: int,
         step: int,
+        is_splitter: bool,
         file_template_id: Optional[int] = None,
-        name: Optional[str] = None,
-        database_id: Optional[int] = None,
-        sql_text: Optional[str] = None,
-        splitter: Optional[bool] = False,
         field_name: Optional[str] = None,
-        key_field: Optional[str] = None,
-        value_field: Optional[str] = None,
-        orientation: Optional[str] = None,
+        name: Optional[str] = None,
+    ) -> CSVSource:
+        """Update a CSVSource."""
+        # source = cast(CSVSource, self.get(source_id=source_id))
+        source = self.get(source_id=source_id)
+        assert isinstance(source, CSVSource)
+        source.Step = step
+        source.Name = name
+        source.FileTemplateId = file_template_id
+        source.IsSplitter = is_splitter
+        source.FieldName = field_name if not is_splitter else None
+        self.session.flush()
+        return source
+
+    def update_excel(
+        self,
+        source_id: int,
+        step: int,
+        is_splitter: bool,
+        file_template_id: Optional[int] = None,
+        field_name: Optional[str] = None,
         sheet_name: Optional[str] = None,
         header_row: Optional[int] = None,
-        llm: Optional[LLM] = None,
+        name: Optional[str] = None,
+    ) -> ExcelSource:
+        """Update an ExcelSource."""
+        source = self.get(source_id=source_id)
+        source.Step = step
+        source.Name = name
+        source.FileTemplateId = file_template_id
+        source.IsSplitter = is_splitter
+        source.FieldName = field_name if not is_splitter else None
+        source.SheetName = sheet_name
+        source.HeaderRow = header_row
+        self.session.flush()
+        return source
+
+    def update_database(
+        self,
+        source_id: int,
+        step: int,
+        is_splitter: bool,
+        database_id: int,
+        sql_text: Optional[str] = None,
+        field_name: Optional[str] = None,
+        name: Optional[str] = None,
+    ) -> DatabaseSource:
+        """Update a DatabaseSource."""
+        source = self.get(source_id=source_id)
+        source.Step = step
+        source.Name = name
+        source.IsSplitter = is_splitter
+        source.DatabaseId = database_id
+        source.SQLText = sql_text
+        source.FieldName = field_name
+        self.session.flush()
+        return source
+
+    def update_llm(
+        self,
+        source_id: int,
+        step: int,
+        llm: LLM,
         llm_prompt_template: Optional[str] = None,
         llm_system_prompt: Optional[str] = None,
-    ) -> Source:
-        """Update the given source."""
+        name: Optional[str] = None,
+    ) -> LLMSource:
+        """Update an LLMSource."""
         source = self.get(source_id=source_id)
-
-        if source:
-            source.Step = step or source.Step
-            source.FileTemplateId = file_template_id or source.FileTemplateId
-            source.Name = name or source.Name
-            source.DatabaseId = database_id or source.DatabaseId
-            source.SQLText = sql_text or source.SQLText
-            source.Splitter = splitter or source.Splitter
-            source.FieldName = field_name or source.FieldName
-            source.KeyField = key_field or source.KeyField
-            source.ValueField = value_field or source.ValueField
-            source.Orientation = orientation or source.Orientation
-            source.SheetName = sheet_name or source.SheetName
-            source.HeaderRow = header_row or source.HeaderRow
-            source.LLM = llm or source.LLM
-            source.LLMPromptTemplate = llm_prompt_template or source.LLMPromptTemplate
-            source.LLMSystemPrompt = llm_system_prompt or source.LLMSystemPrompt
-
-            self.session.flush()
-
+        source.Step = step
+        source.Name = name
+        source.LLM = llm
+        source.LLMPromptTemplate = llm_prompt_template
+        source.LLMSystemPrompt = llm_system_prompt
+        self.session.flush()
         return source
 
 
@@ -685,9 +857,7 @@ class LLMProviderRepository(Repository):
             LLMProvider(CommonName="Huggingface", LangChainName="huggingface"),
             LLMProvider(CommonName="Groq", LangChainName="groq"),
             LLMProvider(CommonName="Ollama", LangChainName="ollama"),
-            LLMProvider(
-                CommonName="Google Anthropic Vertex", LangChainName="google_anthropic_vertex"
-            ),
+            LLMProvider(CommonName="Google Anthropic Vertex", LangChainName="google_anthropic_vertex"),
             LLMProvider(CommonName="Deepseek", LangChainName="deepseek"),
             LLMProvider(CommonName="IBM", LangChainName="ibm"),
             LLMProvider(CommonName="Nvidia", LangChainName="nvidia"),
@@ -729,9 +899,7 @@ class LLMRepository(Repository):
         if llm:
             self.session.delete(llm)
 
-    def add(
-        self, provider: LLMProvider, model: str, base_url: str, api_key: str, system_prompt: str
-    ) -> LLM:
+    def add(self, provider: LLMProvider, model: str, base_url: str, api_key: str, system_prompt: str) -> LLM:
         """Add a form field to a Workflow."""
         llm = LLM(
             provider=provider,
@@ -766,11 +934,7 @@ class SourceInstanceRepository(Repository):
 
     def set_loaded(self, source_instance_id: int) -> None:
         """Set a given SourceInstance as 'loaded'."""
-        stmt = (
-            update(SourceInstance)
-            .where(SourceInstance.Id == source_instance_id)
-            .values(Status="Loaded")
-        )
+        stmt = update(SourceInstance).where(SourceInstance.Id == source_instance_id).values(Status="Loaded")
         self.session.execute(stmt)
 
 
@@ -795,18 +959,12 @@ class OutcomeInstanceRepository(Repository):
 
     def set_complete(self, outcome_instance_id: int) -> None:
         """Set a given OutcomeInstance as 'loaded'."""
-        stmt = (
-            update(OutcomeInstance)
-            .where(OutcomeInstance.Id == outcome_instance_id)
-            .values(Status="Complete")
-        )
+        stmt = update(OutcomeInstance).where(OutcomeInstance.Id == outcome_instance_id).values(Status="Complete")
         self.session.execute(stmt)
 
     def set_rendered_name(self, outcome_instance_id: int, rendered_name: str) -> None:
         """Set the RenderedName of a given OutcomeInstance."""
         stmt = (
-            update(OutcomeInstance)
-            .where(OutcomeInstance.Id == outcome_instance_id)
-            .values(RenderedName=rendered_name)
+            update(OutcomeInstance).where(OutcomeInstance.Id == outcome_instance_id).values(RenderedName=rendered_name)
         )
         self.session.execute(stmt)

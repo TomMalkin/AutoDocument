@@ -35,6 +35,11 @@ class SharePointSiteStorageService(StorageService):
         self.filename = ""
         self.temp_file_name = ""
 
+    @property
+    def path(self) -> Path:
+        """For consistency."""
+        return Path(self.filename)
+
     def render(self, data: dict):
         """Render the appropriate fields in this class with the finalised data."""
         self.filename = Template(self.relative_file_path).render(**data)
